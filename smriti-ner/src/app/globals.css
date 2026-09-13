@@ -1,0 +1,127 @@
+/* ============================================================
+   SMRITI-NER — Global Design System
+   Clean White Professional Theme
+   ============================================================ */
+
+:root {
+  --white: #ffffff;
+  --bg: #f8f9fa;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --primary: #1a1a2e;
+  --primary-light: #3a3a5c;
+  --accent: #c9a84c;
+  --accent-light: #f5ecd7;
+  --green: #059669;
+  --green-light: #d1fae5;
+  --red: #dc2626;
+  --red-light: #fee2e2;
+  --blue: #2563eb;
+  --blue-light: #dbeafe;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.03);
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --transition: 200ms ease;
+
+  /* ── Sub-Phase 2.1 Elder-Centric WCAG 2.2 AAA Tokens ── */
+  --elder-slate: #0f172a;       /* 15.6:1 contrast on white */
+  --elder-charcoal: #1e293b;    /* 13.2:1 contrast */
+  --elder-mid-slate: #334155;   /* 9.3:1 contrast */
+  --elder-emerald: #065f46;     /* 7.4:1 contrast */
+  --elder-amber: #92400e;       /* 7.2:1 contrast */
+  --elder-azure: #1e3a8a;       /* 11.5:1 contrast */
+  --elder-crimson: #991b1b;     /* 7.3:1 contrast */
+
+  /* Touch Target Grid Specifications */
+  --elder-touch-min: 64px;
+  --elder-touch-pad: 16px;
+
+  /* Typography Scale */
+  --elder-font-display: 2.5rem;   /* 40px */
+  --elder-font-headline: 2.0rem;  /* 32px / 24pt+ */
+  --elder-font-subhead: 1.625rem; /* 26px */
+  --elder-font-body-lg: 1.375rem; /* 22px */
+  --elder-font-body: 1.125rem;    /* 18px */
+  --elder-font-caption: 1.0rem;   /* 16px */
+
+  /* Motion & Anti-Agitation Transitions */
+  --elder-duration: 240ms;
+  --elder-easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --elder-golden-halo: 0 0 0 4px rgba(201, 168, 76, 0.45);
+}
+
+/* Soothing Golden Halo anti-agitation breathing animation */
+@keyframes goldenHaloBreath {
+  0% {
+    box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(201, 168, 76, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.25);
+  }
+}
+
+.golden-halo-pulse {
+  animation: goldenHaloBreath 2.2s infinite ease-in-out;
+}
+
+/* Respect user's motion preference (prefers-reduced-motion) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--gray-800);
+  line-height: 1.5;
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}

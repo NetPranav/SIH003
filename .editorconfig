@@ -1,0 +1,27 @@
+# ── Smriti-NER: EditorConfig ────────────────────────────────────────────────
+# Standardizes formatting across VS Code, JetBrains, Vim, and Antigravity IDE
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+# Web & TypeScript files (2 spaces)
+[*.{js,jsx,ts,tsx,json,css,scss,html,yml,yaml,md}]
+indent_size = 2
+
+# Python backend & AI engine (PEP 8 - 4 spaces)
+[*.py]
+indent_size = 4
+max_line_length = 100
+
+# Makefiles & Dockerfiles
+[Makefile]
+indent_style = tab
+
+[Dockerfile*]
+indent_size = 2
