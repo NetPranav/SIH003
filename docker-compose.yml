@@ -1,0 +1,193 @@
+# ==============================================================================
+# Smriti-NER (স্মৃতি / ꯁ꯭ꯃ꯭ꯔꯤꯇꯤ) — Production Cloud Docker Compose Orchestration
+# SIH 2026 Problem Statement ID: 26003 | Ministry of Development of North Eastern Region
+# Architecture: FastAPI Cluster + TimescaleDB + Redis + Celery + Nginx TLS 1.3
+# Compliance: DISHA 2018 (Sections 29/34) & MeitY Cloud Data Sovereignty
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # ── 1. Nginx Reverse Proxy (TLS 1.3 Termination & Security Headers) ───────
+  nginx-proxy:
+    image: nginx:1.25-alpine
+    container_name: smriti-nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - nginx-ssl-certs:/etc/ssl/smriti:ro
+    depends_on:
+      - fastapi-core-01
+      - fastapi-core-02
+    networks:
+      - smriti-public-net
+      - smriti-internal-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ── 2. FastAPI Core Application Nodes (Dual Worker Cluster) ───────────────
+  fastapi-core-01:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: smriti-api-node-01
+    restart: always
+    environment:
+      - NODE_ID=node-01
+      - DB_HOST=timescaledb
+      - DB_PORT=5432
+      - DB_NAME=smriti_ner_db
+      - DB_USER=smriti_admin
+      - DB_PASSWORD=smriti_disha_secure_2026
+      - REDIS_HOST=redis-broker
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=smriti_redis_2026
+      - DISHA_DATA_SOVEREIGNTY=IN-GOV-LOCAL
+      - ENVIRONMENT=production
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      redis-broker:
+        condition: service_healthy
+    networks:
+      - smriti-internal-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  fastapi-core-02:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: smriti-api-node-02
+    restart: always
+    environment:
+      - NODE_ID=node-02
+      - DB_HOST=timescaledb
+      - DB_PORT=5432
+      - DB_NAME=smriti_ner_db
+      - DB_USER=smriti_admin
+      - DB_PASSWORD=smriti_disha_secure_2026
+      - REDIS_HOST=redis-broker
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=smriti_redis_2026
+      - DISHA_DATA_SOVEREIGNTY=IN-GOV-LOCAL
+      - ENVIRONMENT=production
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      redis-broker:
+        condition: service_healthy
+    networks:
+      - smriti-internal-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── 3. TimescaleDB (PostgreSQL 16 with Hypertables & Compression) ──────────
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: smriti-timescaledb
+    restart: always
+    environment:
+      - POSTGRES_DB=smriti_ner_db
+      - POSTGRES_USER=smriti_admin
+      - POSTGRES_PASSWORD=smriti_disha_secure_2026
+      - TS_TUNE_MEMORY=2GB
+      - TS_TUNE_NUM_CPUS=2
+    volumes:
+      - timescaledb-data:/var/lib/postgresql/data
+      - ./server/db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - smriti-internal-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smriti_admin -d smriti_ner_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── 4. Redis In-Memory Cache & Celery Task Broker ──────────────────────────
+  redis-broker:
+    image: redis:7.2-alpine
+    container_name: smriti-redis-broker
+    restart: always
+    command: redis-server --requirepass smriti_redis_2026 --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - smriti-internal-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "smriti_redis_2026", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # ── 5. Celery Asynchronous Worker (Telemetry & BKT Updates) ───────────────
+  celery-worker:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: smriti-celery-worker
+    restart: always
+    command: celery -A server.celery_app worker --loglevel=info --concurrency=4 -n smriti_worker_01@%h
+    environment:
+      - DB_HOST=timescaledb
+      - DB_PORT=5432
+      - DB_NAME=smriti_ner_db
+      - DB_USER=smriti_admin
+      - DB_PASSWORD=smriti_disha_secure_2026
+      - REDIS_HOST=redis-broker
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=smriti_redis_2026
+      - CELERY_CONCURRENCY=4
+    depends_on:
+      - timescaledb
+      - redis-broker
+    networks:
+      - smriti-internal-net
+
+  # ── 6. Celery Beat Scheduler (Circadian Calming & MMSE Audits) ─────────────
+  celery-beat:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: smriti-celery-beat
+    restart: always
+    command: celery -A server.celery_app beat --loglevel=info
+    environment:
+      - REDIS_HOST=redis-broker
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=smriti_redis_2026
+    depends_on:
+      - redis-broker
+    networks:
+      - smriti-internal-net
+
+networks:
+  smriti-public-net:
+    driver: bridge
+  smriti-internal-net:
+    driver: bridge
+    internal: true # Isolates DB, Redis, and internal APIs from raw public internet
+
+volumes:
+  timescaledb-data:
+    driver: local
+  redis-data:
+    driver: local
+  nginx-ssl-certs:
+    driver: local

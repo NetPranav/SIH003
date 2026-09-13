@@ -1,0 +1,99 @@
+# ==============================================================================
+# Smriti-NER (স্মৃতি / ꯁ꯭ꯃ꯭ꯔꯤꯇꯤ) — Staging Cloud Docker Compose Configuration
+# SIH 2026 Problem Statement ID: 26003 | MDoNER
+# Includes automatic synthetic patient cohort generation for 8 NER states
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  fastapi-staging:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: smriti-staging-api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ID=staging-node-01
+      - DB_HOST=timescaledb-staging
+      - DB_PORT=5432
+      - DB_NAME=smriti_staging_db
+      - DB_USER=smriti_staging_admin
+      - DB_PASSWORD=smriti_staging_pass_2026
+      - REDIS_HOST=redis-staging
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=smriti_staging_redis
+      - ENVIRONMENT=staging
+      - SEED_SYNTHETIC_DATA=true
+    depends_on:
+      timescaledb-staging:
+        condition: service_healthy
+      redis-staging:
+        condition: service_healthy
+    networks:
+      - smriti-staging-net
+
+  timescaledb-staging:
+    image: timescale/timescaledb:latest-pg16
+    container_name: smriti-timescaledb-staging
+    restart: always
+    environment:
+      - POSTGRES_DB=smriti_staging_db
+      - POSTGRES_USER=smriti_staging_admin
+      - POSTGRES_PASSWORD=smriti_staging_pass_2026
+    volumes:
+      - timescaledb-staging-data:/var/lib/postgresql/data
+      - ./server/db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    ports:
+      - "5433:5432"
+    networks:
+      - smriti-staging-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smriti_staging_admin -d smriti_staging_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis-staging:
+    image: redis:7.2-alpine
+    container_name: smriti-redis-staging
+    restart: always
+    command: redis-server --requirepass smriti_staging_redis
+    ports:
+      - "6380:6379"
+    networks:
+      - smriti-staging-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "smriti_staging_redis", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  # Synthetic Data Seeder (Runs on container startup)
+  staging-seeder:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: smriti-staging-seeder
+    command: python /app/seed_staging_data.py --count 100 --days 30
+    environment:
+      - DB_HOST=timescaledb-staging
+      - DB_PORT=5432
+      - DB_NAME=smriti_staging_db
+      - DB_USER=smriti_staging_admin
+      - DB_PASSWORD=smriti_staging_pass_2026
+    depends_on:
+      timescaledb-staging:
+        condition: service_healthy
+    networks:
+      - smriti-staging-net
+
+networks:
+  smriti-staging-net:
+    driver: bridge
+
+volumes:
+  timescaledb-staging-data:
+    driver: local
