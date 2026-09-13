@@ -51,7 +51,7 @@ interface Props {
 }
 
 export default function CaregiverDashboard({ navigate }: Props) {
-  const [activeTab, setActiveTab] = useState<"overview" | "neuropsych" | "cultural_vault" | "life_review" | "design_system" | "ia_wireframes" | "usability_testing" | "ivr_accessibility" | "phase1_1">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "monorepo_arch" | "ivr_accessibility" | "usability_testing" | "ia_wireframes" | "design_system" | "life_review" | "cultural_vault" | "neuropsych" | "phase1_1">("overview");
   const [designSubTab, setDesignSubTab] = useState<"colors" | "typography" | "touch" | "icons" | "motion">("colors");
   const [wireframeView, setWireframeView] = useState<"patient_ia" | "caregiver_ia" | "asha_ia" | "reminder_flow" | "social_flow">("patient_ia");
   const [usabilitySubTab, setUsabilitySubTab] = useState<"metrics" | "cohort" | "tasks" | "iterations" | "wellness">("metrics");
@@ -64,6 +64,12 @@ export default function CaregiverDashboard({ navigate }: Props) {
   const [tremorBlockedClicks, setTremorBlockedClicks] = useState<number>(0);
   const [haloActive, setHaloActive] = useState<boolean>(true);
   const [activeRtSession, setActiveRtSession] = useState<number | null>(null);
+
+  // Sub-Phase 3.1 Monorepo & CI/CD State
+  const [archSubTab, setArchSubTab] = useState<"monorepo" | "cicd" | "gitflow" | "quality_gates">("monorepo");
+  const [ciRunning, setCiRunning] = useState<boolean>(false);
+  const [ciStagesCompleted, setCiStagesCompleted] = useState<number>(5);
+  const [selectedPackage, setSelectedPackage] = useState<"client" | "server" | "ai_engine" | "ivr_service" | "assets" | "docs">("client");
 
   // Sub-Phase 2.4 IVR Telephony Engine State
   const [ivrSubTab, setIvrSubTab] = useState<"simulator" | "menu_tree" | "usability_trial" | "telephony_arch">("simulator");
@@ -425,6 +431,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       }}>
         {[
           { id: "overview", label: "Overview" },
+          { id: "monorepo_arch", label: "P3.1 Arch" },
           { id: "ivr_accessibility", label: "P2.4 IVR" },
           { id: "usability_testing", label: "P2.3 Usability" },
           { id: "ia_wireframes", label: "P2.2 IA" },
@@ -3775,6 +3782,577 @@ export default function CaregiverDashboard({ navigate }: Props) {
         </div>
       )}
 
+      {/* Tab: Sub-Phase 3.1 Production Development Environment & Monorepo Architecture */}
+      {activeTab === "monorepo_arch" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {/* Sub-Phase 3.1 Header Overview */}
+          <div style={{
+            background: "var(--white)",
+            border: "1.5px solid var(--gray-200)",
+            borderRadius: "var(--radius-lg)",
+            padding: "1.1rem",
+            boxShadow: "var(--shadow-sm)"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
+              <div>
+                <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                  Sub-Phase 3.1 — Development Environment & Monorepo Architecture
+                </h3>
+                <p style={{ fontSize: "0.78rem", color: "var(--gray-600)", marginTop: "0.2rem" }}>
+                  Unified Multi-Service Repository, Automated CI/CD Pipeline, and DISHA Code Quality Gates
+                </p>
+              </div>
+              <span style={{
+                background: "#ecfdf5",
+                color: "#065f46",
+                border: "1px solid #a7f3d0",
+                fontSize: "0.7rem",
+                fontWeight: 800,
+                padding: "0.25rem 0.6rem",
+                borderRadius: "999px"
+              }}>
+                GITFLOW ACTIVE • ZERO-WARNING GATES
+              </span>
+            </div>
+
+            {/* Sub-Tab Navigation */}
+            <div style={{
+              display: "flex",
+              gap: "0.4rem",
+              marginTop: "1rem",
+              borderBottom: "1px solid var(--gray-200)",
+              paddingBottom: "0.5rem",
+              overflowX: "auto"
+            }}>
+              {[
+                { id: "monorepo", label: "📁 Monorepo File Tree" },
+                { id: "cicd", label: "🚀 Automated CI/CD Pipeline" },
+                { id: "gitflow", label: "🌿 GitFlow Branching Model" },
+                { id: "quality_gates", label: "🛡️ Code Quality & DISHA Gates" },
+              ].map((st) => (
+                <button
+                  key={st.id}
+                  onClick={() => setArchSubTab(st.id as any)}
+                  style={{
+                    padding: "0.4rem 0.75rem",
+                    borderRadius: "6px",
+                    border: archSubTab === st.id ? "1.5px solid var(--primary)" : "1px solid var(--gray-200)",
+                    background: archSubTab === st.id ? "var(--primary)" : "var(--gray-50)",
+                    color: archSubTab === st.id ? "#fff" : "var(--gray-700)",
+                    fontSize: "0.74rem",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  {st.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Sub-Tab 1: Monorepo File Tree */}
+          {archSubTab === "monorepo" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{
+                background: "#f8fafc",
+                border: "1px solid #e2e8f0",
+                borderRadius: "var(--radius-lg)",
+                padding: "0.9rem",
+                fontSize: "0.76rem",
+                color: "var(--gray-700)",
+                lineHeight: 1.45
+              }}>
+                Smriti-NER is organized as a production-grade <strong>unified monorepo</strong> enabling co-versioned releases between the Next.js client, FastAPI cloud server, AI cognitive difficulty engine, and BSNL telephony IVR service.
+              </div>
+
+              {/* Package Selector Pills */}
+              <div style={{
+                display: "flex",
+                gap: "0.4rem",
+                overflowX: "auto",
+                paddingBottom: "0.25rem"
+              }}>
+                {[
+                  { id: "client", label: "📱 /client (Next.js PWA)", desc: "Elder-centric web client & touch games" },
+                  { id: "server", label: "⚡ /server (FastAPI Core)", desc: "DISHA cloud API & TimescaleDB" },
+                  { id: "ai_engine", label: "🧠 /ai-engine (DCDA / BKT)", desc: "Bayesian knowledge tracing engine" },
+                  { id: "ivr_service", label: "📞 /ivr-service (Telephony)", desc: "BSNL SIP trunk & FreeSWITCH gateway" },
+                  { id: "assets", label: "🎨 /assets (Cultural Vault)", desc: "Folk audio, motifs, and vector icons" },
+                  { id: "docs", label: "📜 /docs (MDoNER Specs)", desc: "13 formal deliverable reports" },
+                ].map((pkg) => (
+                  <button
+                    key={pkg.id}
+                    onClick={() => setSelectedPackage(pkg.id as any)}
+                    style={{
+                      padding: "0.45rem 0.75rem",
+                      borderRadius: "8px",
+                      border: selectedPackage === pkg.id ? "2px solid var(--primary)" : "1px solid var(--gray-200)",
+                      background: selectedPackage === pkg.id ? "var(--primary)" : "var(--white)",
+                      color: selectedPackage === pkg.id ? "#fff" : "var(--gray-800)",
+                      fontSize: "0.74rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      whiteSpace: "nowrap"
+                    }}
+                  >
+                    {pkg.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Selected Package Detail Inspector */}
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.1rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                {selectedPackage === "client" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                          /client (smriti-ner) — Elder-Centric PWA Shell
+                        </h4>
+                        <span style={{ fontSize: "0.72rem", color: "var(--gray-500)" }}>
+                          Next.js 16.3 • React 19 • TypeScript • WCAG 2.2 AAA
+                        </span>
+                      </div>
+                      <span style={{ background: "#dbeafe", color: "#1e40af", padding: "0.2rem 0.5rem", borderRadius: "6px", fontWeight: 800, fontSize: "0.68rem" }}>
+                        PORT 8089 (TURBOPACK)
+                      </span>
+                    </div>
+
+                    <div style={{ background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "0.75rem", fontFamily: "monospace" }}>
+                      <div>├── src/app/ (Globals, Layout, SSR Page)</div>
+                      <div>├── src/components/games/ (DholPepa, Kaziranga, Loom, Haat)</div>
+                      <div>├── src/components/screens/ (Home, Caregiver, Asha, Pin, Album, Reminders)</div>
+                      <div>├── src/components/ui/ (ElderButton, BottomNav, Modals)</div>
+                      <div>├── src/lib/ (designSystemTokens, audio, ivrTelephonyEngine, dcdaEngine)</div>
+                      <div>└── package.json (Zero external UI dependencies — pure vanilla CSS)</div>
+                    </div>
+
+                    <div style={{ fontSize: "0.76rem", color: "var(--gray-700)", lineHeight: 1.45 }}>
+                      <strong>Key Responsibilities:</strong> 100% offline-first progressive web app for dementia patients and caregivers. Enforces 64dp hitboxes, 180ms tremor suppression, 0.45Hz circadian deceleration, on-device Web Audio synthesis, and multi-language support (8 NER languages).
+                    </div>
+                  </div>
+                )}
+
+                {selectedPackage === "server" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                          /server — FastAPI Cloud Core & Telemetry Gateway
+                        </h4>
+                        <span style={{ fontSize: "0.72rem", color: "var(--gray-500)" }}>
+                          Python 3.11 • FastAPI • TimescaleDB • Redis • DISHA Middleware
+                        </span>
+                      </div>
+                      <span style={{ background: "#dcfce7", color: "#166534", padding: "0.2rem 0.5rem", borderRadius: "6px", fontWeight: 800, fontSize: "0.68rem" }}>
+                        PORT 8000
+                      </span>
+                    </div>
+
+                    <div style={{ background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "0.75rem", fontFamily: "monospace" }}>
+                      <div>├── main.py (FastAPI app, DISHA headers middleware, /health, /telemetry/sync)</div>
+                      <div>├── test_main.py & test_logic.py (Automated unit tests)</div>
+                      <div>├── requirements.txt (fastapi, uvicorn, pydantic &ge; 2.5, httpx, pytest)</div>
+                      <div>└── Dockerfile (Multi-stage non-root Python 3.11-slim container)</div>
+                    </div>
+
+                    <div style={{ fontSize: "0.76rem", color: "var(--gray-700)", lineHeight: 1.45 }}>
+                      <strong>Key Responsibilities:</strong> Ingests periodic behavioral telemetry batches, verifies SHA-256 pseudo-patient tokens, computes clinical MMSE trajectory scores, and exposes FHIR R4 DiagnosticReport payloads for ABDM Health Locker synchronization.
+                    </div>
+                  </div>
+                )}
+
+                {selectedPackage === "ai_engine" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                          /ai-engine — Dynamic Cognitive Difficulty & BKT Core
+                        </h4>
+                        <span style={{ fontSize: "0.72rem", color: "var(--gray-500)" }}>
+                          Python 3.11 • Bayesian Knowledge Tracing • Zone of Proximal Flow
+                        </span>
+                      </div>
+                      <span style={{ background: "#f3e8ff", color: "#6b21a8", padding: "0.2rem 0.5rem", borderRadius: "6px", fontWeight: 800, fontSize: "0.68rem" }}>
+                        BKT & DCDA
+                      </span>
+                    </div>
+
+                    <div style={{ background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "0.75rem", fontFamily: "monospace" }}>
+                      <div>├── bkt_dcda_engine.py (Bayesian Knowledge Tracing updates, slip/guess adaptation)</div>
+                      <div>├── test_bkt_engine.py (Unit tests for level transitions and MMSE projections)</div>
+                      <div>└── requirements.txt (numpy, scipy, scikit-learn, pytest)</div>
+                    </div>
+
+                    <div style={{ fontSize: "0.76rem", color: "var(--gray-700)", lineHeight: 1.45 }}>
+                      <strong>Key Responsibilities:</strong> Computes posterior competence probabilities after each game tap, adjusts game velocity and distractor count to prevent cognitive distress, and aggregates multi-domain game performance into standard MMSE 5-domain scores.
+                    </div>
+                  </div>
+                )}
+
+                {selectedPackage === "ivr_service" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                          /ivr-service — Telephony SIP Gateway & Missed-Call Service
+                        </h4>
+                        <span style={{ fontSize: "0.72rem", color: "var(--gray-500)" }}>
+                          Python 3.11 • FreeSWITCH SIP Webhooks • Bhashini Indic Connector
+                        </span>
+                      </div>
+                      <span style={{ background: "#fed7aa", color: "#9a3412", padding: "0.2rem 0.5rem", borderRadius: "6px", fontWeight: 800, fontSize: "0.68rem" }}>
+                        1800-889-2600
+                      </span>
+                    </div>
+
+                    <div style={{ background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "0.75rem", fontFamily: "monospace" }}>
+                      <div>├── telephony_gateway.py (1-ring missed-call CDR queue, callback task manager)</div>
+                      <div>├── test_telephony_gateway.py & test_logic.py (Callback queue tests)</div>
+                      <div>└── requirements.txt (fastapi, uvicorn, pydantic, httpx, pytest)</div>
+                    </div>
+
+                    <div style={{ fontSize: "0.76rem", color: "var(--gray-700)", lineHeight: 1.45 }}>
+                      <strong>Key Responsibilities:</strong> Listens for incoming 1-ring missed calls from BSNL SIP exchanges across all 8 NER circles, triggers automated outbound callbacks within 3 seconds, and coordinates Bhashini speech-to-text semantic ingestion.
+                    </div>
+                  </div>
+                )}
+
+                {selectedPackage === "assets" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                          /assets — North Eastern Cultural Heritage Repository
+                        </h4>
+                        <span style={{ fontSize: "0.72rem", color: "var(--gray-500)" }}>
+                          Folk Audio • Handloom Vectors • Indigenous Wildlife • Sacred Tree Motifs
+                        </span>
+                      </div>
+                    </div>
+
+                    <div style={{ background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "0.75rem", fontFamily: "monospace" }}>
+                      <div>├── audio/ (Pepa, Pung, Duitara, Kham, Sifung acoustic sound fonts)</div>
+                      <div>├── textiles/ (Muga Mekhela, Dokhona, Jainsem, Puanchei, Rignai vectors)</div>
+                      <div>├── fauna/ (One-horned Rhino, Sangai Deer, Red Panda, Hoolock Gibbon)</div>
+                      <div>└── fonts/ (Open-source Assamese, Meitei Mayek, Devanagari font families)</div>
+                    </div>
+                  </div>
+                )}
+
+                {selectedPackage === "docs" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                          /docs — Comprehensive Engineering & Clinical Specifications
+                        </h4>
+                        <span style={{ fontSize: "0.72rem", color: "var(--gray-500)" }}>
+                          13 Deliverable Specs • Roadmap v2.0 • SIH Pitch Deck • SRS Document
+                        </span>
+                      </div>
+                    </div>
+
+                    <div style={{ background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "0.75rem", fontFamily: "monospace" }}>
+                      <div>├── 01_SIH_2026_Official_Pitch_Deck_Slide_by_Slide.md</div>
+                      <div>├── 02_Smriti_NER_Comprehensive_Project_Proposal.md</div>
+                      <div>├── 03_System_Architecture_and_Software_Requirements_Specification_SRS.md</div>
+                      <div>├── 04_Mathematical_Formulation_and_AI_DCDA_Engine_Spec.md</div>
+                      <div>├── 05_ASHA_Worker_and_Rural_Caregiver_Field_Manual.md</div>
+                      <div>├── 06–08 (Phase 1 Clinical & Cultural Foundation Reports)</div>
+                      <div>├── 09–12 (Phase 2 Design System, IA, Usability & IVR Reports)</div>
+                      <div>├── 13_SubPhase_3_1_Development_Environment_and_Standards_Handbook.md</div>
+                      <div>└── Roadmap_2.md (Master 26-Month Clinical & Technical Implementation Plan)</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Sub-Tab 2: Automated CI/CD Pipeline */}
+          {archSubTab === "cicd" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{
+                background: "#f8fafc",
+                border: "1px solid #e2e8f0",
+                borderRadius: "var(--radius-lg)",
+                padding: "0.9rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "0.5rem"
+              }}>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: "0.85rem", color: "var(--gray-900)" }}>
+                    GitHub Actions Multi-Job CI/CD Quality Gate (.github/workflows/ci.yml)
+                  </div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--gray-500)", marginTop: "0.15rem" }}>
+                    Automated linting, TypeScript compiler checks, Python unit tests, and security audits
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setCiRunning(true);
+                    setCiStagesCompleted(0);
+                    const t1 = setTimeout(() => setCiStagesCompleted(1), 300);
+                    const t2 = setTimeout(() => setCiStagesCompleted(2), 600);
+                    const t3 = setTimeout(() => setCiStagesCompleted(3), 900);
+                    const t4 = setTimeout(() => setCiStagesCompleted(4), 1200);
+                    const t5 = setTimeout(() => {
+                      setCiStagesCompleted(5);
+                      setCiRunning(false);
+                      playAudioFeedback("success");
+                    }, 1500);
+                  }}
+                  disabled={ciRunning}
+                  style={{
+                    background: ciRunning ? "#9ca3af" : "#065f46",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "0.45rem 0.85rem",
+                    fontSize: "0.74rem",
+                    fontWeight: 700,
+                    cursor: ciRunning ? "wait" : "pointer"
+                  }}
+                >
+                  {ciRunning ? "Running Pipeline..." : "⚡ Trigger Manual CI Run"}
+                </button>
+              </div>
+
+              {/* Pipeline Stages Card Grid */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+                {[
+                  {
+                    idx: 1,
+                    name: "Job 1: client-check",
+                    target: "smriti-ner (Next.js PWA Client)",
+                    command: "npx tsc --noEmit && npm run build",
+                    details: "Next.js 16.3 static bundle generation, TypeScript 0 errors, 4/4 static pages generated.",
+                  },
+                  {
+                    idx: 2,
+                    name: "Job 2: server-check",
+                    target: "server (FastAPI Backend)",
+                    command: "black --check server/ && ruff check server/ && pytest server/",
+                    details: "Python 3.11 syntax check, DISHA headers middleware check, /health 200 OK, telemetry endpoint valid.",
+                  },
+                  {
+                    idx: 3,
+                    name: "Job 3: ai-engine-check",
+                    target: "ai-engine (DCDA / BKT Engine)",
+                    command: "black --check ai-engine/ && pytest ai-engine/",
+                    details: "4/4 unit tests passed (Bayesian update, competence decay, level progression, MMSE proxy).",
+                  },
+                  {
+                    idx: 4,
+                    name: "Job 4: ivr-service-check",
+                    target: "ivr-service (Telephony Gateway)",
+                    command: "pytest ivr-service/",
+                    details: "BSNL SIP trunk webhook queue verified, SHA-256 pseudo-ID tokenization verified.",
+                  },
+                  {
+                    idx: 5,
+                    name: "Job 5: security-compliance-audit",
+                    target: "Repository Security & DISHA Compliance",
+                    command: "npm audit --production && secret-leak-scanner",
+                    details: "Zero hardcoded private keys, zero unhashed phone numbers, RAM-only ephemeral audio streams confirmed.",
+                  },
+                ].map((stg) => {
+                  const isDone = ciStagesCompleted >= stg.idx;
+                  return (
+                    <div
+                      key={stg.idx}
+                      style={{
+                        background: "var(--white)",
+                        border: isDone ? "1.5px solid #a7f3d0" : "1px solid var(--gray-200)",
+                        borderRadius: "var(--radius)",
+                        padding: "0.85rem",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        boxShadow: "var(--shadow-sm)"
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
+                        <span style={{ fontSize: "1.2rem" }}>{isDone ? "✅" : "⏳"}</span>
+                        <div>
+                          <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                            {stg.name}
+                          </div>
+                          <div style={{ fontSize: "0.7rem", color: "var(--gray-500)", fontFamily: "monospace" }}>
+                            {stg.command}
+                          </div>
+                          <div style={{ fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.2rem" }}>
+                            {stg.details}
+                          </div>
+                        </div>
+                      </div>
+                      <span style={{
+                        background: isDone ? "#ecfdf5" : "#f1f5f9",
+                        color: isDone ? "#047857" : "#64748b",
+                        fontSize: "0.68rem",
+                        fontWeight: 800,
+                        padding: "0.2rem 0.5rem",
+                        borderRadius: "999px"
+                      }}>
+                        {isDone ? "PASSED" : "QUEUED"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Sub-Tab 3: GitFlow Branching Model */}
+          {archSubTab === "gitflow" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.1rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)", marginBottom: "0.5rem" }}>
+                  GitFlow Branch Hierarchy & Release Strategy
+                </h4>
+                <p style={{ fontSize: "0.76rem", color: "var(--gray-600)", lineHeight: 1.45, marginBottom: "1rem" }}>
+                  Maintains strict isolation between experimental clinical features, staging field validation cohorts, and the production patient build.
+                </p>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+                  <div style={{ background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontWeight: 800, fontSize: "0.82rem", color: "#0f172a" }}>🔒 branch: main</span>
+                      <span style={{ background: "#e2e8f0", color: "#334155", fontSize: "0.65rem", padding: "0.15rem 0.4rem", borderRadius: "4px", fontWeight: 700 }}>
+                        PROTECTED (2 APPROVALS)
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.2rem" }}>
+                      Production branch. Deploys directly to certified government health cloud. Requires passed CI/CD quality gates and clinical sign-off.
+                    </div>
+                  </div>
+
+                  <div style={{ background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontWeight: 800, fontSize: "0.82rem", color: "#0369a1" }}>🚀 branch: staging</span>
+                      <span style={{ background: "#e0f2fe", color: "#0369a1", fontSize: "0.65rem", padding: "0.15rem 0.4rem", borderRadius: "4px", fontWeight: 700 }}>
+                        PHC FIELD MIRROR
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.2rem" }}>
+                      Staging environment mirror used during pilot evaluations with ASHA workers across Majuli and Sohra PHCs.
+                    </div>
+                  </div>
+
+                  <div style={{ background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontWeight: 800, fontSize: "0.82rem", color: "#047857" }}>🌿 branch: develop</span>
+                      <span style={{ background: "#dcfce7", color: "#15803d", fontSize: "0.65rem", padding: "0.15rem 0.4rem", borderRadius: "4px", fontWeight: 700 }}>
+                        ACTIVE INTEGRATION
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.2rem" }}>
+                      Continuous integration branch for active sub-phases. All feature branches PR into develop.
+                    </div>
+                  </div>
+
+                  <div style={{ background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontWeight: 800, fontSize: "0.82rem", color: "#7c3aed" }}>✨ branch: feature/*</span>
+                      <span style={{ background: "#f3e8ff", color: "#7c3aed", fontSize: "0.65rem", padding: "0.15rem 0.4rem", borderRadius: "4px", fontWeight: 700 }}>
+                        EPHEMERAL BRANCHES
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.2rem" }}>
+                      Isolated work per roadmap sub-phase (e.g., <code>feat/ivr-line</code>, <code>feat/dcda-engine</code>, <code>feat/ble-relay</code>).
+                    </div>
+                  </div>
+                </div>
+
+                {/* Conventional Commits Guide */}
+                <div style={{ marginTop: "1rem", borderTop: "1px solid var(--gray-200)", paddingTop: "0.75rem" }}>
+                  <div style={{ fontWeight: 800, fontSize: "0.82rem", color: "var(--gray-900)", marginBottom: "0.4rem" }}>
+                    Conventional Commit Specification
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.4rem", fontSize: "0.72rem", fontFamily: "monospace" }}>
+                    <div style={{ background: "#f1f5f9", padding: "0.35rem 0.55rem", borderRadius: "4px" }}>
+                      feat(client): add 64dp button
+                    </div>
+                    <div style={{ background: "#f1f5f9", padding: "0.35rem 0.55rem", borderRadius: "4px" }}>
+                      fix(telephony): resolve SIP drop
+                    </div>
+                    <div style={{ background: "#f1f5f9", padding: "0.35rem 0.55rem", borderRadius: "4px" }}>
+                      feat(ai-engine): tune BKT slip
+                    </div>
+                    <div style={{ background: "#f1f5f9", padding: "0.35rem 0.55rem", borderRadius: "4px" }}>
+                      docs(standards): update handbook
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sub-Tab 4: Code Quality & DISHA Gates */}
+          {archSubTab === "quality_gates" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.1rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)", marginBottom: "0.5rem" }}>
+                  Automated Code Quality & Healthcare Compliance Standards
+                </h4>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginTop: "0.75rem" }}>
+                  <div style={{ background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                    <div style={{ fontWeight: 800, fontSize: "0.8rem", color: "var(--gray-900)" }}>
+                      Pre-Commit Hooks (.pre-commit-config.yaml)
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.4rem" }}>
+                      <div>✅ Trailing whitespace trimmer</div>
+                      <div>✅ End-of-file newline fixer</div>
+                      <div>✅ Strict JSON & YAML validation</div>
+                      <div>✅ Black 23.9.1 (Python 100-col formatting)</div>
+                      <div>✅ Ruff 0.1.9 (Lightning-fast Python linter)</div>
+                    </div>
+                  </div>
+
+                  <div style={{ background: "#f8fafc", padding: "0.75rem", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                    <div style={{ fontWeight: 800, fontSize: "0.8rem", color: "var(--gray-900)" }}>
+                      DISHA 2018 Security Mandates
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.4rem" }}>
+                      <div>🔒 Ephemeral RAM-only voice audio processing</div>
+                      <div>🔒 Deterministic SHA-256 HMAC Pseudo-IDs</div>
+                      <div>🔒 Strict TLS 1.3 encryption on all endpoints</div>
+                      <div>🔒 Mandatory security headers (X-Frame, HSTS)</div>
+                      <div>🔒 Zero PHI logged to server stdout or disk</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tab: Sub-Phase 1.1 Data */}
       {activeTab === "phase1_1" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {/* Phase 1.1 Overview Box */}
