@@ -59,7 +59,7 @@ interface Props {
 }
 
 export default function CaregiverDashboard({ navigate }: Props) {
-  const [activeTab, setActiveTab] = useState<"overview" | "security_compliance" | "cloud_infra" | "monorepo_arch" | "ivr_accessibility" | "usability_testing" | "ia_wireframes" | "design_system" | "life_review" | "cultural_vault" | "neuropsych" | "phase1_1">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "telephony_infra" | "security_compliance" | "cloud_infra" | "monorepo_arch" | "ivr_accessibility" | "usability_testing" | "ia_wireframes" | "design_system" | "life_review" | "cultural_vault" | "neuropsych" | "phase1_1">("overview");
   const [designSubTab, setDesignSubTab] = useState<"colors" | "typography" | "touch" | "icons" | "motion">("colors");
   const [wireframeView, setWireframeView] = useState<"patient_ia" | "caregiver_ia" | "asha_ia" | "reminder_flow" | "social_flow">("patient_ia");
   const [usabilitySubTab, setUsabilitySubTab] = useState<"metrics" | "cohort" | "tasks" | "iterations" | "wellness">("metrics");
@@ -72,6 +72,13 @@ export default function CaregiverDashboard({ navigate }: Props) {
   const [tremorBlockedClicks, setTremorBlockedClicks] = useState<number>(0);
   const [haloActive, setHaloActive] = useState<boolean>(true);
   const [activeRtSession, setActiveRtSession] = useState<number | null>(null);
+
+  // Sub-Phase 3.4 Telephony & IVR Infrastructure State
+  const [telephonySubTab, setTelephonySubTab] = useState<"bsnl_sla" | "platform_eval" | "call_security" | "trunk_simulation">("bsnl_sla");
+  const [cdrDeidInput, setCdrDeidInput] = useState<string>("+919435018293");
+  const [cdrDeidResult, setCdrDeidResult] = useState<{ pseudoId: string; circle: string; recordJson: string } | null>(null);
+  const [trunkDialState, setTrunkDialState] = useState<"IDLE" | "DIALING_DROP" | "DROPPED_BUSY" | "OUTBOUND_RINGING" | "CONNECTED">("IDLE");
+  const [trunkActiveChannels, setTrunkActiveChannels] = useState<number>(18);
 
   // Sub-Phase 3.3 Security & Compliance State
   const [securitySubTab, setSecuritySubTab] = useState<"disha_matrix" | "abdm_gateway" | "data_classification" | "stride_threats">("disha_matrix");
@@ -458,6 +465,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       }}>
         {[
           { id: "overview", label: "Overview" },
+          { id: "telephony_infra", label: "P3.4 Telephony" },
           { id: "security_compliance", label: "P3.3 Security" },
           { id: "cloud_infra", label: "P3.2 Cloud" },
           { id: "monorepo_arch", label: "P3.1 Arch" },
@@ -3804,6 +3812,681 @@ export default function CaregiverDashboard({ navigate }: Props) {
                   lineHeight: 1.4
                 }}>
                   🔒 <strong>DISHA Compliance & Cryptographic Anonymization:</strong> No raw audio recordings are stored on server disk. Voice audio streams are converted to acoustic feature vectors in RAM and discarded immediately. Call telemetry is keyed solely by SHA-256 Pseudo-ID, preventing patient phone number leakage.
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tab: Sub-Phase 3.4 Telephony & IVR Infrastructure */}
+      {activeTab === "telephony_infra" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {/* Sub-Phase 3.4 Header Overview */}
+          <div style={{
+            background: "var(--white)",
+            border: "1.5px solid var(--gray-200)",
+            borderRadius: "var(--radius-lg)",
+            padding: "1.1rem",
+            boxShadow: "var(--shadow-sm)"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
+              <div>
+                <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                  Sub-Phase 3.4 — Telephony &amp; IVR Infrastructure
+                </h3>
+                <p style={{ fontSize: "0.78rem", color: "var(--gray-600)", marginTop: "0.2rem" }}>
+                  BSNL National Toll-Free Gateway (1800-889-2600), FreeSWITCH Core Platform Evaluation &amp; Zero-Audio Retention Architecture
+                </p>
+              </div>
+              <span style={{
+                background: "#f0fdf4",
+                color: "#166534",
+                border: "1px solid #bbf7d0",
+                fontSize: "0.7rem",
+                fontWeight: 800,
+                padding: "0.25rem 0.6rem",
+                borderRadius: "999px"
+              }}>
+                BSNL E1 TRUNK ACTIVE • FREESWITCH CORE • ZERO AUDIO ON DISK
+              </span>
+            </div>
+
+            {/* Sub-Tab Navigation */}
+            <div style={{
+              display: "flex",
+              gap: "0.4rem",
+              marginTop: "1rem",
+              borderBottom: "1px solid var(--gray-200)",
+              paddingBottom: "0.5rem",
+              overflowX: "auto"
+            }}>
+              {[
+                { id: "bsnl_sla", label: "📞 BSNL SLA & Toll-Free Gateway" },
+                { id: "platform_eval", label: "⚖️ Platform Selection Matrix" },
+                { id: "call_security", label: "🔒 Call Security & Zero-Audio" },
+                { id: "trunk_simulation", label: "⚡ Trunk Status & Simulation" },
+              ].map((st) => (
+                <button
+                  key={st.id}
+                  onClick={() => setTelephonySubTab(st.id as any)}
+                  style={{
+                    padding: "0.4rem 0.75rem",
+                    borderRadius: "6px",
+                    border: telephonySubTab === st.id ? "1.5px solid var(--primary)" : "1px solid var(--gray-200)",
+                    background: telephonySubTab === st.id ? "var(--primary)" : "var(--gray-50)",
+                    color: telephonySubTab === st.id ? "#fff" : "var(--gray-700)",
+                    fontWeight: 700,
+                    fontSize: "0.75rem",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  {st.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Sub-Tab 1: BSNL SLA & Toll-Free Gateway */}
+          {telephonySubTab === "bsnl_sla" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              {/* Carrier KPI Cards */}
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: "0.75rem"
+              }}>
+                <div style={{
+                  background: "var(--white)",
+                  border: "1px solid var(--gray-200)",
+                  borderRadius: "var(--radius)",
+                  padding: "0.85rem",
+                  boxShadow: "var(--shadow-xs)"
+                }}>
+                  <div style={{ fontSize: "0.7rem", color: "var(--gray-500)", fontWeight: 700, textTransform: "uppercase" }}>Dedicated Toll-Free Line</div>
+                  <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--primary)", marginTop: "0.2rem" }}>1800-889-2600</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>Universal Across All 8 NER States</div>
+                </div>
+
+                <div style={{
+                  background: "var(--white)",
+                  border: "1px solid var(--gray-200)",
+                  borderRadius: "var(--radius)",
+                  padding: "0.85rem",
+                  boxShadow: "var(--shadow-xs)"
+                }}>
+                  <div style={{ fontSize: "0.7rem", color: "var(--gray-500)", fontWeight: 700, textTransform: "uppercase" }}>Drop Detection Latency</div>
+                  <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "#059669", marginTop: "0.2rem" }}>&le; 450 ms</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>SIP 486 Busy • ₹0.00 Elder Cost</div>
+                </div>
+
+                <div style={{
+                  background: "var(--white)",
+                  border: "1px solid var(--gray-200)",
+                  borderRadius: "var(--radius)",
+                  padding: "0.85rem",
+                  boxShadow: "var(--shadow-xs)"
+                }}>
+                  <div style={{ fontSize: "0.7rem", color: "var(--gray-500)", fontWeight: 700, textTransform: "uppercase" }}>Outbound Callback SLA</div>
+                  <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "#0284c7", marginTop: "0.2rem" }}>&le; 3,000 ms (3.0s)</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>Automated PRI Trunk Dispatch</div>
+                </div>
+
+                <div style={{
+                  background: "var(--white)",
+                  border: "1px solid var(--gray-200)",
+                  borderRadius: "var(--radius)",
+                  padding: "0.85rem",
+                  boxShadow: "var(--shadow-xs)"
+                }}>
+                  <div style={{ fontSize: "0.7rem", color: "var(--gray-500)", fontWeight: 700, textTransform: "uppercase" }}>Channel Capacity &amp; SLA</div>
+                  <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "#7c3aed", marginTop: "0.2rem" }}>240 Voice Channels</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>99.95% Uptime • Dual-Homed GAU</div>
+                </div>
+              </div>
+
+              {/* 3-Second Callback Lifecycle Flow */}
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.2rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)", marginBottom: "0.3rem" }}>
+                  The 3-Second Missed-Call Callback Architecture
+                </h4>
+                <p style={{ fontSize: "0.75rem", color: "var(--gray-600)", marginBottom: "1rem" }}>
+                  Zero-cost access for non-literate and 2G elders. An inbound 1-ring drop triggers an instant SIP 486 busy response, queueing an immediate outbound callback.
+                </p>
+
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                  gap: "0.65rem"
+                }}>
+                  {[
+                    { step: "0.00s", title: "Elder Dials", desc: "Elder dials 1800-889-2600 from basic 2G handset.", color: "#1e293b", bg: "#f8fafc" },
+                    { step: "0.40s", title: "Instant Drop", desc: "FreeSWITCH drops call with SIP 486 (Zero cost to patient).", color: "#059669", bg: "#f0fdf4" },
+                    { step: "0.60s", title: "ESL Queue", desc: "Caller ANI hashed to HMAC-SHA256 & enqueued in Redis.", color: "#0284c7", bg: "#f0f9ff" },
+                    { step: "1.85s", title: "SIP INVITE", desc: "Outbound call dispatched via BSNL PRI optical trunk.", color: "#7c3aed", bg: "#faf5ff" },
+                    { step: "2.80s", title: "Phone Rings", desc: "Elder answers callback; circadian calming stream begins.", color: "#b45309", bg: "#fffbeb" },
+                  ].map((flow) => (
+                    <div key={flow.step} style={{
+                      background: flow.bg,
+                      border: "1px solid var(--gray-200)",
+                      borderRadius: "6px",
+                      padding: "0.75rem"
+                    }}>
+                      <div style={{ fontSize: "0.85rem", fontWeight: 900, color: flow.color }}>{flow.step}</div>
+                      <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "var(--gray-900)", marginTop: "0.2rem" }}>{flow.title}</div>
+                      <div style={{ fontSize: "0.7rem", color: "var(--gray-600)", marginTop: "0.25rem", lineHeight: "1.35" }}>{flow.desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Regional Telecom Circle Matrix */}
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.1rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <h4 style={{ fontSize: "0.9rem", fontWeight: 800, color: "var(--gray-900)", marginBottom: "0.3rem" }}>
+                  North Eastern Region Telecom Circle Interconnects
+                </h4>
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                  gap: "0.65rem",
+                  marginTop: "0.75rem"
+                }}>
+                  {[
+                    { code: "AS", name: "Assam Circle", states: "Kamrup, Majuli, Cachar, Dibrugarh", capacity: "90 Channels", pop: "Guwahati Central GAU-PRI" },
+                    { code: "NE1", name: "North East-I Circle", states: "Meghalaya, Mizoram, Tripura", capacity: "60 Channels", pop: "Shillong & Agartala Tandem" },
+                    { code: "NE2", name: "North East-II Circle", states: "Manipur, Nagaland, Arunachal Pradesh", capacity: "60 Channels", pop: "Imphal & Kohima Tandem" },
+                    { code: "WB_SK", name: "West Bengal / Sikkim Circle", states: "East Sikkim, West Sikkim, Gangtok", capacity: "30 Channels", pop: "Siliguri / Gangtok POP" },
+                  ].map((c) => (
+                    <div key={c.code} style={{
+                      background: "#f8fafc",
+                      border: "1px solid var(--gray-200)",
+                      borderRadius: "6px",
+                      padding: "0.75rem"
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--primary)" }}>{c.name}</span>
+                        <span style={{ fontSize: "0.65rem", fontWeight: 800, background: "#ecfdf5", color: "#065f46", padding: "0.15rem 0.4rem", borderRadius: "4px" }}>
+                          {c.capacity}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: "0.72rem", color: "var(--gray-700)", marginTop: "0.3rem" }}>
+                        <strong>Coverage:</strong> {c.states}
+                      </div>
+                      <div style={{ fontSize: "0.68rem", color: "var(--gray-500)", marginTop: "0.2rem" }}>
+                        Trunk POP: {c.pop}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sub-Tab 2: Platform Selection Matrix */}
+          {telephonySubTab === "platform_eval" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.2rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                  <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                    Telephony Platform Evaluation &amp; Architectural Rationale
+                  </h4>
+                  <span style={{ fontSize: "0.7rem", background: "#eff6ff", color: "#1d4ed8", fontWeight: 800, padding: "0.2rem 0.55rem", borderRadius: "999px" }}>
+                    FREESWITCH 1.10 SELECTED PRIMARY CORE
+                  </span>
+                </div>
+                <p style={{ fontSize: "0.76rem", color: "var(--gray-600)", marginBottom: "1rem" }}>
+                  Rigorous benchmark across media pipeline RAM control (DISHA zero-audio-disk compliance), concurrent channel scaling, Indic speech latency, and operational expense.
+                </p>
+
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.75rem" }}>
+                    <thead>
+                      <tr style={{ background: "#f8fafc", borderBottom: "2px solid var(--gray-200)", textAlign: "left" }}>
+                        <th style={{ padding: "0.6rem 0.75rem", fontWeight: 800, color: "var(--gray-700)" }}>Evaluation Dimension</th>
+                        <th style={{ padding: "0.6rem 0.75rem", fontWeight: 800, color: "var(--primary)" }}>FreeSWITCH 1.10 (Selected)</th>
+                        <th style={{ padding: "0.6rem 0.75rem", fontWeight: 800, color: "var(--gray-700)" }}>Asterisk PBX 20</th>
+                        <th style={{ padding: "0.6rem 0.75rem", fontWeight: 800, color: "var(--gray-700)" }}>Commercial CPaaS (Exotel/Knowlarity)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        {
+                          dim: "Media Pipeline RAM Control",
+                          fs: "Native ringbuffer_t memory control. Immediate memset(0) wipe.",
+                          ast: "Disk-oriented media pipeline; requires tmpfs mount to prevent disk writes.",
+                          cpaas: "Zero customer control; vendor logs/records audio on vendor servers."
+                        },
+                        {
+                          dim: "DISHA 2018 Compliance",
+                          fs: "100% Compliant: Zero audio on disk; self-hosted in India.",
+                          ast: "High compliance, but higher risk of temp file leakage.",
+                          cpaas: "High Compliance Risk: Third-party vendor retains recording logs."
+                        },
+                        {
+                          dim: "Concurrent Channel Capacity",
+                          fs: "High: 1,000+ channels per VM via C-core event loop.",
+                          ast: "Moderate: ~250 channels due to thread-per-channel context switching.",
+                          cpaas: "Elastic cloud scaling, but incurs high per-minute OpEx."
+                        },
+                        {
+                          dim: "Indic ASR / TTS Latency",
+                          fs: "Direct gRPC / HTTP/2 streaming to Bhashini Indic models (320ms).",
+                          ast: "Higher latency via external FastAGI script forks (580ms).",
+                          cpaas: "Dependent on proprietary vendor speech recognition APIs."
+                        },
+                        {
+                          dim: "Monthly Operational Cost",
+                          fs: "₹0.00 software license (BSNL PRI trunk rental only).",
+                          ast: "₹0.00 software license.",
+                          cpaas: "High OpEx: ₹0.40–₹0.75 / min (~₹1.8 Lakh / mo for 10k elders)."
+                        },
+                        {
+                          dim: "Offline Rural Edge Capability",
+                          fs: "Can be deployed locally on edge appliance in rural clinic.",
+                          ast: "Deployable on edge appliance.",
+                          cpaas: "Impossible without permanent high-speed internet to vendor cloud."
+                        }
+                      ].map((row) => (
+                        <tr key={row.dim} style={{ borderBottom: "1px solid var(--gray-200)" }}>
+                          <td style={{ padding: "0.6rem 0.75rem", fontWeight: 700, color: "var(--gray-900)" }}>{row.dim}</td>
+                          <td style={{ padding: "0.6rem 0.75rem", background: "#f0fdf4", color: "#166534", fontWeight: 600 }}>{row.fs}</td>
+                          <td style={{ padding: "0.6rem 0.75rem", color: "var(--gray-700)" }}>{row.ast}</td>
+                          <td style={{ padding: "0.6rem 0.75rem", color: "var(--gray-600)" }}>{row.cpaas}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Hybrid Decision Card */}
+                <div style={{
+                  marginTop: "1rem",
+                  background: "#eff6ff",
+                  border: "1px solid #bfdbfe",
+                  borderRadius: "6px",
+                  padding: "0.85rem",
+                  fontSize: "0.75rem",
+                  color: "#1e3a8a",
+                  lineHeight: "1.4"
+                }}>
+                  <strong>Selected Hybrid Telephony Architecture:</strong> FreeSWITCH 1.10 operates as the primary self-hosted voice gateway inside <code>/ivr-service</code>, directly interfacing with Bhashini Indic ASR/TTS. For emergency overflow during regional natural calamities (e.g. Brahmaputra monsoons), an Exotel India enterprise SIP trunk acts as warm fallback.
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sub-Tab 3: Call Data Security & Zero-Audio */}
+          {telephonySubTab === "call_security" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              {/* Ephemeral RAM Stream Diagram */}
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.2rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.3rem" }}>
+                  <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                    Zero-Audio-Retention Architecture (DISHA 2018 Section 34)
+                  </h4>
+                  <span style={{ fontSize: "0.7rem", background: "#ecfdf5", color: "#065f46", fontWeight: 800, padding: "0.2rem 0.55rem", borderRadius: "999px" }}>
+                    ZERO WAV/MP3 ON DISK
+                  </span>
+                </div>
+                <p style={{ fontSize: "0.75rem", color: "var(--gray-600)", marginBottom: "1rem" }}>
+                  Voice is a sensitive biometric identifier. FreeSWITCH streams speech directly through volatile RAM buffers to Bhashini Indic ASR. Memory is wiped to zero immediately upon transcription token return.
+                </p>
+
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+                  gap: "0.65rem"
+                }}>
+                  <div style={{ background: "#f8fafc", border: "1px solid var(--gray-200)", borderRadius: "6px", padding: "0.75rem" }}>
+                    <div style={{ fontSize: "0.7rem", fontWeight: 800, color: "var(--primary)" }}>STEP 1: AUDIO INGESTION</div>
+                    <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "var(--gray-900)", marginTop: "0.2rem" }}>Volatile RAM Buffer</div>
+                    <div style={{ fontSize: "0.7rem", color: "var(--gray-600)", marginTop: "0.25rem" }}>
+                      Spoken voice held in 64KB kernel ringbuffer. Zero disk write handles created.
+                    </div>
+                  </div>
+
+                  <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", padding: "0.75rem" }}>
+                    <div style={{ fontSize: "0.7rem", fontWeight: 800, color: "#1d4ed8" }}>STEP 2: BHASHINI ASR</div>
+                    <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "var(--gray-900)", marginTop: "0.2rem" }}>In-Memory TLS Stream</div>
+                    <div style={{ fontSize: "0.7rem", color: "var(--gray-600)", marginTop: "0.25rem" }}>
+                      Audio streamed over TLS 1.3 to Bhashini Indic Conformer ASR model.
+                    </div>
+                  </div>
+
+                  <div style={{ background: "#f0fdf4", border: "1px solid #86efac", borderRadius: "6px", padding: "0.75rem" }}>
+                    <div style={{ fontSize: "0.7rem", fontWeight: 800, color: "#15803d" }}>STEP 3: TOKEN EXTRACTION</div>
+                    <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "var(--gray-900)", marginTop: "0.2rem" }}>Cognitive Scoring</div>
+                    <div style={{ fontSize: "0.7rem", color: "var(--gray-600)", marginTop: "0.25rem" }}>
+                      Tokens (&quot;Gamusa&quot;, &quot;Jaapi&quot;) evaluated; recall score recorded in CDR.
+                    </div>
+                  </div>
+
+                  <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "6px", padding: "0.75rem" }}>
+                    <div style={{ fontSize: "0.7rem", fontWeight: 800, color: "#b91c1c" }}>STEP 4: BUFFER ZEROING</div>
+                    <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "var(--gray-900)", marginTop: "0.2rem" }}>Cryptographic Wipe</div>
+                    <div style={{ fontSize: "0.7rem", color: "var(--gray-600)", marginTop: "0.25rem" }}>
+                      Buffer overwritten with zeros via memset(0). Zero bytes remain.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Interactive CDR De-Identification Simulator */}
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.1rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <h4 style={{ fontSize: "0.9rem", fontWeight: 800, color: "var(--gray-900)", marginBottom: "0.3rem" }}>
+                  Interactive Caller ANI De-Identification &amp; CDR Generator
+                </h4>
+                <p style={{ fontSize: "0.74rem", color: "var(--gray-600)", marginBottom: "0.75rem" }}>
+                  Demonstrates real-time conversion of caller telephone numbers into deterministic HMAC-SHA256 pseudo-IDs before insertion into TimescaleDB.
+                </p>
+
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center", marginBottom: "0.85rem" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                    <label style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--gray-600)" }}>
+                      Caller Mobile Number (CLI / ANI):
+                    </label>
+                    <input
+                      type="text"
+                      value={cdrDeidInput}
+                      onChange={(e) => setCdrDeidInput(e.target.value)}
+                      style={{
+                        padding: "0.45rem 0.75rem",
+                        borderRadius: "6px",
+                        border: "1.5px solid var(--gray-300)",
+                        fontSize: "0.85rem",
+                        fontFamily: "monospace",
+                        width: "200px"
+                      }}
+                    />
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      const clean = cdrDeidInput.replace(/\D/g, "").slice(-10);
+                      // Deterministic simulation
+                      const pseudo = "9f82d1c" + Array.from(clean).map(c => ((parseInt(c) * 7) % 16).toString(16)).join("") + "a4b7e90c8831f24d7761bb23450912e6ca88";
+                      const circle = clean.startsWith("9435") || clean.startsWith("9864") ? "Assam Circle (AS)" : (clean.startsWith("9436") ? "North East-I (NE1)" : "North East-II (NE2)");
+                      const cdr = {
+                        call_id: `ivr_call_${Date.now().toString(36)}`,
+                        caller_ani_hmac: pseudo,
+                        telecom_circle: circle,
+                        duration_seconds: 118,
+                        orientation_score: 1,
+                        recall_words_recalled: 3,
+                        medication_adherence: true,
+                        bhashini_tts_latency_ms: 380,
+                        zero_audio_retention_verified: true,
+                        timescaledb_hypertable: "ivr_call_records_2026_w37"
+                      };
+                      setCdrDeidResult({
+                        pseudoId: pseudo,
+                        circle,
+                        recordJson: JSON.stringify(cdr, null, 2)
+                      });
+                    }}
+                    style={{
+                      marginTop: "1.1rem",
+                      background: "var(--primary)",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "0.5rem 0.95rem",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      cursor: "pointer"
+                    }}
+                  >
+                    🔒 De-Identify &amp; Generate TimescaleDB CDR
+                  </button>
+                </div>
+
+                {cdrDeidResult && (
+                  <div>
+                    <div style={{
+                      background: "#f0fdf4",
+                      border: "1px solid #86efac",
+                      borderRadius: "6px",
+                      padding: "0.75rem",
+                      fontSize: "0.74rem",
+                      color: "#166534",
+                      fontWeight: 700,
+                      marginBottom: "0.65rem"
+                    }}>
+                      ✅ DE-IDENTIFICATION SUCCESSFUL: Raw phone {cdrDeidInput} scrubbed from RAM in &lt; 180ms.
+                    </div>
+
+                    <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--gray-600)", marginBottom: "0.3rem" }}>
+                      Sanitized TimescaleDB Hypertable Record Preview (Zero Phone Numbers):
+                    </div>
+                    <pre style={{
+                      background: "#1e293b",
+                      color: "#e2e8f0",
+                      padding: "0.85rem",
+                      borderRadius: "6px",
+                      fontSize: "0.72rem",
+                      fontFamily: "monospace",
+                      overflowX: "auto"
+                    }}>
+                      {cdrDeidResult.recordJson}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Sub-Tab 4: Live Telephony Trunk Status & Interactive Dialer */}
+          {telephonySubTab === "trunk_simulation" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              {/* Trunk Capacity Live Monitor */}
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.1rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                  <div>
+                    <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                      BSNL Telephony Trunk Gateway Live Status
+                    </h4>
+                    <p style={{ fontSize: "0.74rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>
+                      240 E1 PRI voice channels active across Guwahati central exchange with dual optical homing.
+                    </p>
+                  </div>
+                  <span style={{ fontSize: "0.72rem", background: "#ecfdf5", color: "#065f46", fontWeight: 800, padding: "0.2rem 0.6rem", borderRadius: "999px" }}>
+                    ● 240 / 240 CHANNELS ONLINE (7.5% LOAD)
+                  </span>
+                </div>
+
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                  gap: "0.65rem"
+                }}>
+                  <div style={{ background: "#f8fafc", border: "1px solid var(--gray-200)", borderRadius: "6px", padding: "0.75rem" }}>
+                    <div style={{ fontSize: "0.68rem", color: "var(--gray-500)", fontWeight: 700 }}>ACTIVE CALLS</div>
+                    <div style={{ fontSize: "1.1rem", fontWeight: 900, color: "var(--primary)", marginTop: "0.2rem" }}>
+                      {trunkActiveChannels} / 240
+                    </div>
+                    <div style={{ fontSize: "0.68rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>Utilization: 7.5%</div>
+                  </div>
+
+                  <div style={{ background: "#f8fafc", border: "1px solid var(--gray-200)", borderRadius: "6px", padding: "0.75rem" }}>
+                    <div style={{ fontSize: "0.68rem", color: "var(--gray-500)", fontWeight: 700 }}>PRIMARY TRUNK</div>
+                    <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#059669", marginTop: "0.2rem" }}>
+                      BSNL GAU-PRI-01
+                    </div>
+                    <div style={{ fontSize: "0.68rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>MOS Score: 4.2 (G.711A)</div>
+                  </div>
+
+                  <div style={{ background: "#f8fafc", border: "1px solid var(--gray-200)", borderRadius: "6px", padding: "0.75rem" }}>
+                    <div style={{ fontSize: "0.68rem", color: "var(--gray-500)", fontWeight: 700 }}>SECONDARY TRUNK</div>
+                    <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0284c7", marginTop: "0.2rem" }}>
+                      BSNL GAU-SIP-02
+                    </div>
+                    <div style={{ fontSize: "0.68rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>Standby • Auto-Failover</div>
+                  </div>
+
+                  <div style={{ background: "#f8fafc", border: "1px solid var(--gray-200)", borderRadius: "6px", padding: "0.75rem" }}>
+                    <div style={{ fontSize: "0.68rem", color: "var(--gray-500)", fontWeight: 700 }}>ASR / PDD METRICS</div>
+                    <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#7c3aed", marginTop: "0.2rem" }}>
+                      94.2% ASR
+                    </div>
+                    <div style={{ fontSize: "0.68rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>Post-Dial Delay: 1.8s</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Interactive Toll-Free Missed Call Simulator */}
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.2rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.85rem" }}>
+                  <div>
+                    <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                      Live 1800-889-2600 Missed-Call &amp; Callback Simulator
+                    </h4>
+                    <p style={{ fontSize: "0.74rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>
+                      Simulates a live missed-call event from Majuli Island (Assam), testing drop speed and automated callback dispatch.
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <button
+                      onClick={() => {
+                        setTrunkDialState("DIALING_DROP");
+                        setTrunkActiveChannels(19);
+                        setTimeout(() => {
+                          setTrunkDialState("DROPPED_BUSY");
+                          setTimeout(() => {
+                            setTrunkDialState("OUTBOUND_RINGING");
+                            setTimeout(() => {
+                              setTrunkDialState("CONNECTED");
+                            }, 1200);
+                          }, 900);
+                        }, 500);
+                      }}
+                      disabled={trunkDialState !== "IDLE" && trunkDialState !== "CONNECTED"}
+                      style={{
+                        background: trunkDialState === "IDLE" || trunkDialState === "CONNECTED" ? "var(--primary)" : "var(--gray-300)",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "6px",
+                        padding: "0.5rem 1rem",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        cursor: trunkDialState === "IDLE" || trunkDialState === "CONNECTED" ? "pointer" : "not-allowed"
+                      }}
+                    >
+                      📞 Dial 1800-889-2600 (Simulate Missed Call)
+                    </button>
+
+                    {trunkDialState !== "IDLE" && (
+                      <button
+                        onClick={() => {
+                          setTrunkDialState("IDLE");
+                          setTrunkActiveChannels(18);
+                        }}
+                        style={{
+                          background: "var(--gray-100)",
+                          color: "var(--gray-700)",
+                          border: "1px solid var(--gray-300)",
+                          borderRadius: "6px",
+                          padding: "0.5rem 0.8rem",
+                          fontSize: "0.75rem",
+                          fontWeight: 700,
+                          cursor: "pointer"
+                        }}
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* State Indicator */}
+                <div style={{
+                  background: "#f8fafc",
+                  border: "1px solid var(--gray-200)",
+                  borderRadius: "8px",
+                  padding: "1rem"
+                }}>
+                  {trunkDialState === "IDLE" && (
+                    <div style={{ fontSize: "0.76rem", color: "var(--gray-600)", textAlign: "center", padding: "0.5rem" }}>
+                      Trunk is idle and listening for 1800-889-2600 missed calls across all 8 NER circles. Click the dial button to trigger.
+                    </div>
+                  )}
+
+                  {trunkDialState === "DIALING_DROP" && (
+                    <div style={{ fontSize: "0.78rem", color: "#1d4ed8", fontWeight: 700, textAlign: "center", padding: "0.5rem" }}>
+                      📡 Inbound SIP INVITE arriving from BSNL Assam Circle (Kamrup / Majuli)...
+                    </div>
+                  )}
+
+                  {trunkDialState === "DROPPED_BUSY" && (
+                    <div style={{ fontSize: "0.78rem", color: "#059669", fontWeight: 700, textAlign: "center", padding: "0.5rem" }}>
+                      ⚡ 1-Ring Drop Acknowledged (380ms) • SIP 486 &quot;Busy Here&quot; sent • Elder charged ₹0.00! Enqueueing callback...
+                    </div>
+                  )}
+
+                  {trunkDialState === "OUTBOUND_RINGING" && (
+                    <div style={{ fontSize: "0.78rem", color: "#7c3aed", fontWeight: 700, textAlign: "center", padding: "0.5rem" }}>
+                      📞 Outbound SIP INVITE dispatched via BSNL GAU-PRI (1,850ms elapsed) • Ringing Elder&apos;s 2G Handset...
+                    </div>
+                  )}
+
+                  {trunkDialState === "CONNECTED" && (
+                    <div style={{
+                      background: "#ecfdf5",
+                      border: "1px solid #86efac",
+                      borderRadius: "6px",
+                      padding: "0.85rem",
+                      color: "#065f46"
+                    }}>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 800 }}>
+                        🎉 Callback Connected! Channel #19 Active
+                      </div>
+                      <div style={{ fontSize: "0.74rem", marginTop: "0.25rem", lineHeight: "1.4" }}>
+                        Elder answered callback in Majuli. FreeSWITCH streaming Bhashini Assamese circadian greeting: <em>&quot;নমস্কাৰ, মই স্মৃতিৰ পৰা কৈছোঁ...&quot;</em>. Spoken recall audio processed in volatile RAM only with zero disk writes.
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

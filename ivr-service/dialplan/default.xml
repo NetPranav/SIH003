@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Smriti-NER (স্মৃতি / ꯁ꯭ꯃ꯭ꯔꯤꯇꯤ) — FreeSWITCH Production XML Dialplan
+  SIH 2026 Problem Statement ID: 26003 | MDoNER
+  Handles 1800-889-2600 missed-call detection, instant drop, and outbound callback dispatch
+-->
+<include>
+  <context name="smriti-tollfree-inbound">
+    
+    <!-- 1. Dedicated Toll-Free Missed Call Inbound Route (1800-889-2600) -->
+    <extension name="tollfree_missed_call_drop">
+      <condition field="destination_number" expression="^(18008892600|1800-889-2600|\+9118008892600)$">
+        <!-- Capture caller ANI and timing -->
+        <action application="set" data="smriti_call_epoch=${epoch}"/>
+        <action application="set" data="smriti_caller_cli=${caller_id_number}"/>
+        <action application="set" data="smriti_circle=${sip_h_X-BSNL-Circle}"/>
+        
+        <!-- Fire asynchronous event to Python Telephony Gateway via Event Socket Library (ESL) -->
+        <action application="event" data="Event-Subclass=smriti::missed_call,Caller-CLI=${caller_id_number},TollFree=18008892600,Circle=${smriti_circle}"/>
+        
+        <!-- Drop call in < 450ms without answering so the elder is charged 0.00 INR -->
+        <action application="sleep" data="300"/>
+        <action application="respond" data="486 Busy Here"/>
+        <action application="hangup" data="NORMAL_CLEARING"/>
+      </condition>
+    </extension>
+
+    <!-- 2. Automated Outbound Callback Audio Session Route -->
+    <extension name="smriti_outbound_session">
+      <condition field="destination_number" expression="^smriti_callback_(\d+)$">
+        <action application="answer"/>
+        <action application="set" data="playback_terminators=#*"/>
+        <action application="set" data="record_sample_rate=16000"/>
+        
+        <!-- Ephemeral Media Buffer Flag: zero disk writing, in-memory stream only -->
+        <action application="set" data="enable_file_write=false"/>
+        <action application="set" data="smriti_ephemeral_stream=true"/>
+        
+        <!-- Coordinates with Python ESL daemon for Bhashini Indic ASR & TTS -->
+        <action application="socket" data="127.0.0.1:8084 async full"/>
+      </condition>
+    </extension>
+
+  </context>
+</include>
