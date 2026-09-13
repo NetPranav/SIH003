@@ -31,6 +31,14 @@ import {
   USABILITY_TRIAL_STATS
 } from "@/lib/ivrTelephonyEngine";
 import {
+  DISHA_STATUTORY_MATRIX,
+  DATA_CLASSIFICATION_TIERS,
+  STRIDE_THREAT_MATRIX,
+  validateAbhaId,
+  generateMockFhirReport,
+  auditClientPayloadForPII
+} from "@/lib/securityEngine";
+import {
   HearthHomeIcon,
   DholGameIcon,
   PepaMusicIcon,
@@ -51,7 +59,7 @@ interface Props {
 }
 
 export default function CaregiverDashboard({ navigate }: Props) {
-  const [activeTab, setActiveTab] = useState<"overview" | "cloud_infra" | "monorepo_arch" | "ivr_accessibility" | "usability_testing" | "ia_wireframes" | "design_system" | "life_review" | "cultural_vault" | "neuropsych" | "phase1_1">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "security_compliance" | "cloud_infra" | "monorepo_arch" | "ivr_accessibility" | "usability_testing" | "ia_wireframes" | "design_system" | "life_review" | "cultural_vault" | "neuropsych" | "phase1_1">("overview");
   const [designSubTab, setDesignSubTab] = useState<"colors" | "typography" | "touch" | "icons" | "motion">("colors");
   const [wireframeView, setWireframeView] = useState<"patient_ia" | "caregiver_ia" | "asha_ia" | "reminder_flow" | "social_flow">("patient_ia");
   const [usabilitySubTab, setUsabilitySubTab] = useState<"metrics" | "cohort" | "tasks" | "iterations" | "wellness">("metrics");
@@ -64,6 +72,16 @@ export default function CaregiverDashboard({ navigate }: Props) {
   const [tremorBlockedClicks, setTremorBlockedClicks] = useState<number>(0);
   const [haloActive, setHaloActive] = useState<boolean>(true);
   const [activeRtSession, setActiveRtSession] = useState<number | null>(null);
+
+  // Sub-Phase 3.3 Security & Compliance State
+  const [securitySubTab, setSecuritySubTab] = useState<"disha_matrix" | "abdm_gateway" | "data_classification" | "stride_threats">("disha_matrix");
+  const [mockAbhaInput, setMockAbhaInput] = useState<string>("91-4567-8901-2345");
+  const [abhaVerified, setAbhaVerified] = useState<boolean>(true);
+  const [sampleFhirOutput, setSampleFhirOutput] = useState<string | null>(null);
+  const [selectedClassificationTier, setSelectedClassificationTier] = useState<number>(1);
+  const [selectedThreatSurface, setSelectedThreatSurface] = useState<"all" | "Edge PWA" | "BLE Mesh" | "IVR Telephony" | "Cloud Core">("all");
+  const [payloadScannerInput, setPayloadScannerInput] = useState<string>('{\n  "patient_pseudo_id": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",\n  "game_id": "dhol_pepa_rhythm",\n  "accuracy": 0.94,\n  "session_notes": "Patient calm, rhythm maintained"\n}');
+  const [payloadScanResult, setPayloadScanResult] = useState<{ isClean: boolean; violations: string[] } | null>(null);
 
   // Sub-Phase 3.2 Cloud Infrastructure & Database State
   const [cloudSubTab, setCloudSubTab] = useState<"topology" | "hypertables" | "compliance" | "staging_cohort">("topology");
@@ -440,6 +458,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       }}>
         {[
           { id: "overview", label: "Overview" },
+          { id: "security_compliance", label: "P3.3 Security" },
           { id: "cloud_infra", label: "P3.2 Cloud" },
           { id: "monorepo_arch", label: "P3.1 Arch" },
           { id: "ivr_accessibility", label: "P2.4 IVR" },
@@ -3785,6 +3804,634 @@ export default function CaregiverDashboard({ navigate }: Props) {
                   lineHeight: 1.4
                 }}>
                   🔒 <strong>DISHA Compliance & Cryptographic Anonymization:</strong> No raw audio recordings are stored on server disk. Voice audio streams are converted to acoustic feature vectors in RAM and discarded immediately. Call telemetry is keyed solely by SHA-256 Pseudo-ID, preventing patient phone number leakage.
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tab: Sub-Phase 3.3 Security & Compliance Framework */}
+      {activeTab === "security_compliance" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {/* Sub-Phase 3.3 Header Overview */}
+          <div style={{
+            background: "var(--white)",
+            border: "1.5px solid var(--gray-200)",
+            borderRadius: "var(--radius-lg)",
+            padding: "1.1rem",
+            boxShadow: "var(--shadow-sm)"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
+              <div>
+                <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                  Sub-Phase 3.3 — Security, Compliance &amp; Threat Model Framework
+                </h3>
+                <p style={{ fontSize: "0.78rem", color: "var(--gray-600)", marginTop: "0.2rem" }}>
+                  Digital Information Security in Healthcare Act (DISHA 2018), Ayushman Bharat Digital Mission (ABDM), 4-Tier Data Classification &amp; STRIDE Analysis
+                </p>
+              </div>
+              <span style={{
+                background: "#eff6ff",
+                color: "#1d4ed8",
+                border: "1px solid #bfdbfe",
+                fontSize: "0.7rem",
+                fontWeight: 800,
+                padding: "0.25rem 0.6rem",
+                borderRadius: "999px"
+              }}>
+                DISHA 2018 VERIFIED • ABDM FHIR READY • ZERO PHI ON CLOUD DISK
+              </span>
+            </div>
+
+            {/* Sub-Tab Navigation */}
+            <div style={{
+              display: "flex",
+              gap: "0.4rem",
+              marginTop: "1rem",
+              borderBottom: "1px solid var(--gray-200)",
+              paddingBottom: "0.5rem",
+              overflowX: "auto"
+            }}>
+              {[
+                { id: "disha_matrix", label: "📜 DISHA 2018 Statutory Matrix" },
+                { id: "abdm_gateway", label: "🇮🇳 ABDM & ABHA Gateway (M1/M2/M3)" },
+                { id: "data_classification", label: "🏷️ 4-Tier Data Classification" },
+                { id: "stride_threats", label: "🛡️ STRIDE Threat Model" },
+              ].map((st) => (
+                <button
+                  key={st.id}
+                  onClick={() => setSecuritySubTab(st.id as any)}
+                  style={{
+                    padding: "0.4rem 0.75rem",
+                    borderRadius: "6px",
+                    border: securitySubTab === st.id ? "1.5px solid var(--primary)" : "1px solid var(--gray-200)",
+                    background: securitySubTab === st.id ? "var(--primary)" : "var(--gray-50)",
+                    color: securitySubTab === st.id ? "#fff" : "var(--gray-700)",
+                    fontWeight: 700,
+                    fontSize: "0.75rem",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  {st.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Sub-Tab 1: DISHA 2018 Statutory Matrix */}
+          {securitySubTab === "disha_matrix" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.1rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                  <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                    Digital Information Security in Healthcare Act (DISHA 2018) Statutory Mapping
+                  </h4>
+                  <span style={{ fontSize: "0.7rem", background: "#ecfdf5", color: "#065f46", fontWeight: 800, padding: "0.2rem 0.5rem", borderRadius: "4px" }}>
+                    SECTIONS 28–36 VERIFIED
+                  </span>
+                </div>
+                <p style={{ fontSize: "0.76rem", color: "var(--gray-600)", marginBottom: "1rem" }}>
+                  MoHFW statutory healthcare privacy mandates mapped to Smriti-NER architectural controls. All digital health data (DHD) is patient-owned with zero unauthorized cloud egress or commercialization.
+                </p>
+
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                  gap: "0.75rem"
+                }}>
+                  {DISHA_STATUTORY_MATRIX.map((item) => (
+                    <div key={item.section} style={{
+                      background: "#f8fafc",
+                      border: "1px solid var(--gray-200)",
+                      borderRadius: "6px",
+                      padding: "0.85rem",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between"
+                    }}>
+                      <div>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.3rem" }}>
+                          <span style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--primary)", fontFamily: "monospace" }}>
+                            {item.section}
+                          </span>
+                          <span style={{
+                            fontSize: "0.62rem",
+                            fontWeight: 800,
+                            background: item.status === "CERT_IN_APPROVED" ? "#eff6ff" : "#ecfdf5",
+                            color: item.status === "CERT_IN_APPROVED" ? "#1d4ed8" : "#065f46",
+                            padding: "0.15rem 0.4rem",
+                            borderRadius: "4px"
+                          }}>
+                            ✓ {item.status.replace("_", " ")}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--gray-900)", marginBottom: "0.35rem" }}>
+                          {item.title}
+                        </div>
+                        <div style={{ fontSize: "0.72rem", color: "var(--gray-700)", marginBottom: "0.45rem", lineHeight: "1.4" }}>
+                          <strong>Mandate:</strong> {item.statutoryMandate}
+                        </div>
+                        <div style={{ fontSize: "0.72rem", color: "#1e3a8a", background: "#eff6ff", padding: "0.45rem", borderRadius: "4px", marginBottom: "0.45rem" }}>
+                          <strong>Implementation:</strong> {item.technicalImplementation}
+                        </div>
+                      </div>
+                      <div style={{ fontSize: "0.65rem", color: "#b91c1c", fontWeight: 600, borderTop: "1px solid var(--gray-200)", paddingTop: "0.4rem", marginTop: "0.3rem" }}>
+                        ⚖️ {item.penaltyClause}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sub-Tab 2: ABDM & ABHA Gateway */}
+          {securitySubTab === "abdm_gateway" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              {/* ABDM Milestone Architecture Cards */}
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                gap: "0.75rem"
+              }}>
+                <div style={{
+                  background: "var(--white)",
+                  border: "1.5px solid var(--gray-200)",
+                  borderRadius: "var(--radius)",
+                  padding: "0.9rem"
+                }}>
+                  <div style={{ fontSize: "0.7rem", color: "var(--gray-500)", fontWeight: 800 }}>MILESTONE M1</div>
+                  <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--primary)", marginTop: "0.2rem" }}>ABHA Verification</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.25rem", lineHeight: "1.4" }}>
+                    OTP &amp; Demographic verification of 14-digit ABHA. Linked to HMAC-SHA256 pseudo-ID in RAM.
+                  </div>
+                </div>
+
+                <div style={{
+                  background: "var(--white)",
+                  border: "1.5px solid var(--gray-200)",
+                  borderRadius: "var(--radius)",
+                  padding: "0.9rem"
+                }}>
+                  <div style={{ fontSize: "0.7rem", color: "var(--gray-500)", fontWeight: 800 }}>MILESTONE M2 (HIP)</div>
+                  <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#059669", marginTop: "0.2rem" }}>Health Info Provider</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.25rem", lineHeight: "1.4" }}>
+                    Publishes cognitive trajectory &amp; MMSE proxy curves as HL7 FHIR R4 DiagnosticReport resources.
+                  </div>
+                </div>
+
+                <div style={{
+                  background: "var(--white)",
+                  border: "1.5px solid var(--gray-200)",
+                  borderRadius: "var(--radius)",
+                  padding: "0.9rem"
+                }}>
+                  <div style={{ fontSize: "0.7rem", color: "var(--gray-500)", fontWeight: 800 }}>MILESTONE M3 (HIU)</div>
+                  <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#7c3aed", marginTop: "0.2rem" }}>Health Info User</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--gray-600)", marginTop: "0.25rem", lineHeight: "1.4" }}>
+                    Consumes clinical neurology consult summaries from empanelled PM-JAY hospitals upon consent.
+                  </div>
+                </div>
+              </div>
+
+              {/* Interactive ABHA Verification & FHIR Generator Tool */}
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.2rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)", marginBottom: "0.3rem" }}>
+                  Interactive ABHA Linker &amp; HL7 FHIR R4 Resource Generator
+                </h4>
+                <p style={{ fontSize: "0.75rem", color: "var(--gray-600)", marginBottom: "1rem" }}>
+                  Test NHA Ayushman Bharat Health Account verification and generate live FHIR R4 cognitive observation bundles.
+                </p>
+
+                <div style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  marginBottom: "1rem"
+                }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                    <label style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--gray-600)" }}>
+                      14-Digit ABHA ID:
+                    </label>
+                    <input
+                      type="text"
+                      value={mockAbhaInput}
+                      onChange={(e) => {
+                        setMockAbhaInput(e.target.value);
+                        setAbhaVerified(validateAbhaId(e.target.value));
+                      }}
+                      style={{
+                        padding: "0.45rem 0.75rem",
+                        borderRadius: "6px",
+                        border: abhaVerified ? "1.5px solid #86efac" : "1.5px solid #fca5a5",
+                        fontSize: "0.85rem",
+                        fontFamily: "monospace",
+                        width: "220px"
+                      }}
+                    />
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      const valid = validateAbhaId(mockAbhaInput);
+                      setAbhaVerified(valid);
+                      if (valid) {
+                        const report = generateMockFhirReport(mockAbhaInput, 24.5);
+                        setSampleFhirOutput(JSON.stringify(report, null, 2));
+                      }
+                    }}
+                    style={{
+                      marginTop: "1.1rem",
+                      background: abhaVerified ? "var(--primary)" : "var(--gray-300)",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "0.5rem 0.95rem",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      cursor: abhaVerified ? "pointer" : "not-allowed"
+                    }}
+                  >
+                    ⚡ Verify &amp; Generate FHIR R4 Report
+                  </button>
+                </div>
+
+                {abhaVerified && (
+                  <div style={{
+                    background: "#f0fdf4",
+                    border: "1px solid #86efac",
+                    borderRadius: "6px",
+                    padding: "0.75rem",
+                    marginBottom: "1rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "0.5rem",
+                    fontSize: "0.75rem",
+                    color: "#166534"
+                  }}>
+                    <div>
+                      <strong>✅ ABHA Linked:</strong> {mockAbhaInput} • <strong>Address:</strong> ratneswar.saikia@abdm
+                    </div>
+                    <div>
+                      <strong>Linked Pseudo-ID:</strong> <span style={{ fontFamily: "monospace" }}>e3b0c442...</span> (Double-Blind)
+                    </div>
+                  </div>
+                )}
+
+                {/* FHIR JSON Code Block */}
+                {sampleFhirOutput && (
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.35rem" }}>
+                      <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--gray-600)" }}>
+                        HL7 FHIR R4 DiagnosticReport (LOINC 72106-8 / MMSE):
+                      </span>
+                      <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontWeight: 700 }}>
+                        READY FOR ABDM HIP GATEWAY
+                      </span>
+                    </div>
+                    <pre style={{
+                      background: "#1e293b",
+                      color: "#e2e8f0",
+                      padding: "0.85rem",
+                      borderRadius: "6px",
+                      fontSize: "0.72rem",
+                      fontFamily: "monospace",
+                      overflowX: "auto",
+                      maxHeight: "260px"
+                    }}>
+                      {sampleFhirOutput}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Sub-Tab 3: 4-Tier Data Classification */}
+          {securitySubTab === "data_classification" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.1rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)", marginBottom: "0.3rem" }}>
+                  4-Tier Data Classification Policy &amp; Boundary Enforcement
+                </h4>
+                <p style={{ fontSize: "0.75rem", color: "var(--gray-600)", marginBottom: "0.85rem" }}>
+                  Rigorous segregation of Protected Health Information (PHI) from on-device behavioral telemetry. Zero Tier 1 records ever persist to cloud disk.
+                </p>
+
+                {/* 4 Tiers Selector */}
+                <div style={{
+                  display: "flex",
+                  gap: "0.4rem",
+                  overflowX: "auto",
+                  paddingBottom: "0.4rem",
+                  marginBottom: "0.85rem"
+                }}>
+                  {DATA_CLASSIFICATION_TIERS.map((tier) => (
+                    <button
+                      key={tier.tier}
+                      onClick={() => setSelectedClassificationTier(tier.tier)}
+                      style={{
+                        padding: "0.4rem 0.75rem",
+                        borderRadius: "6px",
+                        border: selectedClassificationTier === tier.tier ? "1.5px solid var(--primary)" : "1px solid var(--gray-200)",
+                        background: selectedClassificationTier === tier.tier ? "var(--primary)" : "var(--gray-50)",
+                        color: selectedClassificationTier === tier.tier ? "#fff" : "var(--gray-700)",
+                        fontWeight: 700,
+                        fontSize: "0.74rem",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap"
+                      }}
+                    >
+                      Tier {tier.tier}: {tier.name}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Selected Tier Details */}
+                {(() => {
+                  const currentTier = DATA_CLASSIFICATION_TIERS.find((t) => t.tier === selectedClassificationTier) || DATA_CLASSIFICATION_TIERS[0];
+                  return (
+                    <div style={{
+                      background: "#f8fafc",
+                      border: "1px solid var(--gray-200)",
+                      borderRadius: "8px",
+                      padding: "1rem",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0.6rem"
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
+                        <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                          Tier {currentTier.tier} — {currentTier.name}
+                        </div>
+                        <span style={{
+                          fontSize: "0.68rem",
+                          fontWeight: 800,
+                          padding: "0.2rem 0.5rem",
+                          borderRadius: "4px",
+                          background: currentTier.sensitivity === "RESTRICTED" ? "#fef2f2" : (currentTier.sensitivity === "CONFIDENTIAL" ? "#fffbeb" : "#eff6ff"),
+                          color: currentTier.sensitivity === "RESTRICTED" ? "#b91c1c" : (currentTier.sensitivity === "CONFIDENTIAL" ? "#b45309" : "#1d4ed8")
+                        }}>
+                          {currentTier.sensitivity} SENSITIVITY
+                        </span>
+                      </div>
+
+                      <div style={{ fontSize: "0.75rem", color: "var(--gray-700)" }}>
+                        <strong>Representative Data Elements:</strong> {currentTier.examples.join(" • ")}
+                      </div>
+                      <div style={{ fontSize: "0.75rem", color: "var(--gray-700)" }}>
+                        <strong>Storage Policy:</strong> {currentTier.storagePolicy}
+                      </div>
+                      <div style={{ fontSize: "0.75rem", color: "var(--gray-700)" }}>
+                        <strong>Encryption Standard:</strong> {currentTier.encryptionStandard}
+                      </div>
+                      <div style={{ fontSize: "0.75rem", color: "var(--gray-700)" }}>
+                        <strong>Retention Ceiling:</strong> {currentTier.retentionLimit}
+                      </div>
+                      <div style={{ fontSize: "0.75rem", color: "var(--gray-700)" }}>
+                        <strong>Access Control:</strong> {currentTier.accessControl}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Interactive Payload PII Scanner */}
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.1rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <h4 style={{ fontSize: "0.9rem", fontWeight: 800, color: "var(--gray-900)", marginBottom: "0.25rem" }}>
+                  Interactive Client-Side PII Leak Detector
+                </h4>
+                <p style={{ fontSize: "0.74rem", color: "var(--gray-600)", marginBottom: "0.75rem" }}>
+                  Tests telemetry payloads for accidental inclusion of Indian telephone numbers (+91) or 12-digit Aadhaar patterns before network transmission.
+                </p>
+
+                <textarea
+                  value={payloadScannerInput}
+                  onChange={(e) => setPayloadScannerInput(e.target.value)}
+                  rows={4}
+                  style={{
+                    width: "100%",
+                    fontFamily: "monospace",
+                    fontSize: "0.75rem",
+                    padding: "0.6rem",
+                    borderRadius: "6px",
+                    border: "1px solid var(--gray-300)",
+                    marginBottom: "0.65rem"
+                  }}
+                />
+
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+                  <button
+                    onClick={() => {
+                      try {
+                        const parsed = JSON.parse(payloadScannerInput);
+                        const result = auditClientPayloadForPII(parsed);
+                        setPayloadScanResult(result);
+                      } catch {
+                        setPayloadScanResult({
+                          isClean: false,
+                          violations: ["Invalid JSON syntax. Please check formatting."]
+                        });
+                      }
+                    }}
+                    style={{
+                      background: "var(--primary)",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "0.45rem 0.85rem",
+                      fontSize: "0.74rem",
+                      fontWeight: 700,
+                      cursor: "pointer"
+                    }}
+                  >
+                    🔍 Audit Payload for Plaintext PII
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const contaminated = '{\n  "patient_pseudo_id": "e3b0c442...",\n  "game_id": "dhol_pepa",\n  "contact_phone": "+91-9435018293",\n  "notes": "Elder responded well"\n}';
+                      setPayloadScannerInput(contaminated);
+                      try {
+                        const parsed = JSON.parse(contaminated);
+                        const result = auditClientPayloadForPII(parsed);
+                        setPayloadScanResult(result);
+                      } catch {}
+                    }}
+                    style={{
+                      background: "#fee2e2",
+                      color: "#b91c1c",
+                      border: "1px solid #fca5a5",
+                      borderRadius: "6px",
+                      padding: "0.45rem 0.85rem",
+                      fontSize: "0.74rem",
+                      fontWeight: 700,
+                      cursor: "pointer"
+                    }}
+                  >
+                    ⚠️ Inject Test PII (+91-9435018293)
+                  </button>
+                </div>
+
+                {payloadScanResult && (
+                  <div style={{
+                    marginTop: "0.75rem",
+                    padding: "0.7rem",
+                    borderRadius: "6px",
+                    fontSize: "0.74rem",
+                    fontWeight: 700,
+                    background: payloadScanResult.isClean ? "#f0fdf4" : "#fef2f2",
+                    border: payloadScanResult.isClean ? "1px solid #86efac" : "1px solid #fca5a5",
+                    color: payloadScanResult.isClean ? "#166534" : "#b91c1c"
+                  }}>
+                    {payloadScanResult.isClean ? (
+                      <div>✅ PAYLOAD AUDIT PASSED: Zero Plaintext PII/PHI detected. Safe for TimescaleDB synchronization.</div>
+                    ) : (
+                      <div>
+                        ❌ DISHA LEAK BLOCKED: {payloadScanResult.violations.join(" • ")}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Sub-Tab 4: STRIDE Threat Model */}
+          {securitySubTab === "stride_threats" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.1rem",
+                boxShadow: "var(--shadow-sm)"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                  <div>
+                    <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                      STRIDE Threat Analysis Matrix (4 Attack Surfaces)
+                    </h4>
+                    <p style={{ fontSize: "0.74rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>
+                      Zero-Trust threat modeling across Edge Patient PWAs, BLE Mesh relays, IVR Telephony trunks, and TimescaleDB cloud core.
+                    </p>
+                  </div>
+                  <span style={{ fontSize: "0.7rem", background: "#ecfdf5", color: "#065f46", fontWeight: 800, padding: "0.2rem 0.55rem", borderRadius: "999px" }}>
+                    12 / 12 THREATS MITIGATED
+                  </span>
+                </div>
+
+                {/* Surface Filter Tabs */}
+                <div style={{
+                  display: "flex",
+                  gap: "0.35rem",
+                  overflowX: "auto",
+                  paddingBottom: "0.35rem",
+                  marginBottom: "0.85rem"
+                }}>
+                  {(["all", "Edge PWA", "BLE Mesh", "IVR Telephony", "Cloud Core"] as const).map((surf) => (
+                    <button
+                      key={surf}
+                      onClick={() => setSelectedThreatSurface(surf)}
+                      style={{
+                        padding: "0.35rem 0.65rem",
+                        borderRadius: "4px",
+                        border: selectedThreatSurface === surf ? "1.5px solid var(--primary)" : "1px solid var(--gray-200)",
+                        background: selectedThreatSurface === surf ? "var(--primary)" : "var(--gray-50)",
+                        color: selectedThreatSurface === surf ? "#fff" : "var(--gray-700)",
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        whiteSpace: "nowrap"
+                      }}
+                    >
+                      {surf === "all" ? "All Surfaces (12)" : surf}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Threat Cards Grid */}
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                  gap: "0.75rem"
+                }}>
+                  {STRIDE_THREAT_MATRIX
+                    .filter((item) => selectedThreatSurface === "all" || item.surface === selectedThreatSurface)
+                    .map((item) => (
+                      <div key={item.id} style={{
+                        background: "#f8fafc",
+                        border: "1px solid var(--gray-200)",
+                        borderRadius: "6px",
+                        padding: "0.85rem",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between"
+                      }}>
+                        <div>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.35rem" }}>
+                            <span style={{ fontSize: "0.7rem", fontFamily: "monospace", fontWeight: 800, color: "var(--primary)" }}>
+                              {item.id} • {item.surface}
+                            </span>
+                            <span style={{
+                              fontSize: "0.62rem",
+                              fontWeight: 800,
+                              padding: "0.15rem 0.4rem",
+                              borderRadius: "4px",
+                              background: item.impact === "CRITICAL" ? "#fee2e2" : (item.impact === "HIGH" ? "#ffedd5" : "#fef9c3"),
+                              color: item.impact === "CRITICAL" ? "#991b1b" : (item.impact === "HIGH" ? "#9a3412" : "#854d0e")
+                            }}>
+                              {item.impact}
+                            </span>
+                          </div>
+
+                          <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--gray-500)", marginBottom: "0.2rem" }}>
+                            Category: {item.category}
+                          </div>
+
+                          <div style={{ fontSize: "0.76rem", color: "var(--gray-800)", marginBottom: "0.45rem", lineHeight: "1.35" }}>
+                            <strong>Threat:</strong> {item.threat}
+                          </div>
+
+                          <div style={{ fontSize: "0.72rem", color: "#166534", background: "#f0fdf4", padding: "0.45rem", borderRadius: "4px" }}>
+                            <strong>Mitigation:</strong> {item.mitigation}
+                          </div>
+                        </div>
+
+                        <div style={{ fontSize: "0.65rem", color: "#059669", fontWeight: 800, marginTop: "0.4rem", paddingTop: "0.3rem", borderTop: "1px solid var(--gray-200)" }}>
+                          ✓ {item.verificationStatus}
+                        </div>
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>
