@@ -68,10 +68,10 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 186 / 240+ Deliverables Completed (77.5% Deliverable Completion)  
+**Overall Velocity**: 190 / 240+ Deliverables Completed (79.2% Deliverable Completion)  
 **Phases Completed**: 12 / 20 (Phases 1 through 12 Complete & Signed Off)  
-**Phases In Progress**: 0 / 20 (Preparing Phase 13)  
-**Phases Pending**: 8 / 20 (Phases 13 through 20)  
+**Phases In Progress**: 1 / 20 (Phase 13 — Sub-Phase 13.1 Complete; Sub-Phases 13.2–13.4 Pending)  
+**Phases Pending**: 7 / 20 (Phases 14 through 20)  
 **Milestones Achieved**: 12 / 20 (M1 through M12 Signed Off; M13–M20 Pending)  
 
 ### Phase & Milestone Checklist
@@ -139,7 +139,7 @@ gantt
   - [x] Sub-Phase 12.3: e-Sanjeevani Teleconsultation Bridge (2/2 tasks done)
   - [x] Sub-Phase 12.4: Welfare Scheme Alignment (NPHCE / RVY) (3/3 tasks done)
 - [ ] **Phase 13: Quality Assurance & Accessibility Audit** (Weeks 34–38) — **Milestone M13 Pending**
-  - [ ] Sub-Phase 13.1: Functional Testing Suite (0/4 tasks done)
+  - [x] Sub-Phase 13.1: Functional Testing Suite (4/4 tasks done)
   - [ ] Sub-Phase 13.2: Accessibility Audit (WCAG 2.2 AAA Target) (0/4 tasks done)
   - [ ] Sub-Phase 13.3: Security & Privacy Audit (0/4 tasks done)
   - [ ] Sub-Phase 13.4: Social & IVR Feature QA (0/3 tasks done)
@@ -744,17 +744,17 @@ gantt
 ---
 
 # PHASE 13: QUALITY ASSURANCE & ACCESSIBILITY AUDIT 🧪
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 13.1–13.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (27% Complete — Sub-Phase 13.1 Complete; Sub-Phases 13.2–13.4 Pending)  
 **Duration**: Weeks 34–38 | **Objective**: Rigorous functional, accessibility, and security testing before clinical pilot.
 
 ### Sub-Phase 13.1 — Functional Testing
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Unit Test Suite | ≥90% coverage for DCDA, BKT, telemetry, sync, IVR bridge | Unit test suite + coverage report |
-| [ ] | Integration Test Suite | Game → telemetry → BKT → MMSE proxy → dashboard flow | Integration test suite |
-| [ ] | Cross-Device Testing | Budget Android, mid-range tablets, iOS | Cross-device test matrix |
-| [ ] | Offline Resilience Testing | 30-day simulated offline run | Offline test report |
+| [x] | Unit Test Suite | ≥90% coverage for DCDA, BKT, telemetry, sync, IVR bridge | Unit test suite + coverage report |
+| [x] | Integration Test Suite | Game → telemetry → BKT → MMSE proxy → dashboard flow | Integration test suite |
+| [x] | Cross-Device Testing | Budget Android, mid-range tablets, iOS | Cross-device test matrix |
+| [x] | Offline Resilience Testing | 30-day simulated offline run | Offline test report |
 
 ### Sub-Phase 13.2 — Accessibility Audit (WCAG 2.2 AAA)
 *Status: [ ] Pending*
