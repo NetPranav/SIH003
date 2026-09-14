@@ -1,0 +1,69 @@
+{
+  "common": {
+    "app_title": "Smriti-NER (স্মৃতি)",
+    "back": "Kir leh",
+    "next": "Kal leh",
+    "help": "Puihna",
+    "repeat": "Sawh nawn",
+    "listen": "Ngaithla",
+    "yes": "Aw",
+    "confirm": "Nemnghet",
+    "close": "Khar",
+    "offline_badge": "Offline Him",
+    "online_badge": "Online Awn",
+    "sync_complete": "Vawn fel vek a ni"
+  },
+  "home": {
+    "greeting": "Chibai {name} {kinship}!",
+    "wellness_card_title": "Ni tin rilru hriselna",
+    "daily_challenge_title": "Vawiin hnam infiamna",
+    "start_session": "Infiam tan rawh",
+    "language_selector": "Ṭawng thlang rawh",
+    "caregiver_portal": "Chhungkaw Portal"
+  },
+  "games": {
+    "dhol_pepa": {
+      "title": "Hnam rimawi ri",
+      "subtitle": "Rimawi hmanrua hriatrengna",
+      "instruction": "A ri ngaithla la, hmanraw dik tawk rawh."
+    },
+    "kaziranga": {
+      "title": "Ramhnuai sa zawnna",
+      "subtitle": "Nungcha leh ramngaw hriatzauna",
+      "instruction": "Hnim kar a rannung bihruk zawng chhuak rawh."
+    },
+    "loom": {
+      "title": "Puan tah ziarang",
+      "subtitle": "Puan ziarang leh rawng thliarhran",
+      "instruction": "Ziarang hre reng la laza dik thlang rawh."
+    },
+    "haat": {
+      "title": "Bazar hriatrengna",
+      "subtitle": "Bazar thil man chhut leh hriatna",
+      "instruction": "Chawhmeh siamna tur token hmangin lei rawh."
+    }
+  },
+  "aacb": {
+    "guidance_title": "Chhungte puihna ({kinship})",
+    "soothing_message": "Mangang suh, kan ti dun zel dawn nia.",
+    "target_hint": "Rangkachak rawng eng kha en rawh le."
+  },
+  "circadian": {
+    "sundowning_alert": "Tlailam hun reh",
+    "twilight_calm_title": "Tlailam hla muanawm",
+    "lullaby_playing": "Nau awih hla zawi zawitein a ri"
+  },
+  "caregiver": {
+    "auth_title": "Caregiver PIN Himna",
+    "pin_prompt": "Digit 4 PIN chhu rawh",
+    "mmse_trend": "Ni 30 rilru chakna zinchhuah",
+    "adherence_overview": "Damdawi leh tui in dik thlap"
+  },
+  "honorifics": {
+    "grandmother": "Ka Pi",
+    "grandfather": "Ka Pu",
+    "mother": "Ka Nu",
+    "father": "Ka Pa",
+    "elder": "Ka Pi / Ka Pu"
+  }
+}

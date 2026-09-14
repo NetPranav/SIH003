@@ -1,0 +1,69 @@
+{
+  "common": {
+    "app_title": "Smriti-NER (স্মৃতি)",
+    "back": "Back",
+    "next": "Next",
+    "help": "Help",
+    "repeat": "Listen Again",
+    "listen": "Listen",
+    "yes": "Yes",
+    "confirm": "Confirm",
+    "close": "Close",
+    "offline_badge": "Offline Secure",
+    "online_badge": "Online Connected",
+    "sync_complete": "Data Securely Synced"
+  },
+  "home": {
+    "greeting": "Welcome {name} {kinship}!",
+    "wellness_card_title": "Daily Cognitive Wellness",
+    "daily_challenge_title": "Today's Heritage Games",
+    "start_session": "Start Daily Session",
+    "language_selector": "Select Language",
+    "caregiver_portal": "Family Dashboard"
+  },
+  "games": {
+    "dhol_pepa": {
+      "title": "Folk Instrument Melody",
+      "subtitle": "Acoustic Memory & NER Music Heritage",
+      "instruction": "Listen to the melody and touch the correct instrument."
+    },
+    "kaziranga": {
+      "title": "Kaziranga Safari Search",
+      "subtitle": "Visual Ecology & Wildlife Recognition",
+      "instruction": "Spot the camouflaged animal resting in the sanctuary."
+    },
+    "loom": {
+      "title": "Weaver's Heritage Loom",
+      "subtitle": "Textile Geometry & Color Recall",
+      "instruction": "Remember the traditional pattern and select matching yarns."
+    },
+    "haat": {
+      "title": "Daily Village Haat",
+      "subtitle": "Culinary Memory & Token Currency Exchange",
+      "instruction": "Gather traditional ingredients using wooden token currency."
+    }
+  },
+  "aacb": {
+    "guidance_title": "Family Guidance ({kinship})",
+    "soothing_message": "Do not worry at all, we will solve it together.",
+    "target_hint": "Notice the card illuminated with the golden halo."
+  },
+  "circadian": {
+    "sundowning_alert": "Twilight Rest Window",
+    "twilight_calm_title": "Evening Peace & Restoration",
+    "lullaby_playing": "Playing gentle regional folk lullaby"
+  },
+  "caregiver": {
+    "auth_title": "Caregiver PIN Security",
+    "pin_prompt": "Enter 4-digit confidential PIN",
+    "mmse_trend": "30-Day Cognitive Trajectory",
+    "adherence_overview": "Medication & Hydration Tracking"
+  },
+  "honorifics": {
+    "grandmother": "Grandmother",
+    "grandfather": "Grandfather",
+    "mother": "Mother",
+    "father": "Father",
+    "elder": "Respected Elder"
+  }
+}

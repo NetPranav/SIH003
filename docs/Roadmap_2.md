@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 95 / 240+ Deliverables Completed (39.6% Deliverable Completion)  
+**Overall Velocity**: 99 / 240+ Deliverables Completed (41.3% Deliverable Completion)  
 **Phases Completed**: 5 / 20 (Phases 1, 2, 3, 4 & 5 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 6 — Sub-Phase 6.1 Complete, Sub-Phases 6.2–6.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 6 — Sub-Phases 6.1 & 6.2 Complete, Sub-Phases 6.3 & 6.4 Pending)  
 **Phases Pending**: 14 / 20 (Phases 7 through 20)  
 **Milestones Achieved**: 5 / 20 (M1, M2, M3, M4, M5 Signed Off; M6–M20 Pending)  
 
@@ -105,7 +105,7 @@ gantt
   - [x] Sub-Phase 5.5: Circadian-Aware Content Engine (3/3 tasks done)
 - [ ] **Phase 6: Multilingual Voice & Bhashini Integration** (Weeks 15–22) — **Milestone M6 Pending**
   - [x] Sub-Phase 6.1: Bhashini (AI4Bharat) Integration (4/4 tasks done)
-  - [ ] Sub-Phase 6.2: Localization Framework (8 Regional Languages) (0/4 tasks done)
+  - [x] Sub-Phase 6.2: Localization Framework (8 Regional Languages) (4/4 tasks done)
   - [ ] Sub-Phase 6.3: Personalized Family Voice System (0/4 tasks done)
   - [ ] Sub-Phase 6.4: Natural-Language Caregiver Summaries (0/3 tasks done)
 - [ ] **Phase 7: Social Connection & Reminiscence Layer** (Weeks 18–25) — **Milestone M7 Pending**
@@ -439,7 +439,7 @@ gantt
 ---
 
 # PHASE 6: MULTILINGUAL VOICE & BHASHINI INTEGRATION 🗣️
-**Phase Status**: [/] IN PROGRESS (25% Complete — Sub-Phase 6.1 Done, Sub-Phases 6.2–6.4 Pending)  
+**Phase Status**: [/] IN PROGRESS (50% Complete — Sub-Phases 6.1 & 6.2 Done, Sub-Phases 6.3 & 6.4 Pending)  
 **Duration**: Weeks 15–22 | **Objective**: Full voice-first, 8-language interaction layer with personalized family voice.
 
 ### Sub-Phase 6.1 — Bhashini (AI4Bharat) Integration
@@ -452,13 +452,13 @@ gantt
 | [x] | Fallback TTS Engine | Vosk/Coqui quantized on-device models | Fallback TTS implementation |
 
 ### Sub-Phase 6.2 — Localization Framework
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | i18n Architecture | Key-based externalization; runtime switching | i18n framework |
-| [ ] | String Translation | All UI/game/trivia/system strings in 8 languages | 8 locale JSON files |
-| [ ] | Script Rendering Validation | Bengali, Meitei Mayek, Devanagari, Latin (Mizo) | Script rendering report |
-| [ ] | Cultural Greeting Localization | "আইতা", "ককা", "ꯏꯃꯥ", "ꯏꯄꯥ" honorifics | Greeting localization matrix |
+| [x] | i18n Architecture | Key-based externalization; runtime switching | i18n framework |
+| [x] | String Translation | All UI/game/trivia/system strings in 8 languages | 8 locale JSON files |
+| [x] | Script Rendering Validation | Bengali, Meitei Mayek, Devanagari, Latin (Mizo) | Script rendering report |
+| [x] | Cultural Greeting Localization | "আইতা", "ককা", "ꯏꯃꯥ", "ꯏꯄꯥ" honorifics | Greeting localization matrix |
 
 ### Sub-Phase 6.3 — Personalized Family Voice System
 *Status: [ ] Pending*

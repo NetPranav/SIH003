@@ -1,0 +1,69 @@
+{
+  "common": {
+    "app_title": "Smriti-NER (স্মৃতি)",
+    "back": "Phai dien",
+    "next": "Sha khmat",
+    "help": "Iar",
+    "repeat": "Pynphai biang",
+    "listen": "Sngap",
+    "yes": "Hooid",
+    "confirm": "Pynskhem",
+    "close": "Khad",
+    "offline_badge": "Shngain Offline",
+    "online_badge": "Don ha Online",
+    "sync_complete": "La kynshew pura"
+  },
+  "home": {
+    "greeting": "Khublei {name} {kinship}!",
+    "wellness_card_title": "Ka jingkoit jingkhiah ka jingmut",
+    "daily_challenge_title": "Ki jingialehkai tynrai mynta ka sngi",
+    "start_session": "Sdang ialehkai",
+    "language_selector": "Jied ktien",
+    "caregiver_portal": "Portal ka iing ka sem"
+  },
+  "games": {
+    "dhol_pepa": {
+      "title": "Ka sur tem tynrai",
+      "subtitle": "Kynmaw ia ki jingtem tynrai",
+      "instruction": "Sngap ia ka sur bad thik ia ka jingtem kaba dei."
+    },
+    "kaziranga": {
+      "title": "Wad ia ki mrad khlaw",
+      "subtitle": "Ki mrad bad ka mariang",
+      "instruction": "Wad ia u mrad ba rieh hapoh ki phlang."
+    },
+    "loom": {
+      "title": "Ka thain jain tynrai",
+      "subtitle": "Kynmaw ia ki rong bad dur jain",
+      "instruction": "Kynmaw ia ka dur bad jied ia u ksai ba dei."
+    },
+    "haat": {
+      "title": "Iew tynrai sngi",
+      "subtitle": "Khein dor bad kynmaw mar",
+      "instruction": "Thied ia ki mar bam da ki token ba dei."
+    }
+  },
+  "aacb": {
+    "guidance_title": "Jingiar ka kur ({kinship})",
+    "soothing_message": "Wat sngewkordit, ngin leh lang ryngkat.",
+    "target_hint": "Peit ia ka dur ba tyngshain ksiar."
+  },
+  "circadian": {
+    "sundowning_alert": "Porkhmih janmiet",
+    "twilight_calm_title": "Ka sur jai-jai janmiet",
+    "lullaby_playing": "Ka rwai pyniohthiah ka sngewbha"
+  },
+  "caregiver": {
+    "auth_title": "PIN jingiada Caregiver",
+    "pin_prompt": "Thep ia u 4-digit PIN",
+    "mmse_trend": "Jingkiew jinghiar jingmut 30 sngi",
+    "adherence_overview": "Jingdih dawai bad um thik pait"
+  },
+  "honorifics": {
+    "grandmother": "Ka Iawbei / Ka Mei-rad",
+    "grandfather": "U Thawlang / U Pa-rad",
+    "mother": "Ka Mei",
+    "father": "U Kpa",
+    "elder": "Ka Mei / U Kpa"
+  }
+}

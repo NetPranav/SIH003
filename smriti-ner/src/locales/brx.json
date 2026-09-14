@@ -1,0 +1,69 @@
+{
+  "common": {
+    "app_title": "स्म्रिति-NER (Smriti-NER)",
+    "back": "उनथिं",
+    "next": "गांहाव",
+    "help": "हेफाजाब",
+    "repeat": "फिन बुं",
+    "listen": "खोनास सं",
+    "yes": "औ",
+    "confirm": "थि खालाम",
+    "close": "बन्द खालाम",
+    "offline_badge": "अफलाइन रैखाथि",
+    "online_badge": "अनलाइन दं",
+    "sync_complete": "थानसि साखाफारा"
+  },
+  "home": {
+    "greeting": "खुलुमबाय {name} {kinship}!",
+    "wellness_card_title": "सानफ्रोमनि गोसोनि थासारि",
+    "daily_challenge_title": "दिनैनि दोहोरोम गेलेनाय",
+    "start_session": "गेलेनाय जागाय",
+    "language_selector": "राव सायख'",
+    "caregiver_portal": "नख'रनि पर्टेल"
+  },
+  "games": {
+    "dhol_pepa": {
+      "title": "दामग्रा-सुरग्रा दामनाय",
+      "subtitle": "बड़ोनि दोहोरोम दामग्रा बाहागो",
+      "instruction": "खोनासं आरो थार दामग्रायाव थुनाय।"
+    },
+    "kaziranga": {
+      "title": "हाग्रानि जिब नागिरनाय",
+      "subtitle": "जिब-जुनार आरो मिथिंगा",
+      "instruction": "एरसोना थानाय थार जिबखौ दिहुन।"
+    },
+    "loom": {
+      "title": "दावना-दामना दानाय",
+      "subtitle": "अर'नाय आरो दख'नानि आखु",
+      "instruction": "थार गाब आरो खुन्दुं सायख'।"
+    },
+    "haat": {
+      "title": "सानफ्रोमनि हाथाय",
+      "subtitle": "हाथायनि हिसाब आरो गोसोखांथि",
+      "instruction": "संनो थाखाय थार बेसाद बाय।"
+    }
+  },
+  "aacb": {
+    "guidance_title": "नख'रनि हेफाजाब ({kinship})",
+    "soothing_message": "दा गि, जों जयै मावगोन।",
+    "target_hint": "सनानि गाब जोंनाय सावगारिखौ नाय।"
+  },
+  "circadian": {
+    "sundowning_alert": "बेलासिनि गोजोन सम",
+    "twilight_calm_title": "बेलासिनि गोजोन मेथाय",
+    "lullaby_playing": "अन्दों मेथाय दामगासिनो दं"
+  },
+  "caregiver": {
+    "auth_title": "हेरफाजाबगिरिनि पिन",
+    "pin_prompt": "४-अनजिमानि पिन सो",
+    "mmse_trend": "३०-साननि गोसोखां दावगानाय",
+    "adherence_overview": "मुलि आरो दै लोंनायनि नेम"
+  },
+  "honorifics": {
+    "grandmother": "आबौ",
+    "grandfather": "आबौ",
+    "mother": "आइ",
+    "father": "आफा",
+    "elder": "आबौ / आइ"
+  }
+}

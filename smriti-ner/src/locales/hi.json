@@ -1,0 +1,69 @@
+{
+  "common": {
+    "app_title": "स्मृति-NER (Smriti-NER)",
+    "back": "पीछे",
+    "next": "आगे",
+    "help": "मदद",
+    "repeat": "फिर से सुनें",
+    "listen": "सुनिए",
+    "yes": "हाँ",
+    "confirm": "पुष्टि करें",
+    "close": "बंद करें",
+    "offline_badge": "ऑफ़लाइन सुरक्षित",
+    "online_badge": "ऑनलाइन कनेक्टेड",
+    "sync_complete": "डेटा सुरक्षित रूप से सिंक हो गया"
+  },
+  "home": {
+    "greeting": "नमस्ते {name} {kinship}!",
+    "wellness_card_title": "दैनिक संज्ञानात्मक स्वास्थ्य",
+    "daily_challenge_title": "आज के पारंपरिक खेल",
+    "start_session": "सत्र शुरू करें",
+    "language_selector": "भाषा चुनें",
+    "caregiver_portal": "परिवार डैशबोर्ड"
+  },
+  "games": {
+    "dhol_pepa": {
+      "title": "पारंपरिक वाद्य संगीत",
+      "subtitle": "पूर्वोत्तर के लोक वाद्ययंत्रों की पहचान",
+      "instruction": "ध्वनि सुनकर सही वाद्ययंत्र को स्पर्श करें।"
+    },
+    "kaziranga": {
+      "title": "काजीरंगा सफारी खोज",
+      "subtitle": "प्रकृति और वन्यजीव पहचान",
+      "instruction": "छुपकर बैठे सही जानवर को खोजिए।"
+    },
+    "loom": {
+      "title": "हथकरघा बुनाई पैटर्न",
+      "subtitle": "वस्त्र डिजाइन और रंग पहचान",
+      "instruction": "पैटर्न याद रखकर सही धागे का चयन करें।"
+    },
+    "haat": {
+      "title": "दैनिक ग्रामीण हाट",
+      "subtitle": "बाजार हिसाब और स्मृति अभ्यास",
+      "instruction": "रेसिपी की सामग्री टोकन देकर खरीदें।"
+    }
+  },
+  "aacb": {
+    "guidance_title": "परिवार का सहारा ({kinship})",
+    "soothing_message": "बिल्कुल चिंता न करें, हम मिलकर पूरा करेंगे।",
+    "target_hint": "सुनहरी चमक वाली तस्वीर को देखिए।"
+  },
+  "circadian": {
+    "sundowning_alert": "शाम का शांत समय",
+    "twilight_calm_title": "संध्या शांति और विश्राम",
+    "lullaby_playing": "पारंपरिक लोरी और शांत संगीत बज रहा है"
+  },
+  "caregiver": {
+    "auth_title": "देखभालकर्ता पिन सुरक्षा",
+    "pin_prompt": "४-अंकों का गुप्त पिन दर्ज करें",
+    "mmse_trend": "३०-दिनों का संज्ञानात्मक रुझान",
+    "adherence_overview": "दवा और जलपान नियमितता"
+  },
+  "honorifics": {
+    "grandmother": "दादीजी / नानीजी",
+    "grandfather": "दादाजी / नानाजी",
+    "mother": "माताजी",
+    "father": "पिताजी",
+    "elder": "बाबाजी / माताजी"
+  }
+}

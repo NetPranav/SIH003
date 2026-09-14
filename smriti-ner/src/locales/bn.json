@@ -1,0 +1,69 @@
+{
+  "common": {
+    "app_title": "স্মৃতি-NER (Smriti-NER)",
+    "back": "পেছনে",
+    "next": "পরবর্তী",
+    "help": "সাহায্য",
+    "repeat": "আবার বলুন",
+    "listen": "শুনুন",
+    "yes": "হ্যাঁ",
+    "confirm": "নিশ্চিত করুন",
+    "close": "বন্ধ করুন",
+    "offline_badge": "অফলাইনে নিরাপদ",
+    "online_badge": "সংযুক্ত আছে",
+    "sync_complete": "তথ্য সংরক্ষিত হয়েছে"
+  },
+  "home": {
+    "greeting": "নমস্কার {name} {kinship}!",
+    "wellness_card_title": "দৈনিক মানসিক সুস্থতা",
+    "daily_challenge_title": "আজকের ঐতিহ্যবাহী খেলা",
+    "start_session": "খেলা শুরু করুন",
+    "language_selector": "ভাষা নির্বাচন করুন",
+    "caregiver_portal": "পরিবারের ড্যাশবোর্ড"
+  },
+  "games": {
+    "dhol_pepa": {
+      "title": "ঢোল ও বাঁশির সুর",
+      "subtitle": "ঐতিহ্যবাহী বাদ্যযন্ত্রের স্মৃতি পরীক্ষা",
+      "instruction": "শব্দ শুনে সঠিক বাদ্যযন্ত্রটি স্পর্শ করুন।"
+    },
+    "kaziranga": {
+      "title": "অরণ্যের সন্ধানে",
+      "subtitle": "বন্যপ্রাণী ও প্রকৃতির পরিচয়",
+      "instruction": "লুকিয়ে থাকা সঠিক প্রাণীটি চিহ্নিত করুন।"
+    },
+    "loom": {
+      "title": "তাঁতের নকশা",
+      "subtitle": "শাড়ির ঐতিহ্যবাহী নকশা ও রঙের বিন্যাস",
+      "instruction": "নকশা মনে রেখে সঠিক সুতো নির্বাচন করুন।"
+    },
+    "haat": {
+      "title": "গ্রামের হাট-বাজার",
+      "subtitle": "বাজারের হিসাব ও স্মৃতি অনুশীলন",
+      "instruction": "রান্নার উপকরণ সঠিক টোকেন দিয়ে সংগ্রহ করুন।"
+    }
+  },
+  "aacb": {
+    "guidance_title": "পরিবারের সাহায্য ({kinship})",
+    "soothing_message": "কোনো চিন্তা করবেন না, আমরা একসাথে সমাধান করব।",
+    "target_hint": "সোনালী আলোয় ঘেরা ছবিটি লক্ষ্য করুন।"
+  },
+  "circadian": {
+    "sundowning_alert": "সন্ধ্যাবেলার শান্ত সময়",
+    "twilight_calm_title": "সন্ধ্যা প্রশান্তি ও সুর",
+    "lullaby_playing": "মধুর লোকগীতি ও ঘুমের সুর বাজছে"
+  },
+  "caregiver": {
+    "auth_title": "পরিচর্যাকারী পিন নিরাপত্তা",
+    "pin_prompt": "৪-সংখ্যার পিন প্রবেশ করান",
+    "mmse_trend": "৩০-দিনের মানসিক স্মৃতি পরিবর্তন",
+    "adherence_overview": "ওষুধ ও জল পানের নিয়মিততা"
+  },
+  "honorifics": {
+    "grandmother": "দিদিমা / ঠাকুমা",
+    "grandfather": "দাদু",
+    "mother": "মা",
+    "father": "বাবা",
+    "elder": "দাদু / দিদা"
+  }
+}

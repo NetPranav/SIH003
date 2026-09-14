@@ -1,0 +1,69 @@
+{
+  "common": {
+    "app_title": "ꯁ꯭ꯃ꯭ꯔꯤꯇꯤ-NER (Smriti-NER)",
+    "back": "ꯍꯟꯖꯤꯅꯕꯥ",
+    "next": "ꯃꯈꯥ ꯇꯥꯅꯥ",
+    "help": "ꯃꯇꯦꯡ",
+    "repeat": "ꯑꯃꯨꯛ ꯍꯥꯌꯕꯤꯌꯨ",
+    "listen": "ꯇꯥꯕꯤꯌꯨ",
+    "yes": "ꯍꯣꯌ",
+    "confirm": "ꯆꯨꯃꯂꯦ",
+    "close": "ꯊꯤꯡꯖꯤꯅꯕꯥ",
+    "offline_badge": "ꯑꯣꯐꯂꯥꯏꯟ ꯉꯥꯛꯊꯣꯀꯄꯥ",
+    "online_badge": "ꯀꯅꯦꯛꯁꯟ ꯂꯩꯔꯦ",
+    "sync_complete": "ꯄꯨꯝꯅꯃꯛ ꯁꯦꯚ ꯇꯧꯔꯦ"
+  },
+  "home": {
+    "greeting": "ꯈꯨꯔꯨꯝꯖꯔꯤ {name} {kinship}!",
+    "wellness_card_title": "ꯅꯨꯃꯤꯠꯀꯤ ꯋꯥꯈꯜ ꯆꯦꯠꯅꯕꯥ",
+    "daily_challenge_title": "ꯉꯁꯤꯒꯤ ꯄꯨꯋꯥꯔꯤ ꯁꯥꯟꯅꯄꯣꯠ",
+    "start_session": "ꯁꯥꯟꯅꯕꯥ ꯍꯧꯔꯁꯤ",
+    "language_selector": "ꯂꯣꯟ ꯈꯅꯕꯤꯌꯨ",
+    "caregiver_portal": "ꯏꯃꯨꯡꯒꯤ ꯄꯣꯔꯇꯦꯜ"
+  },
+  "games": {
+    "dhol_pepa": {
+      "title": "ꯄꯦꯅꯥ ꯑꯃꯁꯨꯡ ꯏꯁꯩ",
+      "subtitle": "ꯃꯅꯤꯄꯨꯔꯒꯤ ꯈꯨꯠꯊꯥꯡ ꯈꯣꯟꯊꯣꯛ",
+      "instruction": "ꯈꯣꯟꯊꯣꯛ ꯇꯥꯕꯤꯔꯒꯥ ꯆꯨꯝꯕꯥ ꯈꯨꯠꯂꯥꯌ ꯅꯝꯕꯤꯌꯨ꯫"
+    },
+    "kaziranga": {
+      "title": "ꯀꯥꯖꯤꯔꯪꯒꯥ ꯁꯥ-ꯁꯟ ꯊꯤꯕꯥ",
+      "subtitle": "ꯃꯍꯧꯁꯥꯒꯤ ꯖꯤꯕꯁꯤꯡ ꯈꯪꯗꯣꯀꯄꯥ",
+      "instruction": "ꯂꯣꯠꯇꯨꯅꯥ ꯂꯩꯔꯤꯕꯥ ꯁꯥ ꯑꯗꯨ ꯊꯤꯗꯣꯛꯎ꯫"
+    },
+    "loom": {
+      "title": "ꯐꯤ ꯁꯥꯕꯒꯤ ꯃꯌꯦꯛ",
+      "subtitle": "ꯏꯅꯥꯐꯤ ꯑꯃꯁꯨꯡ ꯃꯆꯨ ꯈꯅꯕꯥ",
+      "instruction": "ꯆꯨꯝꯕꯥ ꯃꯌꯦꯛ ꯅꯤꯡꯁꯤꯡꯗꯨꯅꯥ ꯂꯪ ꯈꯅꯕꯤꯌꯨ꯫"
+    },
+    "haat": {
+      "title": "ꯏꯃꯥ ꯀꯩꯊꯦꯜ",
+      "subtitle": "ꯄꯣꯠ-ꯆꯩ ꯂꯩꯕꯥ ꯑꯃꯁꯨꯡ ꯅꯤꯡꯁꯤꯡꯕꯥ",
+      "instruction": "ꯆꯥꯅꯕꯥ ꯁꯦꯝꯅꯕꯥ ꯆꯨꯝꯕꯥ ꯄꯣꯠꯂꯝ ꯂꯩꯕꯤꯌꯨ꯫"
+    }
+  },
+  "aacb": {
+    "guidance_title": "ꯏꯃꯨꯡꯒꯤ ꯃꯇꯦꯡ ({kinship})",
+    "soothing_message": "ꯋꯥꯈꯜ ꯇꯥꯅꯕꯥ ꯇꯧꯕꯤꯒꯅꯨ, ꯑꯩꯈꯣꯌ ꯄꯨꯟꯅꯥ ꯇꯧꯁꯤ꯫",
+    "target_hint": "ꯁꯅꯥ ꯃꯆꯨꯒꯤ ꯃꯉꯥꯜ ꯊꯣꯛꯂꯤꯕꯥ ꯑꯗꯨ ꯌꯦꯡꯕꯤꯌꯨ꯫"
+  },
+  "circadian": {
+    "sundowning_alert": "ꯅꯨꯃꯤꯗꯥꯡꯋꯥꯏꯔꯝꯒꯤ ꯏꯉꯥꯎ",
+    "twilight_calm_title": "ꯅꯨꯃꯤꯗꯥꯡꯒꯤ ꯅꯨꯡꯉꯥꯏꯕꯥ ꯏꯁꯩ",
+    "lullaby_playing": "ꯊꯥ ꯊꯥ ꯊꯕꯨꯡꯇꯣꯟ ꯏꯁꯩ ꯇꯥꯔꯤ"
+  },
+  "caregiver": {
+    "auth_title": "ꯀꯦꯌꯔꯒꯤꯚꯔ ꯄꯤꯟ ꯂꯣꯛ",
+    "pin_prompt": "ꯑꯀꯛꯅꯕꯥ ꯗꯤꯖꯤꯠ ꯴ꯒꯤ ꯄꯤꯟ ꯅꯝꯕꯤꯌꯨ",
+    "mmse_trend": "ꯅꯨꯃꯤꯠ ꯳꯰ꯒꯤ ꯋꯥꯈꯜ ꯆꯦꯠꯄꯒꯤ ꯆꯥꯡ",
+    "adherence_overview": "ꯍꯤꯗꯥꯛ ꯑꯃꯁꯨꯡ ꯏꯁꯤꯡ ꯊꯛꯄꯒꯤ ꯆꯥꯡ"
+  },
+  "honorifics": {
+    "grandmother": "ꯏꯕꯦꯟ",
+    "grandfather": "ꯏꯄꯨ",
+    "mother": "ꯏꯃꯥ",
+    "father": "ꯏꯄꯥ",
+    "elder": "ꯏꯃꯥ / ꯏꯄꯥ"
+  }
+}

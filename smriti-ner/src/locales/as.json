@@ -1,0 +1,69 @@
+{
+  "common": {
+    "app_title": "স্মৃতি-NER (Smriti-NER)",
+    "back": "পিছলৈ",
+    "next": "আগলৈ",
+    "help": "সহায়",
+    "repeat": "পুনৰ শুনক",
+    "listen": "শুনক",
+    "yes": "হয়",
+    "confirm": "নিশ্চিত কৰক",
+    "close": "বন্ধ কৰক",
+    "offline_badge": "অফলাইন সুৰক্ষিত",
+    "online_badge": "সংযোগ সক্ৰিয়",
+    "sync_complete": "তথ্য সংৰক্ষিত হ'ল"
+  },
+  "home": {
+    "greeting": "নমস্কাৰ {name} {kinship}!",
+    "wellness_card_title": "দৈনিক মানসিক সুস্থতা",
+    "daily_challenge_title": "আজিৰ পৰম্পৰাগত খেল",
+    "start_session": "খেল আৰম্ভ কৰক",
+    "language_selector": "ভাষা বাছক",
+    "caregiver_portal": "পৰিয়ালৰ ডেচবৰ্ড"
+  },
+  "games": {
+    "dhol_pepa": {
+      "title": "ঢোল-পেঁপাৰ সুৰ",
+      "subtitle": "অসমৰ লোকবাদ্যৰ স্মৃতি পৰীক্ষা",
+      "instruction": "শব্দটো শুনি সঠিক বাদ্যটোত স্পৰ্শ কৰক।"
+    },
+    "kaziranga": {
+      "title": "কাজিৰঙাৰ সন্ধান",
+      "subtitle": "প্ৰকৃতি আৰু জীৱ-জন্তুৰ চিনাকি",
+      "instruction": "নল-খাগৰিৰ আঁৰত লুকাই থকা সঠিক জন্তুটো বিচাৰি উলিয়াওক।"
+    },
+    "loom": {
+      "title": "তাঁতশালৰ চানেকি",
+      "subtitle": "বস্ত্রশিল্পৰ আৰ্হি আৰু ৰং চিনাক্তকৰণ",
+      "instruction": "গামোচাৰ চানেকিটো মনত ৰাখি সঠিক সূতা বাছক।"
+    },
+    "haat": {
+      "title": "দৈনিক বজাৰৰ স্মৃতি",
+      "subtitle": "সামগ্ৰীৰ হিচাপ আৰু পৰম্পৰাগত ব্যৱসায়",
+      "instruction": "ৰন্ধন প্ৰণালীৰ সামগ্ৰী সঠিক টোকেনেৰে কিনি লওক।"
+    }
+  },
+  "aacb": {
+    "guidance_title": "পৰিয়ালৰ সহায় ({kinship})",
+    "soothing_message": "একো চিন্তা নকৰিব, আমি একেলগে কৰিম।",
+    "target_hint": "সোণালী পোহৰ পৰা ছবিখন চাওকচোন।"
+  },
+  "circadian": {
+    "sundowning_alert": "সন্ধ্যাৰ শান্ত সময়",
+    "twilight_calm_title": "সন্ধ্যাৰ সুৰ আৰু জিৰণি",
+    "lullaby_playing": "লোকগীত আৰু টোপনিৰ সুৰ বাজি আছে"
+  },
+  "caregiver": {
+    "auth_title": "পৰিচৰ্যা পিন সুৰক্ষা",
+    "pin_prompt": "৪-সংখ্যাৰ গোপন পিন দিয়ক",
+    "mmse_trend": "৩০-দিনীয়া মানসিক স্মৃতিৰ গতি",
+    "adherence_overview": "ঔষধ আৰু পানী খোৱাৰ নিয়মীয়াতা"
+  },
+  "honorifics": {
+    "grandmother": "আইতা",
+    "grandfather": "ককা",
+    "mother": "মা",
+    "father": "দেউতা",
+    "elder": "আইতা / ককা"
+  }
+}
