@@ -798,6 +798,202 @@ async def complete_clue_linked_round(req: ElderRoundCompleteRequest):
     )
 
 
+# ── Community Reminiscence Circles Models & Storage ─────────────────────────
+class CircleParticipantModel(BaseModel):
+    patient_id: str
+    name: str
+    kinship_title: str
+    present: bool = True
+    engagement_level: str = "VERY_ACTIVE"  # "VERY_ACTIVE" | "MODERATE" | "OBSERVER"
+
+
+class CircleScheduleRequest(BaseModel):
+    village_id: str
+    village_name: str
+    facility_type: str = "ANGANWADI_CENTRE"
+    facilitator_name: str = "Jonali Saikia (ASHA)"
+    scheduled_start_time: str
+    scheduled_end_time: str
+    language: str = "as"
+    topic: str = "পুৰণি বিহুগীত আৰু তাঁতশালৰ স্মৃতি"
+    initial_participants: Optional[List[CircleParticipantModel]] = []
+
+
+class CircleEngagementLogRequest(BaseModel):
+    session_id: str
+    participants: List[CircleParticipantModel]
+    collective_stars_earned: int = 450
+    laughter_interaction_rating: float = 0.92
+    verbal_participation_rating: float = 0.88
+    field_notes: Optional[str] = None
+
+
+class CircleSessionResponse(BaseModel):
+    session_id: str
+    village_id: str
+    village_name: str
+    facility_type: str
+    facilitator_name: str
+    scheduled_start_time: str
+    scheduled_end_time: str
+    status: str
+    language: str
+    topic: str
+    participants: List[CircleParticipantModel]
+    collective_stars_earned: int
+    laughter_interaction_rating: float
+    verbal_participation_rating: float
+    field_notes: Optional[str] = None
+
+
+COMMUNITY_CIRCLES_STORE: Dict[str, dict] = {}
+
+ASHA_FACILITATION_GUIDES = {
+    "as": {
+        "language": "as",
+        "title": "আশাকৰ্মীৰ বাবে সাপ্তাহিক স্মৃতি চক্ৰ পৰিচালনা পুথি",
+        "stage1_intro": "মৰমৰ ককা-আইতাসকলক স্বাগত জনাওক আৰু সকলোৱে একেলগে লোকগীতৰ সুৰত গুণগুণাওক (০-৫ মিনিট)।",
+        "stage2_prompts": [
+            "বৰ্তমান স্ক্ৰীণত দেখা দিয়া পুৰণি বাদ্যযন্ত্ৰটো সকলোৱে চিনাক্ত কৰক।",
+            "আমাৰ গাঁৱৰ পুৰণি হাটত আটাইতকৈ জনপ্ৰিয় বস্তু কি আছিল বাৰু?",
+        ],
+        "stage3_story": "নিজৰ ডেকা কালৰ আটাইতকৈ আনন্দদায়ক বিহু বা উৎসৱৰ এটা মধুৰ স্মৃতি সকলোৰে লগত ভাগ-বতৰা কৰক (১৫-২২ মিনিট)।",
+        "stage4_closure": "সকলোকে গৰম চাহ আৰু তামোল-পাণেৰে আপ্যায়ন কৰি আশীৰ্বাদ লওক (২২-২৫ মিনিট)।",
+        "checklist": ["আৰামদায়ক বহাৰ ব্যৱস্থা নিশ্চিত কৰক", "ব্যক্তিগত নম্বৰ নিদিব, সমূহীয়া আনন্দ বঢ়াওক"],
+    },
+    "mni": {
+        "language": "mni",
+        "title": "ꯑꯥꯁꯥ ꯊꯕꯛꯄꯨꯔꯣꯏꯒꯤ ꯆꯌꯣꯜꯒꯤ ꯅꯤꯡꯁꯤꯡ ꯂꯩꯔꯣꯜ ꯂꯃꯖꯤꯡ",
+        "stage1_intro": "ꯏꯄꯥ-ꯏꯃꯥꯁꯤꯡꯕꯨ ꯇꯔꯥꯝꯅꯥ ꯑꯣꯛꯄꯤꯌꯨ ꯑꯃꯁꯨꯡ ꯏꯁꯩ ꯁꯛꯄꯤꯌꯨ (꯰-꯵ ꯃꯤꯅꯤꯠ)꯫",
+        "stage2_prompts": ["ꯁ꯭ꯀ꯭ꯔꯤꯟꯗꯥ ꯎꯕꯥ ꯄꯨꯋꯥꯔꯤ ꯁꯥꯟꯅꯄꯣꯠ ꯑꯁꯤ ꯈꯪꯗꯣꯛꯄꯤꯌꯨ꯫"],
+        "stage3_story": "ꯅꯍꯥ ꯑꯣꯏꯔꯤꯉꯩꯒꯤ ꯂꯥꯏ ꯍꯔꯥꯎꯕꯒꯤ ꯅꯨꯡꯉꯥꯏꯕꯥ ꯋꯥꯔꯤ ꯂꯤꯕꯤꯌꯨ (꯱꯵-꯲꯲ ꯃꯤꯅꯤꯠ)꯫",
+        "stage4_closure": "ꯆꯥ ꯊꯛꯃꯤꯟꯅꯗꯨꯅꯥ ꯊꯧꯅꯤꯖꯕꯥ (꯲꯲-꯲꯵ ꯃꯤꯅꯤꯠ)꯫",
+        "checklist": ["ꯈꯨꯗꯤꯡꯃꯛꯄꯨ ꯅꯨꯡꯉꯥꯏꯅꯥ ꯐꯝꯍꯅꯕꯤꯌꯨ", "ꯃꯤꯑꯣꯏ ꯑꯃꯒꯤ ꯁ꯭ꯀꯣꯔ ꯊꯝꯒꯅꯨ"],
+    },
+    "bn": {
+        "language": "bn",
+        "title": "আশাকর্মীদের সাপ্তাহিক স্মৃতিচক্র পরিচালনা নির্দেশিকা",
+        "stage1_intro": "শ্রদ্ধেয় প্রবীণদের স্বাগত জানান এবং সবাই মিলে লোকগানের সুরে শুরু করুন (০-৫ মিনিট)।",
+        "stage2_prompts": ["পর্দায় দেখানো ঐতিহ্যবাহী জিনিসটি সবাই মিলে শনাক্ত করুন।"],
+        "stage3_story": "যৌবনকালের কোনো স্মরণীয় উৎসব বা মেলা নিয়ে গল্প বলুন (১৫-২২ মিনিট)।",
+        "stage4_closure": "চা ও হালকা জলখাবার পরিবেশন করে সমাপ্তি করুন (২২-২৫ মিনিট)।",
+        "checklist": ["সবার বসার আরামদায়ক ব্যবস্থা নিশ্চিত করুন", "ব্যক্তিগত প্রতিযোগিতা বর্জন করুন"],
+    },
+    "brx": {
+        "language": "brx",
+        "title": "आशा हेफाजाबगिरिनि सप्ताहानि गोसोखां मेल लामजिर",
+        "stage1_intro": "गोजोन बयोस गोनां बिथांमोनखौ बराय आरो मेथाय खन (०-५ मिनिट)।",
+        "stage2_prompts": ["स्क्रिनआव नुनो मोननाय गोजाम मुवाखौ सायख'दो।"],
+        "stage3_story": "उन्दै समनि गोजोन बवैसागुनि सावरायथि हो (१५-२२ मिनिट)।",
+        "stage4_closure": "चा लोंनानै जोबनाय खालाम (२२-२५ मिनिट)।",
+        "checklist": ["गासैखौबो मोजाङै जिरायहो", "गावनि गावनि नम्बर दाखो"],
+    },
+    "kha": {
+        "language": "kha",
+        "title": "Ka Jingbthah ia ki ASHA ban pyniaid ia ka Seng Kynmaw",
+        "stage1_intro": "Pdiang sngewbha ia ki tymmen bad rwai lem ia ki sur tynrai (0-5 minit).",
+        "stage2_prompts": ["Ithuh lem ia ka tiar tynrai kaba paw ha ka screen."],
+        "stage3_story": "Iathuh shaphang ka por samla bad ki lehkmen kiba sngewtynnad (15-22 minit).",
+        "stage4_closure": "Dih sha lang bad pynkut da ka jingkyrkhu (22-25 minit).",
+        "checklist": ["Pynbiang ia ka jaka shong kaba suk", "Wat ai score marwei"],
+    },
+    "lus": {
+        "language": "lus",
+        "title": "ASHA tan Chhungkaw Hriatrengna Inkhawm Kaihhruaina",
+        "stage1_intro": "Pitar leh puterte lo lawm la, hnam hla sa ho rawh u (0-5 minute).",
+        "stage2_prompts": ["Screen a hmanlai thil lo lang hi han zawng chhuak ho teh u."],
+        "stage3_story": "Tleirawl laia Kut hman dan ngaihnawm tak han sawi ho teh u (15-22 minute).",
+        "stage4_closure": "Thingpui in ho la, duhsakna inhlanin tin rawh u (22-25 minute).",
+        "checklist": ["Thutna nuam tak siamsak vek tur a ni", "Mi mal in-elna siam suh"],
+    },
+    "hi": {
+        "language": "hi",
+        "title": "आशा दीदी हेतु साप्ताहिक सामुदायिक स्मृति चौपाल मार्गदर्शिका",
+        "stage1_intro": "बुजुर्गों का सस्नेह स्वागत करें और पारंपरिक लोकगीत गुनगुनाकर सत्र शुरू करें (०-५ मिनट)।",
+        "stage2_prompts": ["स्क्रीन पर दिख रहे पारंपरिक वाद्य या घरेलू वस्तु को मिलकर पहचानें।"],
+        "stage3_story": "अपनी जवानी के किसी यादगार मेले या त्योहार का सुखद प्रसंग सुनाएं (१५-२२ मिनट)।",
+        "stage4_closure": "गरम चाय और जलपान के साथ आशीर्वाद लेते हुए समापन करें (२२-२५ मिनट)।",
+        "checklist": ["बुजुर्गों के आरामदायक बैठने की व्यवस्था सुनिश्चित करें", "प्रतिस्पर्धा पूरी तरह वर्जित रखें"],
+    },
+    "en": {
+        "language": "en",
+        "title": "ASHA Facilitator Guide for Weekly Community Reminiscence Circles",
+        "stage1_intro": "Warmly welcome participating elders and initiate gentle pentatonic folk song humming (0–5 min).",
+        "stage2_prompts": ["Collaboratively identify the traditional tool or musical instrument on the shared screen."],
+        "stage3_story": "Invite elders to share a cherished harvest or festival story from their youth (15–22 min).",
+        "stage4_closure": "Conclude with warm herbal tea and collective community blessings (22–25 min).",
+        "checklist": ["Ensure supportive seating", "Strictly avoid individual scoring; prioritize collective stars"],
+    },
+}
+
+
+@app.post("/api/v1/social/circles/schedule", response_model=CircleSessionResponse, tags=["Social & Reminiscence"])
+async def schedule_circle_session(req: CircleScheduleRequest):
+    """Schedules a weekly community reminiscence circle session at an Anganwadi/PHC centre."""
+    import uuid
+
+    session_id = f"circle_{uuid.uuid4().hex[:10]}"
+    record = {
+        "session_id": session_id,
+        "village_id": req.village_id,
+        "village_name": req.village_name,
+        "facility_type": req.facility_type,
+        "facilitator_name": req.facilitator_name,
+        "scheduled_start_time": req.scheduled_start_time,
+        "scheduled_end_time": req.scheduled_end_time,
+        "status": "SCHEDULED",
+        "language": req.language if req.language in SUPPORTED_VOICE_LANGUAGES else "as",
+        "topic": req.topic,
+        "participants": [p.model_dump() if hasattr(p, "model_dump") else p.dict() for p in (req.initial_participants or [])],
+        "collective_stars_earned": 0,
+        "laughter_interaction_rating": 0.0,
+        "verbal_participation_rating": 0.0,
+        "field_notes": None,
+    }
+
+    COMMUNITY_CIRCLES_STORE[session_id] = record
+    return CircleSessionResponse(**record)
+
+
+@app.get("/api/v1/social/circles/upcoming", response_model=List[CircleSessionResponse], tags=["Social & Reminiscence"])
+async def get_upcoming_circles(village_id: Optional[str] = None):
+    """Returns scheduled or active community circle sessions, optionally filtered by village."""
+    results = []
+    for sess in COMMUNITY_CIRCLES_STORE.values():
+        if sess["status"] in ("SCHEDULED", "IN_PROGRESS"):
+            if not village_id or sess["village_id"] == village_id:
+                results.append(CircleSessionResponse(**sess))
+    return results
+
+
+@app.post("/api/v1/social/circles/log-engagement", response_model=CircleSessionResponse, tags=["Social & Reminiscence"])
+async def log_circle_engagement(req: CircleEngagementLogRequest):
+    """Logs collective, non-competitive engagement metrics for a completed circle session."""
+    if req.session_id not in COMMUNITY_CIRCLES_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Community circle session '{req.session_id}' not found.",
+        )
+
+    sess = COMMUNITY_CIRCLES_STORE[req.session_id]
+    sess["participants"] = [p.model_dump() if hasattr(p, "model_dump") else p.dict() for p in req.participants]
+    sess["collective_stars_earned"] = max(0, req.collective_stars_earned)
+    sess["laughter_interaction_rating"] = min(1.0, max(0.0, req.laughter_interaction_rating))
+    sess["verbal_participation_rating"] = min(1.0, max(0.0, req.verbal_participation_rating))
+    sess["field_notes"] = req.field_notes
+    sess["status"] = "COMPLETED"
+
+    COMMUNITY_CIRCLES_STORE[req.session_id] = sess
+    return CircleSessionResponse(**sess)
+
+
+@app.get("/api/v1/social/circles/facilitation-guide", tags=["Social & Reminiscence"])
+async def get_asha_facilitation_guide(language: Optional[str] = "as"):
+    """Returns the 4-stage localized ASHA facilitation guide across 8 NER languages."""
+    lang = language if language in ASHA_FACILITATION_GUIDES else "as"
+    return ASHA_FACILITATION_GUIDES.get(lang, ASHA_FACILITATION_GUIDES["en"])
+
+
 if __name__ == "__main__":
     import uvicorn
 
