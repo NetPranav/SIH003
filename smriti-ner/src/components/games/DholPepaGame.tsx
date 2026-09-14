@@ -1,11 +1,16 @@
+// ── SMRITI-NER GAME 1: DHOL-PEPA SUR-MILON (ঢোল-পেঁপা সুৰ-মিলন) ───────────────
+// Sub-Phase 4.4: 6-Instrument Web Audio synthesis, adaptive tier grid & telemetry
+
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import type { ScreenId } from "@/lib/types";
 import { INSTRUMENTS } from "@/lib/constants";
 import { playInstrumentSound, playSuccessJingle, playGentleChime } from "@/lib/audio";
 import { decomposeLatency, evaluateAACB, updateBKT, type BKTState } from "@/lib/dcdaEngine";
 import { sessionManager } from "@/lib/gameSessionManager";
+import { getTierConfig, type DifficultyTier } from "@/lib/difficultyStateMachine";
+import ElderCard from "@/components/ui/ElderCard";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -13,15 +18,19 @@ interface Props {
 }
 
 export default function DholPepaGame({ navigate, showSuccess }: Props) {
-  // Use first 4 instruments for clean 2x2 grid
-  const activeInstruments = INSTRUMENTS.slice(0, 4);
+  // Current difficulty tier (1 through 5)
+  const [tier, setTier] = useState<DifficultyTier>(2);
+  const tierConfig = getTierConfig(tier);
+
+  // Active instruments count adapts to difficulty tier (2 to 6 instruments)
+  const activeInstruments = INSTRUMENTS.slice(0, Math.min(INSTRUMENTS.length, Math.max(2, tierConfig.choiceCount)));
 
   const [sequence, setSequence] = useState<number[]>([0, 1]);
   const [playerStep, setPlayerStep] = useState<number>(0);
   const [isPlayingSeq, setIsPlayingSeq] = useState<boolean>(false);
   const [activeHighlight, setActiveHighlight] = useState<number | null>(null);
   const [round, setRound] = useState<number>(1);
-  const [statusMsg, setStatusMsg] = useState<string>("Listen to the rhythm...");
+  const [statusMsg, setStatusMsg] = useState<string>("Listen to the folk rhythm...");
   const [aacbStatus, setAacbStatus] = useState<{
     triggered: boolean;
     goldenHaloActive: boolean;
@@ -47,7 +56,7 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
     sessionManager.startSession({
       gameId: "dhol-pepa",
       conceptId: "auditory_folk_rhythm",
-      initialTier: 2,
+      initialTier: tier,
     });
   }, []);
 
@@ -58,54 +67,61 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
 
   const playPattern = async (seq: number[]) => {
     setIsPlayingSeq(true);
-    setStatusMsg("Listen closely...");
+    setStatusMsg("Listen closely to the instruments...");
     await new Promise((r) => setTimeout(r, 600));
 
     for (let i = 0; i < seq.length; i++) {
       const instIndex = seq[i];
       setActiveHighlight(instIndex);
-      const inst = activeInstruments[instIndex];
-      playInstrumentSound(inst.freq, inst.waveType, 300);
-      await new Promise((r) => setTimeout(r, 450));
+      const inst = activeInstruments[instIndex] || activeInstruments[0];
+      playInstrumentSound(inst.freq, inst.waveType, 320);
+      await new Promise((r) => setTimeout(r, 480));
       setActiveHighlight(null);
-      await new Promise((r) => setTimeout(r, 200));
+      await new Promise((r) => setTimeout(r, 220));
     }
 
     setIsPlayingSeq(false);
-    setStatusMsg("Now your turn: tap the same rhythm!");
+    setStatusMsg("Now your turn: tap the matching instruments in rhythm!");
     setPlayerStep(0);
     tapStartRef.current = Date.now();
   };
 
-  const handleInstrumentTap = (idx: number) => {
+  const handleInstrumentTap = (idx: number, e?: React.MouseEvent<HTMLButtonElement>) => {
     if (isPlayingSeq) return;
 
     // Bi-Factor Latency Decomposition
     const totalReactionTime = Date.now() - tapStartRef.current;
-    // Simulate slight physiological motor wander (1.1 - 1.4)
     const simulatedWander = 1.15;
     const latencyReport = decomposeLatency(totalReactionTime, simulatedWander);
 
     // Play tapped sound
     const inst = activeInstruments[idx];
-    playInstrumentSound(inst.freq, inst.waveType, 250);
+    playInstrumentSound(inst.freq, inst.waveType, 260);
 
     // Visual feedback
     setActiveHighlight(idx);
     setTimeout(() => setActiveHighlight(null), 250);
 
     const expectedIdx = sequence[playerStep];
-
-    // Check against current step in sequence
     const isMatch = idx === expectedIdx;
 
     // Record interaction in Shared Game Framework
     try {
-      sessionManager.recordInteraction({
+      const touchCoords = e ? { x: e.clientX, y: e.clientY } : undefined;
+      const targetRect = e?.currentTarget.getBoundingClientRect();
+      const targetCenter = targetRect
+        ? { x: Math.round(targetRect.left + targetRect.width / 2), y: Math.round(targetRect.top + targetRect.height / 2) }
+        : undefined;
+
+      const { session } = sessionManager.recordInteraction({
         targetId: String(expectedIdx),
         selectedId: String(idx),
         totalReactionTimeMs: totalReactionTime,
+        touchCoordinates: touchCoords,
+        targetCenter,
       });
+
+      setTier(session.currentTier);
     } catch {
       // Graceful fallback
     }
@@ -143,7 +159,7 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
             sessionManager.startSession({
               gameId: "dhol-pepa",
               conceptId: "auditory_folk_rhythm",
-              initialTier: 2,
+              initialTier: tier,
             });
           });
         } else {
@@ -176,177 +192,206 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
       if (aacbEval.triggered) {
         setStatusMsg("Gentle guidance active: Follow the golden glowing instrument");
       } else {
-        setStatusMsg("Let's hear that sequence again together...");
+        setStatusMsg("Take your time — listen again!");
       }
-
-      setTimeout(() => {
-        playPattern(sequence);
-      }, 1200);
     }
   };
 
-  const currentExpectedInstrument = sequence[playerStep];
+  const repeatPattern = () => {
+    if (!isPlayingSeq) {
+      playPattern(sequence);
+    }
+  };
 
   return (
-    <div style={{
-      padding: "1.25rem 1.25rem 5rem",
-      backgroundColor: "var(--white)",
-      minHeight: "100dvh",
-      display: "flex",
-      flexDirection: "column"
-    }}>
-      {/* Top Bar */}
-      <div style={{
+    <div
+      style={{
+        padding: "1.25rem 1.25rem 5rem",
+        backgroundColor: "var(--white)",
+        minHeight: "100dvh",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        marginBottom: "1rem",
-        paddingBottom: "0.75rem",
-        borderBottom: "1px solid var(--gray-200)"
-      }}>
+        flexDirection: "column",
+      }}
+    >
+      {/* ── Top Bar with Back Navigation & Cognitive Tier Badge ── */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "1rem",
+          paddingBottom: "0.75rem",
+          borderBottom: "1px solid var(--gray-200)",
+        }}
+      >
         <button
+          type="button"
           onClick={() => navigate("games")}
+          aria-label="Back to Games"
           style={{
             background: "var(--gray-100)",
             border: "none",
             borderRadius: "50%",
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "1.1rem",
-            cursor: "pointer"
+            fontSize: "1.2rem",
+            cursor: "pointer",
           }}
         >
           ←
         </button>
 
         <div style={{ textAlign: "center" }}>
-          <h2 style={{ fontSize: "1.15rem", fontWeight: 800, color: "var(--gray-900)" }}>
+          <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--gray-900)", margin: 0 }}>
             Dhol-Pepa Sur-Milon
           </h2>
-          <span style={{ fontSize: "0.75rem", color: aacbStatus.triggered ? "#d97706" : "var(--accent)", fontWeight: 700 }}>
-            Round {round} of 3 • {aacbStatus.triggered ? "AACB Compassionate Guidance" : "Adaptive DCDA"}
+          <span style={{ fontSize: "0.75rem", color: "var(--primary)", fontWeight: 700 }}>
+            {tierConfig.nativeName} • Round {round} of 3
           </span>
         </div>
 
         <button
-          onClick={() => playPattern(sequence)}
+          type="button"
+          onClick={repeatPattern}
           disabled={isPlayingSeq}
+          aria-label="Repeat Rhythm Sequence"
           style={{
-            background: "var(--gray-50)",
-            border: "1px solid var(--gray-200)",
+            background: "#eff6ff",
+            border: "1.5px solid #bfdbfe",
             borderRadius: "999px",
-            padding: "0.35rem 0.65rem",
+            padding: "0.4rem 0.75rem",
             fontSize: "0.75rem",
-            fontWeight: 600,
-            cursor: "pointer"
+            fontWeight: 700,
+            color: "#1d4ed8",
+            cursor: isPlayingSeq ? "not-allowed" : "pointer",
           }}
         >
-          🔁 Replay
+          🔁 Repeat
         </button>
       </div>
 
-      {/* Dementia Comfort & AACB Guidance Prompt */}
-      <div style={{
-        textAlign: "center",
-        padding: "0.85rem 1rem",
-        background: aacbStatus.triggered ? "#fffbeb" : isPlayingSeq ? "#eff6ff" : "#f0fdf4",
-        border: `1.5px solid ${aacbStatus.triggered ? "#fcd34d" : isPlayingSeq ? "#bfdbfe" : "#bbf7d0"}`,
-        borderRadius: "var(--radius)",
-        marginBottom: "1.25rem",
-        color: aacbStatus.triggered ? "#b45309" : isPlayingSeq ? "#1e40af" : "#166534",
-        fontWeight: 600,
-        fontSize: "0.92rem",
-        transition: "all var(--transition)"
-      }}>
-        {aacbStatus.guidanceMessage || statusMsg}
+      {/* ── Guidance & Reassurance Banner ── */}
+      <div
+        style={{
+          background: aacbStatus.triggered ? "#fffbeb" : "#f8fafc",
+          border: `1.5px solid ${aacbStatus.triggered ? "#fde68a" : "var(--gray-200)"}`,
+          borderRadius: "var(--radius-lg)",
+          padding: "0.85rem 1rem",
+          marginBottom: "1.25rem",
+          textAlign: "center",
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontSize: "0.95rem",
+            fontWeight: 700,
+            color: aacbStatus.triggered ? "#92400e" : "var(--gray-700)",
+          }}
+        >
+          {statusMsg}
+        </p>
+
+        {aacbStatus.triggered && (
+          <span style={{ fontSize: "0.75rem", color: "#b45309", marginTop: "0.25rem", display: "inline-block" }}>
+            ✨ Compassionate Guidance: We’ve highlighted the correct folk instrument for you.
+          </span>
+        )}
       </div>
 
-      {/* 2x2 Instrument Grid (Generous Accessible Touch Hitboxes) */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "1.25rem",
-        flex: 1,
-        alignContent: "center",
-        maxWidth: "380px",
-        margin: "0 auto",
-        width: "100%"
-      }}>
+      {/* ── 6-Instrument Responsive Grid ── */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: activeInstruments.length <= 4 ? "1fr 1fr" : "repeat(3, 1fr)",
+          gap: "0.85rem",
+          flex: 1,
+          alignContent: "center",
+        }}
+      >
         {activeInstruments.map((inst, idx) => {
           const isHighlighted = activeHighlight === idx;
-          const isTargetInAacb = aacbStatus.goldenHaloActive && idx === currentExpectedInstrument;
-          const isDistractorInAacb = aacbStatus.goldenHaloActive && idx !== currentExpectedInstrument;
+          const isTargetInAacb = aacbStatus.goldenHaloActive && sequence[playerStep] === idx;
 
           return (
             <button
               key={inst.id}
+              type="button"
+              onClick={(e) => handleInstrumentTap(idx, e)}
               disabled={isPlayingSeq}
-              onClick={() => handleInstrumentTap(idx)}
+              aria-label={`${inst.name} (${inst.native}). Tap to play sound.`}
               style={{
-                aspectRatio: "1",
-                minHeight: "130px",
+                minHeight: activeInstruments.length <= 4 ? "140px" : "110px",
+                padding: "1rem 0.75rem",
+                borderRadius: "var(--radius-lg)",
                 background: isHighlighted
-                  ? "var(--accent-light)"
+                  ? "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)"
                   : isTargetInAacb
-                  ? "#fef9c3"
+                  ? "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)"
                   : "var(--white)",
                 border: isTargetInAacb
-                  ? "3.5px solid #d97706"
+                  ? "3px solid #f59e0b"
                   : isHighlighted
-                  ? "3px solid var(--accent)"
+                  ? "3px solid #2563eb"
                   : "2px solid var(--gray-200)",
-                borderRadius: "var(--radius-xl)",
+                boxShadow: isHighlighted || isTargetInAacb
+                  ? "0 10px 20px -3px rgba(37, 99, 235, 0.25)"
+                  : "var(--shadow-sm)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "0.5rem",
-                cursor: isPlayingSeq ? "default" : "pointer",
-                boxShadow: isTargetInAacb
-                  ? "0 0 25px rgba(217, 119, 6, 0.45)"
-                  : isHighlighted
-                  ? "0 8px 24px rgba(201, 168, 76, 0.3)"
-                  : "var(--shadow)",
-                opacity: isDistractorInAacb ? 0.45 : 1,
-                transform: isTargetInAacb ? "scale(1.04)" : isHighlighted ? "scale(1.05)" : "none",
-                transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)"
+                gap: "0.35rem",
+                cursor: isPlayingSeq ? "not-allowed" : "pointer",
+                transition: "all 0.15s ease",
+                transform: isHighlighted ? "scale(1.05)" : "scale(1)",
+                outline: "none",
               }}
             >
-              <span style={{ fontSize: "3rem" }}>{inst.emoji}</span>
-              <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--gray-900)" }}>
-                {inst.name}
+              <span style={{ fontSize: activeInstruments.length <= 4 ? "2.5rem" : "2rem" }}>
+                {inst.emoji}
               </span>
-              <span style={{ fontSize: "0.85rem", color: "var(--gray-500)", fontWeight: 600 }}>
+              <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--gray-900)" }}>
                 {inst.native}
+              </span>
+              <span style={{ fontSize: "0.75rem", color: "var(--gray-500)", fontWeight: 600 }}>
+                {inst.name}
               </span>
             </button>
           );
         })}
       </div>
 
-      {/* Clinical Telemetry Bar */}
-      <div style={{
-        marginTop: "1.25rem",
-        padding: "0.6rem 0.85rem",
-        background: "var(--gray-50)",
-        borderRadius: "var(--radius)",
-        border: "1px solid var(--gray-200)",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        fontSize: "0.72rem",
-        color: "var(--gray-600)"
-      }}>
-        <span>BKT Concept Mastery: <strong>{Math.round(bkt.pLearned * 100)}%</strong></span>
-        <span>•</span>
-        <span>Tremor Separation: <strong>Active</strong></span>
-        <span>•</span>
-        <span style={{ color: aacbStatus.triggered ? "#d97706" : "var(--green)", fontWeight: 700 }}>
-          {aacbStatus.triggered ? "AACB Attenuated" : "Normal Baseline"}
-        </span>
+      {/* ── Sequence Progress Dots ── */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "0.6rem",
+          marginTop: "1.5rem",
+        }}
+      >
+        {sequence.map((_, sIdx) => {
+          const isDone = sIdx < playerStep;
+          const isCurrent = sIdx === playerStep;
+
+          return (
+            <div
+              key={sIdx}
+              style={{
+                width: isCurrent ? 24 : 12,
+                height: 12,
+                borderRadius: "999px",
+                backgroundColor: isDone ? "var(--green)" : isCurrent ? "var(--primary)" : "var(--gray-300)",
+                transition: "all 0.2s ease",
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );

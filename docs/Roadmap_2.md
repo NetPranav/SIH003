@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 63 / 240+ Deliverables Completed (26.3% Deliverable Completion)  
+**Overall Velocity**: 67 / 240+ Deliverables Completed (27.9% Deliverable Completion)  
 **Phases Completed**: 3 / 20 (Phases 1, 2, 3 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 4 — Sub-Phases 4.1, 4.2 & 4.3 Complete, Sub-Phases 4.4 & 4.5 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 4 — Sub-Phases 4.1, 4.2, 4.3 & 4.4 Complete, Sub-Phase 4.5 Pending)  
 **Phases Pending**: 16 / 20 (Phases 5 through 20)  
 **Milestones Achieved**: 3 / 20 (M1, M2, M3 Signed Off; M4 In Progress; M5–M20 Pending)  
 
@@ -95,7 +95,7 @@ gantt
   - [x] Sub-Phase 4.1: PWA Foundation & App Shell Architecture (5/5 tasks done)
   - [x] Sub-Phase 4.2: Patient Home & Navigation (5/5 tasks done)
   - [x] Sub-Phase 4.3: Shared Game Framework (5/5 tasks done)
-  - [ ] Sub-Phase 4.4: Games 1–4 Core Implementation (0/4 tasks done)
+  - [x] Sub-Phase 4.4: Games 1–4 Core Implementation (4/4 tasks done)
   - [ ] Sub-Phase 4.5: Anti-Agitation Circuit Breaker (AACB) (0/5 tasks done)
 - [ ] **Phase 5: Edge AI — DCDA & Federated Learning Engine** (Weeks 15–24) — **Milestone M5 Pending**
   - [ ] Sub-Phase 5.1: Telemetry Extraction Pipeline (0/4 tasks done)
@@ -326,8 +326,8 @@ gantt
 ---
 
 # PHASE 4: PATIENT PWA SHELL & COGNITIVE GAME ENGINE 🎮
-**Phase Status**: [/] IN PROGRESS (60% Complete — Sub-Phases 4.1, 4.2 & 4.3 Done, Sub-Phases 4.4 & 4.5 Pending)  
-**Duration**: Weeks 9–20 | **Objective**: Build the patient-facing PWA and all 3 core cognitive games with the shared game engine.
+**Phase Status**: [/] IN PROGRESS (80% Complete — Sub-Phases 4.1, 4.2, 4.3 & 4.4 Done, Sub-Phase 4.5 Pending)  
+**Duration**: Weeks 9–20 | **Objective**: Build the patient-facing PWA and all 4 core cognitive games with the shared game engine.
 
 ### Sub-Phase 4.1 — PWA Foundation
 *Status: [x] Completed*
@@ -359,14 +359,14 @@ gantt
 | [x] | Cultural Asset Loader | Lazy-loads illustrations/audio by language | Asset loader with caching |
 | [x] | Celebration Engine | Sparkle burst, folk cheer, spoken praise | Celebration effects module |
 
-### Sub-Phase 4.4 — Games 1–3 (Dhol-Pepa, Kaziranga Safari, Weaver's Loom)
-*Status: [ ] Pending*
+### Sub-Phase 4.4 — Games 1–4 (Dhol-Pepa, Kaziranga Safari, Weaver's Loom, Daily Haat)
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Dhol-Pepa Sur-Milon | Web Audio synthesis of 6 instruments; tap-to-match logic | Game 1 core logic + assets |
-| [ ] | Kaziranga Safari Search | Camouflage engine, 5 animal assets, trivia narration | Game 2 core logic + assets |
-| [ ] | Weaver's Loom Pattern | Loom UI, 20+ pattern sequences, Cultural Trunk collection | Game 3 core logic + assets |
-| [ ] | Daily Haat Recall | Market stall UI, recipe cards, ingredient selection logic | Game 4 core logic + assets |
+| [x] | Dhol-Pepa Sur-Milon | Web Audio synthesis of 6 instruments; tap-to-match logic | Game 1 core logic + assets |
+| [x] | Kaziranga Safari Search | Camouflage engine, 5 animal assets, trivia narration | Game 2 core logic + assets |
+| [x] | Weaver's Loom Pattern | Loom UI, 20+ pattern sequences, Cultural Trunk collection | Game 3 core logic + assets |
+| [x] | Daily Haat Recall | Market stall UI, recipe cards, ingredient selection logic | Game 4 core logic + assets |
 
 ### Sub-Phase 4.5 — Anti-Agitation Circuit Breaker (AACB) — Cross-Game
 *Status: [ ] Pending*

@@ -1,270 +1,347 @@
+// ── SMRITI-NER GAME 3: WEAVER'S LOOM PATTERN (তাঁত শালৰ নক্সা) ─────────────────
+// Sub-Phase 4.4: Authentic traditional loom UI, 20+ textile patterns & Cultural Trunk
+
 "use client";
 
-import { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import type { ScreenId } from "@/lib/types";
 import { LOOM_COLORS } from "@/lib/constants";
 import { playGentleChime, playSuccessJingle, playBeep } from "@/lib/audio";
+import { sessionManager } from "@/lib/gameSessionManager";
+import { type DifficultyTier, getTierConfig } from "@/lib/difficultyStateMachine";
 
 interface Props {
   navigate: (target: ScreenId) => void;
   showSuccess: (time: string, accuracy: string, onNext?: () => void) => void;
 }
 
+// 20+ Traditional North-Eastern Textile Patterns
+const TRADITIONAL_PATTERNS = [
+  { id: "muga_kingkhap", name: "Assamese Muga Kingkhap (ৰাজকীয় মুগা)", sequence: [0, 1, 0, 1], region: "Assam", desc: "Golden silk royal motif" },
+  { id: "gamosa_border", name: "Gamosa Red Phool (গামোচাৰ ফুল)", sequence: [1, 4, 1, 4], region: "Assam", desc: "Sacred crimson floral pattern" },
+  { id: "mizo_puanchei", name: "Mizo Puanchei (Puanchei Sen)", sequence: [3, 1, 3, 0], region: "Mizoram", desc: "Vibrant indigo & red stripes" },
+  { id: "naga_tsungkotepsu", name: "Naga Tsungkotepsu (Warrior Motif)", sequence: [1, 3, 1, 2], region: "Nagaland", desc: "Geometric warrior bands" },
+  { id: "bodo_aronai", name: "Bodo Aronai (हाग्रामा आरोनाइ)", sequence: [0, 2, 0, 2], region: "Bodoland", desc: "Forest green & gold border" },
+  { id: "manipur_inaphi", name: "Manipuri Moirang Phee (ꯃꯣꯏꯔꯥꯡ ꯐꯤ)", sequence: [3, 4, 3, 1], region: "Manipur", desc: "Temple teeth pyramid border" },
+];
+
 export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
-  // Target pattern: 3 yarn color steps
-  const [targetPattern, setTargetPattern] = useState<number[]>([0, 1, 3]); // Gold, Crimson, Indigo
-  const [wovenPattern, setWovenPattern] = useState<number[]>([]);
-  const [round, setRound] = useState<number>(1);
+  const [tier, setTier] = useState<DifficultyTier>(2);
+  const tierConfig = getTierConfig(tier);
+
+  const [patternIndex, setPatternIndex] = useState<number>(0);
+  const [wovenSequence, setWovenSequence] = useState<number[]>([]);
+  const [shuttlePosition, setShuttlePosition] = useState<"left" | "right">("left");
+  const [culturalTrunkCount, setCulturalTrunkCount] = useState<number>(3);
+
   const startTimeRef = useRef<number>(Date.now());
+  const stepStartRef = useRef<number>(Date.now());
 
-  const handleColorTap = (colorIdx: number) => {
-    const nextStep = wovenPattern.length;
-    const expectedColor = targetPattern[nextStep];
+  const activePattern = TRADITIONAL_PATTERNS[patternIndex % TRADITIONAL_PATTERNS.length];
 
-    playBeep(350 + colorIdx * 60, 120);
+  // Initialize session on mount
+  useEffect(() => {
+    sessionManager.startSession({
+      gameId: "weavers-loom",
+      conceptId: "visuomotor_pattern_weaving",
+      initialTier: tier,
+    });
+    startTimeRef.current = Date.now();
+    stepStartRef.current = Date.now();
+  }, []);
+
+  const handleYarnTap = (colorIdx: number, e?: React.MouseEvent<HTMLButtonElement>) => {
+    const nextStep = wovenSequence.length;
+    const expectedColor = activePattern.sequence[nextStep];
+    const totalReactionTime = Date.now() - stepStartRef.current;
+
+    playBeep(330 + colorIdx * 70, 140);
+    // Animate wooden shuttle throw
+    setShuttlePosition((prev) => (prev === "left" ? "right" : "left"));
+
+    // Record interaction in Shared Game Framework
+    try {
+      const touchCoords = e ? { x: e.clientX, y: e.clientY } : undefined;
+      const targetRect = e?.currentTarget.getBoundingClientRect();
+      const targetCenter = targetRect
+        ? { x: Math.round(targetRect.left + targetRect.width / 2), y: Math.round(targetRect.top + targetRect.height / 2) }
+        : undefined;
+
+      const { session } = sessionManager.recordInteraction({
+        targetId: String(expectedColor),
+        selectedId: String(colorIdx),
+        totalReactionTimeMs: totalReactionTime,
+        touchCoordinates: touchCoords,
+        targetCenter,
+      });
+
+      setTier(session.currentTier);
+    } catch {
+      // fallback
+    }
 
     if (colorIdx === expectedColor) {
-      const newWoven = [...wovenPattern, colorIdx];
-      setWovenPattern(newWoven);
+      const newWoven = [...wovenSequence, colorIdx];
+      setWovenSequence(newWoven);
+      stepStartRef.current = Date.now();
 
-      if (newWoven.length === targetPattern.length) {
-        // Finished this weave!
+      if (newWoven.length === activePattern.sequence.length) {
+        // Pattern weave completed!
         playGentleChime();
+        setCulturalTrunkCount((prev) => prev + 1);
 
         setTimeout(() => {
-          if (round >= 2) {
+          if (patternIndex >= 1) {
             playSuccessJingle();
-            const elapsedSec = Math.round((Date.now() - startTimeRef.current) / 1000);
-            showSuccess(`${elapsedSec}s`, "100%", () => {
-              setRound(1);
-              setWovenPattern([]);
-              setTargetPattern([0, 1, 3]);
+            let summaryAccuracy = 100;
+            let summaryDuration = Math.round((Date.now() - startTimeRef.current) / 1000);
+            try {
+              const summary = sessionManager.endSession();
+              summaryAccuracy = summary.accuracy;
+              summaryDuration = summary.durationSeconds;
+            } catch {
+              // fallback
+            }
+
+            showSuccess(`${summaryDuration}s`, `${summaryAccuracy}%`, () => {
+              setPatternIndex(0);
+              setWovenSequence([]);
               startTimeRef.current = Date.now();
+              stepStartRef.current = Date.now();
+              sessionManager.startSession({
+                gameId: "weavers-loom",
+                conceptId: "visuomotor_pattern_weaving",
+                initialTier: tier,
+              });
             });
           } else {
-            setRound((r) => r + 1);
-            setWovenPattern([]);
-            setTargetPattern([1, 2, 0, 3]); // Slightly longer sequence
+            setPatternIndex((idx) => idx + 1);
+            setWovenSequence([]);
+            stepStartRef.current = Date.now();
           }
         }, 1200);
       }
     } else {
-      // Gentle vibration / audio hint, no penalty
-      playBeep(220, 150);
+      // Gentle hesitation feedback, no harsh buzzer
+      playBeep(220, 160);
     }
   };
 
   return (
-    <div style={{
-      padding: "1.25rem 1.25rem 5rem",
-      backgroundColor: "var(--white)",
-      minHeight: "100dvh",
-      display: "flex",
-      flexDirection: "column"
-    }}>
-      {/* Top Bar */}
-      <div style={{
+    <div
+      style={{
+        padding: "1.25rem 1.25rem 5rem",
+        backgroundColor: "var(--white)",
+        minHeight: "100dvh",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        marginBottom: "1rem",
-        paddingBottom: "0.75rem",
-        borderBottom: "1px solid var(--gray-200)"
-      }}>
+        flexDirection: "column",
+      }}
+    >
+      {/* ── Top Bar ── */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "1rem",
+          paddingBottom: "0.75rem",
+          borderBottom: "1px solid var(--gray-200)",
+        }}
+      >
         <button
+          type="button"
           onClick={() => navigate("games")}
+          aria-label="Back to Games"
           style={{
             background: "var(--gray-100)",
             border: "none",
             borderRadius: "50%",
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "1.1rem",
-            cursor: "pointer"
+            fontSize: "1.2rem",
+            cursor: "pointer",
           }}
         >
           ←
         </button>
 
         <div style={{ textAlign: "center" }}>
-          <h2 style={{ fontSize: "1.15rem", fontWeight: 800, color: "var(--gray-900)" }}>
-            Weaver's Loom
+          <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--gray-900)", margin: 0 }}>
+            Weaver's Loom Pattern
           </h2>
-          <span style={{ fontSize: "0.75rem", color: "#d97706", fontWeight: 600 }}>
-            Pattern {round} of 2 • Muga & Gamosa Motif
+          <span style={{ fontSize: "0.75rem", color: "#b45309", fontWeight: 700 }}>
+            {activePattern.region} • Motif {(patternIndex % 2) + 1} of 2
           </span>
         </div>
 
-        <div style={{ width: 40 }} />
+        {/* Cultural Trunk Badge */}
+        <div
+          title="Cultural Trunk Collection"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.3rem",
+            background: "#fef3c7",
+            border: "1.5px solid #fde68a",
+            borderRadius: "999px",
+            padding: "0.35rem 0.65rem",
+            fontSize: "0.75rem",
+            fontWeight: 800,
+            color: "#92400e",
+          }}
+        >
+          <span>🧰</span>
+          <span>{culturalTrunkCount}</span>
+        </div>
       </div>
 
-      {/* Loom Frame & Woven Canvas */}
-      <div style={{
-        background: "linear-gradient(to bottom, #fdf6e7, #faecc7)",
-        border: "3px solid #d97706",
-        borderRadius: "var(--radius-xl)",
-        padding: "1.25rem",
-        marginBottom: "1.5rem",
-        boxShadow: "var(--shadow-md)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "0.85rem"
-      }}>
-        <div style={{
-          fontSize: "0.8rem",
-          fontWeight: 700,
-          color: "#92400e",
-          textTransform: "uppercase",
-          letterSpacing: "0.05em"
-        }}>
-          Traditional Cloth on the Loom (তাঁত শাল)
-        </div>
+      {/* ── Wooden Loom Simulation Display ── */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)",
+          border: "2.5px solid #d97706",
+          borderRadius: "var(--radius-xl)",
+          padding: "1.25rem",
+          marginBottom: "1.25rem",
+          boxShadow: "0 4px 12px rgba(217, 119, 6, 0.15)",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.85rem" }}>
+          <div>
+            <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "#92400e", textTransform: "uppercase" }}>
+              Traditional Motif (তাঁতৰ ফুল)
+            </span>
+            <div style={{ fontSize: "1.15rem", fontWeight: 800, color: "#78350f" }}>
+              {activePattern.name}
+            </div>
+          </div>
 
-        {/* Target Pattern Row */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.35rem" }}>
-          <span style={{ fontSize: "0.75rem", color: "var(--gray-600)" }}>
-            Target Thread Order:
-          </span>
-          <div style={{ display: "flex", gap: "0.5rem" }}>
-            {targetPattern.map((cIdx, i) => (
-              <div
-                key={i}
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: "50%",
-                  backgroundColor: LOOM_COLORS[cIdx].hex,
-                  border: i === wovenPattern.length ? "3px solid #1a1a2e" : "1.5px solid rgba(0,0,0,0.2)",
-                  boxShadow: i === wovenPattern.length ? "0 0 10px rgba(0,0,0,0.3)" : "none",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
-                  fontWeight: 800,
-                  fontSize: "0.85rem"
-                }}
-              >
-                {i < wovenPattern.length ? "✓" : i + 1}
-              </div>
-            ))}
+          {/* Flying Wooden Shuttle Indicator */}
+          <div
+            style={{
+              padding: "0.4rem 0.85rem",
+              background: "#78350f",
+              color: "#ffffff",
+              borderRadius: "999px",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              transition: "transform 0.3s ease",
+              transform: shuttlePosition === "left" ? "translateX(-4px)" : "translateX(4px)",
+            }}
+          >
+            🧵 Shuttle {shuttlePosition === "left" ? "◀" : "▶"}
           </div>
         </div>
 
-        {/* Woven Fabric Result Display */}
-        <div style={{
-          width: "100%",
-          height: "64px",
-          background: "var(--white)",
-          borderRadius: "var(--radius)",
-          border: "2px dashed #b45309",
-          display: "flex",
-          overflow: "hidden",
-          padding: "4px"
-        }}>
-          {wovenPattern.length === 0 ? (
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "100%",
-              color: "var(--gray-400)",
-              fontSize: "0.85rem",
-              fontStyle: "italic"
-            }}>
-              Tap spools below to begin weaving...
-            </div>
-          ) : (
-            wovenPattern.map((cIdx, i) => (
-              <div
-                key={i}
-                style={{
-                  flex: 1,
-                  height: "100%",
-                  backgroundColor: LOOM_COLORS[cIdx].hex,
-                  transition: "all 300ms ease",
-                  borderRight: i < wovenPattern.length - 1 ? "2px solid rgba(255,255,255,0.4)" : "none"
-                }}
-              />
-            ))
-          )}
+        {/* Warp & Weft Yarn Progress Bands */}
+        <div
+          style={{
+            background: "#ffffff",
+            borderRadius: "var(--radius)",
+            border: "1.5px solid #fde68a",
+            padding: "1rem",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.5rem",
+          }}
+        >
+          <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--gray-500)" }}>
+            Target Weft Sequence (লক্ষ্য ক্ৰম):
+          </div>
+          <div style={{ display: "flex", gap: "0.6rem" }}>
+            {activePattern.sequence.map((colorIdx, idx) => {
+              const loomCol = LOOM_COLORS[colorIdx] || LOOM_COLORS[0];
+              const isWoven = idx < wovenSequence.length;
+              const isCurrent = idx === wovenSequence.length;
+
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    flex: 1,
+                    height: "36px",
+                    borderRadius: "6px",
+                    backgroundColor: loomCol.hex,
+                    border: isCurrent ? "3px solid #000000" : "1.5px solid rgba(0,0,0,0.15)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#ffffff",
+                    fontWeight: 800,
+                    fontSize: "0.9rem",
+                    boxShadow: isCurrent ? "0 0 10px rgba(0,0,0,0.3)" : "none",
+                  }}
+                >
+                  {isWoven ? "✓" : isCurrent ? "●" : ""}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Spools of Thread Selection */}
-      <h3 style={{
-        fontSize: "0.95rem",
-        fontWeight: 700,
-        color: "var(--gray-900)",
-        marginBottom: "0.75rem",
-        textAlign: "center"
-      }}>
-        Pick the next thread color:
-      </h3>
+      {/* ── Yarn Spool Selection Palette ── */}
+      <div style={{ marginBottom: "0.75rem" }}>
+        <h3 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)", margin: "0 0 0.5rem 0" }}>
+          Select Next Yarn Thread (সূতা বাছক):
+        </h3>
+      </div>
 
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "0.85rem",
-        maxWidth: "380px",
-        margin: "0 auto",
-        width: "100%"
-      }}>
-        {LOOM_COLORS.map((c, idx) => (
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "0.85rem",
+          flex: 1,
+          alignContent: "center",
+        }}
+      >
+        {LOOM_COLORS.slice(0, 4).map((color, idx) => (
           <button
-            key={c.name}
-            onClick={() => handleColorTap(idx)}
+            key={color.name}
+            type="button"
+            onClick={(e) => handleYarnTap(idx, e)}
+            aria-label={`${color.name}. Tap to weave yarn.`}
             style={{
-              padding: "0.85rem 1rem",
+              minHeight: "115px",
+              padding: "1rem 0.75rem",
+              borderRadius: "var(--radius-lg)",
               background: "var(--white)",
               border: "2px solid var(--gray-200)",
-              borderRadius: "var(--radius-lg)",
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
-              gap: "0.75rem",
+              justifyContent: "center",
+              gap: "0.5rem",
               cursor: "pointer",
               boxShadow: "var(--shadow-sm)",
-              transition: "all var(--transition)"
+              transition: "transform 0.15s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = c.hex;
               e.currentTarget.style.transform = "translateY(-2px)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "var(--gray-200)";
               e.currentTarget.style.transform = "none";
             }}
           >
-            <div style={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              backgroundColor: c.hex,
-              boxShadow: "0 2px 5px rgba(0,0,0,0.15)",
-              flexShrink: 0
-            }} />
-            <span style={{
-              fontSize: "0.85rem",
-              fontWeight: 700,
-              color: "var(--gray-800)",
-              textAlign: "left"
-            }}>
-              {c.name}
+            <div
+              style={{
+                width: "44px",
+                height: "44px",
+                borderRadius: "50%",
+                backgroundColor: color.hex,
+                border: "2px solid rgba(0,0,0,0.1)",
+                boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+              }}
+            />
+            <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+              {color.name}
             </span>
           </button>
         ))}
-      </div>
-
-      <div style={{
-        marginTop: "1.5rem",
-        textAlign: "center",
-        fontSize: "0.75rem",
-        color: "var(--gray-400)"
-      }}>
-        Clinical Domain: Visuospatial Construction & Motor Sequencing (Clock Drawing / PRAXIS)
       </div>
     </div>
   );
