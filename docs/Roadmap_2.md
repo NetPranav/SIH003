@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 76 / 240+ Deliverables Completed (31.7% Deliverable Completion)  
+**Overall Velocity**: 80 / 240+ Deliverables Completed (33.3% Deliverable Completion)  
 **Phases Completed**: 4 / 20 (Phases 1, 2, 3 & 4 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 5 — Sub-Phase 5.1 Complete, Sub-Phases 5.2–5.5 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 5 — Sub-Phases 5.1 & 5.2 Complete, Sub-Phases 5.3–5.5 Pending)  
 **Phases Pending**: 15 / 20 (Phases 6 through 20)  
 **Milestones Achieved**: 4 / 20 (M1, M2, M3, M4 Signed Off; M5–M20 Pending)  
 
@@ -99,7 +99,7 @@ gantt
   - [x] Sub-Phase 4.5: Anti-Agitation Circuit Breaker (AACB) (5/5 tasks done)
 - [ ] **Phase 5: Edge AI — DCDA & Federated Learning Engine** (Weeks 15–24) — **Milestone M5 Pending**
   - [x] Sub-Phase 5.1: Telemetry Extraction Pipeline (4/4 tasks done)
-  - [ ] Sub-Phase 5.2: Bayesian Knowledge Tracing (BKT) Engine (0/4 tasks done)
+  - [x] Sub-Phase 5.2: Bayesian Knowledge Tracing (BKT) Engine (4/4 tasks done)
   - [ ] Sub-Phase 5.3: Difficulty Orchestrator & MMSE Proxy (0/4 tasks done)
   - [ ] Sub-Phase 5.4: Federated Learning Layer (Client Training & Packaging) (0/4 tasks done)
   - [ ] Sub-Phase 5.5: Circadian-Aware Content Engine (0/3 tasks done)
@@ -385,7 +385,7 @@ gantt
 ---
 
 # PHASE 5: EDGE AI — DCDA & FEDERATED LEARNING ENGINE 🧠
-**Phase Status**: [/] IN PROGRESS (20% Complete — Sub-Phase 5.1 Done, Sub-Phases 5.2–5.5 Pending)  
+**Phase Status**: [/] IN PROGRESS (40% Complete — Sub-Phases 5.1 & 5.2 Done, Sub-Phases 5.3–5.5 Pending)  
 **Duration**: Weeks 15–24 | **Objective**: Real-time adaptive difficulty plus privacy-preserving on-device model improvement.
 
 ### Sub-Phase 5.1 — Telemetry Extraction Pipeline
@@ -398,13 +398,13 @@ gantt
 | [x] | Session Telemetry Vector | [RT_total, τ, RT_delib, accuracy, difficulty, aacb_triggered, time_of_day] | Telemetry vector schema |
 
 ### Sub-Phase 5.2 — Bayesian Knowledge Tracing (BKT) Engine
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | BKT Model Implementation | 4-parameter BKT: P(L₀), P(T), P(G), P(S) | BKT engine module |
-| [ ] | Posterior Update Logic | HMM forward algorithm per interaction | Update algorithm |
-| [ ] | Mastery Threshold Tuning | Increment ≥0.85, decrement ≤0.35 | Threshold configuration |
-| [ ] | Edge Optimization | <5ms compute on 2GB RAM Android | Performance benchmarks |
+| [x] | BKT Model Implementation | 4-parameter BKT: P(L₀), P(T), P(G), P(S) | BKT engine module |
+| [x] | Posterior Update Logic | HMM forward algorithm per interaction | Update algorithm |
+| [x] | Mastery Threshold Tuning | Increment ≥0.85, decrement ≤0.35 | Threshold configuration |
+| [x] | Edge Optimization | <5ms compute on 2GB RAM Android | Performance benchmarks |
 
 ### Sub-Phase 5.3 — Difficulty Orchestrator & MMSE Proxy
 *Status: [ ] Pending*

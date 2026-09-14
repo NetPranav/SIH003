@@ -69,34 +69,27 @@ export function decomposeLatency(
   };
 }
 
+import { BKTEngine, type BKTState as FullBKTState } from "./bktEngine";
+
 // ── 2. Bayesian Knowledge Tracing (BKT) ──────────────────────
 // Evaluates true cognitive mastery while filtering out lucky guesses and motor tremors
+export { bktEngine, BKTEngine } from "./bktEngine";
+
 export function updateBKT(
   currentState: BKTState,
-  isCorrect: boolean
+  isCorrect: boolean,
+  choiceCount?: number
 ): BKTState {
-  const { pLearned, pTransition, pGuess, pSlip } = currentState;
-  let posterior = 0;
-
-  if (isCorrect) {
-    // P(L_t | Y_t = 1) = (P(L_{t-1}) * (1 - P(S))) / [ P(L_{t-1}) * (1 - P(S)) + (1 - P(L_{t-1})) * P(G) ]
-    const numerator = pLearned * (1 - pSlip);
-    const denominator = numerator + (1 - pLearned) * pGuess;
-    posterior = numerator / Math.max(0.0001, denominator);
-  } else {
-    // P(L_t | Y_t = 0) = (P(L_{t-1}) * P(S)) / [ P(L_{t-1}) * P(S) + (1 - P(L_{t-1})) * (1 - P(G)) ]
-    const numerator = pLearned * pSlip;
-    const denominator = numerator + (1 - pLearned) * (1 - pGuess);
-    posterior = numerator / Math.max(0.0001, denominator);
-  }
-
-  // Latent transition for t+1: P(L_{t+1}) = posterior + (1 - posterior) * P(T)
-  const nextPLearned = posterior + (1 - posterior) * pTransition;
-
+  const fullState: FullBKTState = {
+    ...currentState,
+    totalTrials: 0,
+    correctTrials: 0,
+  };
+  const updated = BKTEngine.updateState(fullState, isCorrect, choiceCount);
   return {
     ...currentState,
-    pLearned: Math.min(0.99, Math.max(0.01, nextPLearned)),
-    lastUpdated: new Date().toISOString(),
+    pLearned: updated.pLearned,
+    lastUpdated: updated.lastUpdated,
   };
 }
 
