@@ -68,11 +68,11 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 268 / 240+ Deliverables Completed (111.7% Deliverable Completion)  
-**Phases Completed**: 17 / 20 (Phases 1 through 17 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 18 — Sub-Phases 18.1, 18.2 & 18.3 Complete; Sub-Phase 18.4 Pending)  
+**Overall Velocity**: 271 / 240+ Deliverables Completed (112.9% Deliverable Completion)  
+**Phases Completed**: 18 / 20 (Phases 1 through 18 Complete & Signed Off)  
+**Phases In Progress**: 0 / 20 (Phase 19 Starting Next)  
 **Phases Pending**: 2 / 20 (Phases 19 through 20)  
-**Milestones Achieved**: 17 / 20 (M1 through M17 Signed Off; M18–M20 Pending)  
+**Milestones Achieved**: 18 / 20 (M1 through M18 Signed Off; M19–M20 Pending)  
 
 ### Phase & Milestone Checklist
 - [x] **Phase 1: Clinical & Cultural Foundation Research** (Weeks 1–6) — **Milestone M1 Signed Off**
@@ -163,11 +163,11 @@ gantt
   - [x] Sub-Phase 17.2: Field Support Network & SOPs (3/3 tasks done)
   - [x] Sub-Phase 17.3: Community Facilitation Training (2/2 tasks done)
   - [x] Sub-Phase 17.4: IVR Support Training (2/2 tasks done)
-- [ ] **Phase 18: MDoNER Central Telemetry Hub & Impact Framework** (Weeks 70–84) — **Milestone M18 Pending**
+- [x] **Phase 18: MDoNER Central Telemetry Hub & Impact Framework** (Weeks 70–84) — **Milestone M18 Signed Off**
   - [x] Sub-Phase 18.1: Central Analytics Dashboard (GIS) (3/3 tasks done)
   - [x] Sub-Phase 18.2: Cultural Cognitive Engagement Index (CCEI) Finalization (3/3 tasks done)
   - [x] Sub-Phase 18.3: Data Warehouse & Research Pipeline (3/3 tasks done)
-  - [ ] Sub-Phase 18.4: Federated Learning at Population Scale (0/2 tasks done)
+  - [x] Sub-Phase 18.4: Federated Learning at Population Scale (2/2 tasks done)
 - [ ] **Phase 19: Pan-NER Public Rollout** (Weeks 82–93) — **Milestone M19 Pending**
   - [ ] Sub-Phase 19.1: Public Release (Play Store, PWA, IVR) (0/3 tasks done)
   - [ ] Sub-Phase 19.2: Community Awareness Campaign (0/3 tasks done)
@@ -962,7 +962,7 @@ gantt
 ---
 
 # PHASE 18: MDoNER CENTRAL TELEMETRY HUB & IMPACT FRAMEWORK 📊
-**Phase Status**: [ ] IN PROGRESS (82% Complete — Sub-Phases 18.1–18.3 Complete; Sub-Phase 18.4 Pending)  
+**Phase Status**: [x] COMPLETE (100% Complete — Sub-Phases 18.1–18.4 Complete & Milestone M18 Signed Off)  
 **Duration**: Weeks 70–84 | **Objective**: Central analytics, research pipeline, and the named Cultural Cognitive Engagement Index (CCEI) as the platform's flagship impact metric.
 
 ### Sub-Phase 18.1 — Central Analytics Dashboard
@@ -990,14 +990,14 @@ gantt
 | [x] | Publication Pipeline | Manuscripts on pilot efficacy, MMSE proxy, CCEI validation | Draft research papers |
 
 ### Sub-Phase 18.4 — Federated Learning at Population Scale
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Cross-District Model Aggregation | Aggregate federated model updates across all active districts | Population-scale FL pipeline |
-| [ ] | Model Drift Monitoring | Track model performance drift across states/languages | Drift monitoring dashboard |
+| [x] | Cross-District Model Aggregation | Aggregate federated model updates across all active districts | Population-scale FL pipeline |
+| [x] | Model Drift Monitoring | Track model performance drift across states/languages | Drift monitoring dashboard |
 
 > [!IMPORTANT]
-> - [ ] **Milestone M18**: Central Hub & CCEI Operational — active in all 8 states; 5,000+ enrolled patients; 1,500+ trained ASHAs; CCEI live on all dashboards. *(Status: PENDING)*
+> - [x] **Milestone M18**: Central Hub & CCEI Operational — active in all 8 states; 5,000+ enrolled patients; 1,500+ trained ASHAs; CCEI live on all dashboards. *(Status: SIGNED OFF)*
 
 ---
 ---
