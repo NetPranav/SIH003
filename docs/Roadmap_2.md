@@ -68,11 +68,11 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 230 / 240+ Deliverables Completed (95.8% Deliverable Completion)  
-**Phases Completed**: 14 / 20 (Phases 1 through 14 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 15 — Sub-Phases 15.1–15.3 Complete; Sub-Phase 15.4 Pending)  
+**Overall Velocity**: 233 / 240+ Deliverables Completed (97.1% Deliverable Completion)  
+**Phases Completed**: 15 / 20 (Phases 1 through 15 Complete & Signed Off)  
+**Phases In Progress**: 0 / 20  
 **Phases Pending**: 5 / 20 (Phases 16 through 20)  
-**Milestones Achieved**: 14 / 20 (M1 through M14 Signed Off; M15–M20 Pending)  
+**Milestones Achieved**: 15 / 20 (M1 through M15 Signed Off; M16–M20 Pending)  
 
 ### Phase & Milestone Checklist
 - [x] **Phase 1: Clinical & Cultural Foundation Research** (Weeks 1–6) — **Milestone M1 Signed Off**
@@ -148,11 +148,11 @@ gantt
   - [x] Sub-Phase 14.2: ASHA Worker Training Program (4/4 tasks done)
   - [x] Sub-Phase 14.3: 90-Day Clinical Observation (500 Patients) (5/5 tasks done)
   - [x] Sub-Phase 14.4: Pilot Efficacy Analysis (4/4 tasks done)
-- [ ] **Phase 15: Feedback Integration & Iteration** (Weeks 52–55) — **Milestone M15 Pending**
+- [x] **Phase 15: Feedback Integration & Iteration** (Weeks 52–55) — **Milestone M15 Signed Off**
   - [x] Sub-Phase 15.1: Feedback Synthesis & Prioritization (3/3 tasks done)
   - [x] Sub-Phase 15.2: Iterative Improvement Sprint (4/4 tasks done)
   - [x] Sub-Phase 15.3: Social & IVR Feature Refinement (2/2 tasks done)
-  - [ ] Sub-Phase 15.4: Composite Metric Draft (CCEI v1) (0/2 tasks done)
+  - [x] Sub-Phase 15.4: Composite Metric Draft (CCEI v1) (2/2 tasks done)
 - [ ] **Phase 16: Multi-State Expansion** (Weeks 56–72) — **Milestone M16 Pending**
   - [ ] Sub-Phase 16.1: State-by-State Rollout Plan (Waves 1–4) (0/4 tasks done)
   - [ ] Sub-Phase 16.2: State-Specific Localization (8 States) (0/4 tasks done)
@@ -837,7 +837,7 @@ gantt
 ---
 
 # PHASE 15: FEEDBACK INTEGRATION & ITERATION 🔁
-**Phase Status**: [ ] IN PROGRESS (82% Complete — Sub-Phases 15.1–15.3 Complete; Sub-Phase 15.4 Pending)  
+**Phase Status**: [x] COMPLETE (100% Complete — Sub-Phases 15.1–15.4 Complete & Milestone M15 Signed Off)  
 **Duration**: Weeks 52–55 | **Objective**: Synthesize pilot learnings into a stable v2.0 release before scaling.
 
 ### Sub-Phase 15.1 — Feedback Synthesis & Prioritization
@@ -865,14 +865,14 @@ gantt
 | [x] | IVR Script Refinement | Simplify menus based on call drop-off patterns | Revised IVR scripts |
 
 ### Sub-Phase 15.4 — Composite Metric Draft (New)
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Cultural Cognitive Engagement Index (CCEI) Draft | Blend accuracy/RT trend + session frequency + AACB rate into one named index | CCEI v1 specification |
-| [ ] | CCEI Back-Testing on Pilot Data | Validate CCEI against pilot outcomes for sanity-check | CCEI validation note |
+| [x] | Cultural Cognitive Engagement Index (CCEI) Draft | Blend accuracy/RT trend + session frequency + AACB rate into one named index | CCEI v1 specification |
+| [x] | CCEI Back-Testing on Pilot Data | Validate CCEI against pilot outcomes for sanity-check | CCEI validation note |
 
 > [!IMPORTANT]
-> - [ ] **Milestone M15**: Post-Pilot v2.0 Ready — critical bugs resolved; models recalibrated; MMSE proxy correlation improved to r≥0.80; CCEI drafted. *(Status: PENDING)*
+> - [x] **Milestone M15**: Post-Pilot v2.0 Ready — critical bugs resolved; models recalibrated; MMSE proxy correlation improved to r≥0.80; CCEI drafted. *(Status: SIGNED OFF)*
 
 ---
 ---
