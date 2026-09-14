@@ -161,3 +161,21 @@ button {
   font-family: inherit;
   cursor: pointer;
 }
+
+/* Circadian-Aware Content Engine Twilight & Sundowning Protection Tokens */
+body.circadian-dusk-mode {
+  transition: filter 2500ms ease, background-color 2500ms ease;
+  filter: sepia(0.18) hue-rotate(-8deg) contrast(0.95) brightness(0.94);
+}
+
+body.circadian-sundowning-active {
+  transition: filter 3000ms ease, background-color 3000ms ease;
+  filter: sepia(0.32) hue-rotate(-15deg) contrast(0.92) brightness(0.88);
+}
+
+body.circadian-sundowning-active .aacb-target-card,
+body.circadian-sundowning-active button {
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.45) !important;
+  border-color: #d4af37 !important;
+}
+

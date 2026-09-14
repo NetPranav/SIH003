@@ -68,11 +68,11 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 84 / 240+ Deliverables Completed (35.0% Deliverable Completion)  
-**Phases Completed**: 4 / 20 (Phases 1, 2, 3 & 4 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 5 — Sub-Phases 5.1, 5.2 & 5.3 Complete, Sub-Phases 5.4 & 5.5 Pending)  
+**Overall Velocity**: 91 / 240+ Deliverables Completed (37.9% Deliverable Completion)  
+**Phases Completed**: 5 / 20 (Phases 1, 2, 3, 4 & 5 Complete & Signed Off)  
+**Phases In Progress**: 0 / 20 (Phase 5 Complete; Phase 6 Next)  
 **Phases Pending**: 15 / 20 (Phases 6 through 20)  
-**Milestones Achieved**: 4 / 20 (M1, M2, M3, M4 Signed Off; M5–M20 Pending)  
+**Milestones Achieved**: 5 / 20 (M1, M2, M3, M4, M5 Signed Off; M6–M20 Pending)  
 
 ### Phase & Milestone Checklist
 - [x] **Phase 1: Clinical & Cultural Foundation Research** (Weeks 1–6) — **Milestone M1 Signed Off**
@@ -97,12 +97,12 @@ gantt
   - [x] Sub-Phase 4.3: Shared Game Framework (5/5 tasks done)
   - [x] Sub-Phase 4.4: Games 1–4 Core Implementation (4/4 tasks done)
   - [x] Sub-Phase 4.5: Anti-Agitation Circuit Breaker (AACB) (5/5 tasks done)
-- [ ] **Phase 5: Edge AI — DCDA & Federated Learning Engine** (Weeks 15–24) — **Milestone M5 Pending**
+- [x] **Phase 5: Edge AI — DCDA & Federated Learning Engine** (Weeks 15–24) — **Milestone M5 Signed Off**
   - [x] Sub-Phase 5.1: Telemetry Extraction Pipeline (4/4 tasks done)
   - [x] Sub-Phase 5.2: Bayesian Knowledge Tracing (BKT) Engine (4/4 tasks done)
   - [x] Sub-Phase 5.3: Difficulty Orchestrator & MMSE Proxy (4/4 tasks done)
   - [x] Sub-Phase 5.4: Federated Learning Layer (Client Training & Packaging) (4/4 tasks done)
-  - [ ] Sub-Phase 5.5: Circadian-Aware Content Engine (0/3 tasks done)
+  - [x] Sub-Phase 5.5: Circadian-Aware Content Engine (3/3 tasks done)
 - [ ] **Phase 6: Multilingual Voice & Bhashini Integration** (Weeks 15–22) — **Milestone M6 Pending**
   - [ ] Sub-Phase 6.1: Bhashini (AI4Bharat) Integration (0/4 tasks done)
   - [ ] Sub-Phase 6.2: Localization Framework (8 Regional Languages) (0/4 tasks done)
@@ -385,7 +385,7 @@ gantt
 ---
 
 # PHASE 5: EDGE AI — DCDA & FEDERATED LEARNING ENGINE 🧠
-**Phase Status**: [/] IN PROGRESS (80% Complete — Sub-Phases 5.1, 5.2, 5.3 & 5.4 Done, Sub-Phase 5.5 Pending)  
+**Phase Status**: [x] COMPLETED (100% Complete — Sub-Phases 5.1, 5.2, 5.3, 5.4 & 5.5 Done & Signed Off)  
 **Duration**: Weeks 15–24 | **Objective**: Real-time adaptive difficulty plus privacy-preserving on-device model improvement.
 
 ### Sub-Phase 5.1 — Telemetry Extraction Pipeline
@@ -425,15 +425,15 @@ gantt
 | [x] | Privacy Validation | Confirm no raw behavioral/PII data leaves device — only model weights | Privacy audit report |
 
 ### Sub-Phase 5.5 — Circadian-Aware Content Engine (New)
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Sundowning Window Detection | Flag late-afternoon/evening sessions via time-of-day + agitation signals | Sundowning detection logic |
-| [ ] | Calming Audio Trigger | Auto-play regional lullabies/ragas instead of just lowering difficulty | Calming content playback module |
-| [ ] | Content-Clinical Mapping | Document link between calming audio and agitation-reduction goal | Clinical mapping note |
+| [x] | Sundowning Window Detection | Flag late-afternoon/evening sessions via time-of-day + agitation signals | Sundowning detection logic |
+| [x] | Calming Audio Trigger | Auto-play regional lullabies/ragas instead of just lowering difficulty | Calming content playback module |
+| [x] | Content-Clinical Mapping | Document link between calming audio and agitation-reduction goal | Clinical mapping note |
 
 > [!IMPORTANT]
-> - [ ] **Milestone M5**: DCDA + Federated Learning Operational — BKT <5ms; MMSE proxy r≥0.75; federated updates verified privacy-safe. *(Status: PENDING)*
+> - [x] **Milestone M5**: DCDA + Federated Learning Operational — BKT <5ms; MMSE proxy r≥0.75; federated updates verified privacy-safe. *(Status: COMPLETED & SIGNED OFF)*
 
 ---
 ---
