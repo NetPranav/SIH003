@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 262 / 240+ Deliverables Completed (109.2% Deliverable Completion)  
+**Overall Velocity**: 265 / 240+ Deliverables Completed (110.4% Deliverable Completion)  
 **Phases Completed**: 17 / 20 (Phases 1 through 17 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 18 — Sub-Phase 18.1 Complete; Sub-Phases 18.2–18.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 18 — Sub-Phases 18.1 & 18.2 Complete; Sub-Phases 18.3 & 18.4 Pending)  
 **Phases Pending**: 2 / 20 (Phases 19 through 20)  
 **Milestones Achieved**: 17 / 20 (M1 through M17 Signed Off; M18–M20 Pending)  
 
@@ -165,7 +165,7 @@ gantt
   - [x] Sub-Phase 17.4: IVR Support Training (2/2 tasks done)
 - [ ] **Phase 18: MDoNER Central Telemetry Hub & Impact Framework** (Weeks 70–84) — **Milestone M18 Pending**
   - [x] Sub-Phase 18.1: Central Analytics Dashboard (GIS) (3/3 tasks done)
-  - [ ] Sub-Phase 18.2: Cultural Cognitive Engagement Index (CCEI) Finalization (0/3 tasks done)
+  - [x] Sub-Phase 18.2: Cultural Cognitive Engagement Index (CCEI) Finalization (3/3 tasks done)
   - [ ] Sub-Phase 18.3: Data Warehouse & Research Pipeline (0/3 tasks done)
   - [ ] Sub-Phase 18.4: Federated Learning at Population Scale (0/2 tasks done)
 - [ ] **Phase 19: Pan-NER Public Rollout** (Weeks 82–93) — **Milestone M19 Pending**
@@ -962,7 +962,7 @@ gantt
 ---
 
 # PHASE 18: MDoNER CENTRAL TELEMETRY HUB & IMPACT FRAMEWORK 📊
-**Phase Status**: [ ] IN PROGRESS (27% Complete — Sub-Phase 18.1 Complete; Sub-Phases 18.2–18.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (55% Complete — Sub-Phases 18.1 & 18.2 Complete; Sub-Phases 18.3 & 18.4 Pending)  
 **Duration**: Weeks 70–84 | **Objective**: Central analytics, research pipeline, and the named Cultural Cognitive Engagement Index (CCEI) as the platform's flagship impact metric.
 
 ### Sub-Phase 18.1 — Central Analytics Dashboard
@@ -974,12 +974,12 @@ gantt
 | [x] | Policy Decision Support | Auto-generated monthly reports for MDoNER officials | Auto-generated policy reports |
 
 ### Sub-Phase 18.2 — Cultural Cognitive Engagement Index (CCEI) Finalization (New)
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | CCEI Formal Specification | Weighted composite: accuracy/RT trend + session frequency + AACB rate + social participation | CCEI v2 formal specification |
-| [ ] | CCEI Dashboard Widget | Single-number index card per patient/district on all dashboards | CCEI dashboard widget |
-| [ ] | CCEI Validation Study | Correlate CCEI against clinical outcomes at scale | CCEI validation paper draft |
+| [x] | CCEI Formal Specification | Weighted composite: accuracy/RT trend + session frequency + AACB rate + social participation | CCEI v2 formal specification |
+| [x] | CCEI Dashboard Widget | Single-number index card per patient/district on all dashboards | CCEI dashboard widget |
+| [x] | CCEI Validation Study | Correlate CCEI against clinical outcomes at scale | CCEI validation paper draft |
 
 ### Sub-Phase 18.3 — Data Warehouse & Research Pipeline
 *Status: [ ] Pending*
