@@ -1,5 +1,8 @@
 // ── SMRITI-NER TELEMETRY COLLECTOR & MOTOR DECOMPOSITION ENGINE ──────────────
-// Sub-Phase 4.3: Precision touch deviation, bi-factor latency & vector packaging
+// Sub-Phase 5.1: Precision touch deviation, bi-factor latency decomposition,
+// micro-tremor filtering, and 7-element Session Telemetry Vector schema.
+
+import { touchStreamLogger, type TrajectoryMetrics } from "./touchStreamLogger";
 
 export interface TrialTelemetry {
   trialIndex: number;
@@ -10,13 +13,22 @@ export interface TrialTelemetry {
   totalReactionTimeMs: number;
   motorLatencyMs: number;
   deliberationLatencyMs: number;
+  deliberationZScore?: number;
   touchCoordinates?: { x: number; y: number };
   targetCenter?: { x: number; y: number };
   spatialDeviationPx?: number;
+  wanderIndex: number;
+  tremorFrequencyHz?: number;
+  isTremorDetected: boolean;
   difficultyTier: number;
   aacbTriggered: boolean;
 }
 
+/**
+ * Standardized 7-element telemetry vector for on-device Federated Learning
+ * and longitudinal clinical neuropsychological monitoring:
+ * [RT_total_avg, tau_motor_avg, RT_delib_avg, accuracy, difficulty_tier, aacb_flag, circadian_factor]
+ */
 export type SessionTelemetryVector = [
   number, // 0: RT_total_avg (ms)
   number, // 1: tau_motor_avg (ms)
@@ -49,7 +61,19 @@ export function decomposeReactionTime(
 }
 
 /**
- * Computes spatial deviation between touch point and target button center.
+ * Computes z-score of cognitive deliberation latency relative to baseline
+ */
+export function calculateDeliberationZScore(
+  deliberationMs: number,
+  meanDeliberationMs = 950,
+  stdDeliberationMs = 380
+): number {
+  const std = Math.max(1, stdDeliberationMs);
+  return Math.round(((deliberationMs - meanDeliberationMs) / std) * 100) / 100;
+}
+
+/**
+ * Computes spatial deviation between touch point and target button centroid
  */
 export function computeSpatialDeviation(
   touch?: { x: number; y: number },
@@ -62,7 +86,7 @@ export function computeSpatialDeviation(
 }
 
 /**
- * Constructs a comprehensive TrialTelemetry object with calculated motor latencies.
+ * Constructs a comprehensive TrialTelemetry record with bi-factor latency isolation
  */
 export function createTrialTelemetry(params: {
   trialIndex: number;
@@ -72,12 +96,17 @@ export function createTrialTelemetry(params: {
   totalReactionTimeMs: number;
   touchCoordinates?: { x: number; y: number };
   targetCenter?: { x: number; y: number };
+  trajectoryMetrics?: TrajectoryMetrics;
   difficultyTier: number;
   aacbTriggered?: boolean;
 }): TrialTelemetry {
+  const wanderIndex = params.trajectoryMetrics?.wanderIndex ?? 1.15;
   const { motorLatencyMs, deliberationLatencyMs } = decomposeReactionTime(
-    params.totalReactionTimeMs
+    params.totalReactionTimeMs,
+    wanderIndex
   );
+
+  const deliberationZScore = calculateDeliberationZScore(deliberationLatencyMs);
 
   const spatialDeviationPx = computeSpatialDeviation(
     params.touchCoordinates,
@@ -93,9 +122,13 @@ export function createTrialTelemetry(params: {
     totalReactionTimeMs: params.totalReactionTimeMs,
     motorLatencyMs,
     deliberationLatencyMs,
+    deliberationZScore,
     touchCoordinates: params.touchCoordinates,
     targetCenter: params.targetCenter,
     spatialDeviationPx,
+    wanderIndex,
+    tremorFrequencyHz: params.trajectoryMetrics?.tremorFrequencyHz,
+    isTremorDetected: Boolean(params.trajectoryMetrics?.isTremorDetected),
     difficultyTier: params.difficultyTier,
     aacbTriggered: Boolean(params.aacbTriggered),
   };
@@ -138,16 +171,42 @@ export function computeSessionTelemetryVector(
 }
 
 /**
- * Circadian Sundowning Factor [0.0 = bright morning, 1.0 = peak sundowning evening 17:00-19:00]
+ * Validates whether a given vector strictly adheres to the 7-element schema
  */
-export function getCircadianFactor(): number {
-  const hour = new Date().getHours();
-  // Peak sundowning is roughly 16:30 - 19:30
-  if (hour >= 16 && hour <= 19) {
-    return 0.85;
-  } else if (hour >= 20 || hour <= 6) {
-    return 0.60; // Late night / early dawn
-  } else {
-    return 0.15; // Optimal daytime window
+export function validateSessionTelemetryVector(v: unknown): v is SessionTelemetryVector {
+  if (!Array.isArray(v) || v.length !== 7) return false;
+  const [rt, tau, delib, acc, tier, aacb, circ] = v;
+  return (
+    typeof rt === "number" && rt >= 0 &&
+    typeof tau === "number" && tau >= 0 &&
+    typeof delib === "number" && delib >= 0 &&
+    typeof acc === "number" && acc >= 0 && acc <= 1 &&
+    typeof tier === "number" && tier >= 1 && tier <= 5 &&
+    (aacb === 0 || aacb === 1) &&
+    typeof circ === "number" && circ >= 0 && circ <= 1
+  );
+}
+
+/**
+ * Computes a circadian multiplier based on local time-of-day.
+ * Peak lucidity window (09:00 - 11:30): ~1.0
+ * Sundowning window (16:30 - 19:30): ~0.20 - 0.45
+ */
+export function getCircadianFactor(date: Date = new Date()): number {
+  const hours = date.getHours() + date.getMinutes() / 60;
+
+  // Morning lucidity peak: 9am - 12pm
+  if (hours >= 9 && hours <= 12) {
+    return 1.0;
   }
+  // Early afternoon steady state: 12pm - 4:30pm
+  if (hours > 12 && hours < 16.5) {
+    return 0.75;
+  }
+  // Sundowning vulnerability window: 4:30pm - 7:30pm
+  if (hours >= 16.5 && hours <= 19.5) {
+    return 0.35;
+  }
+  // Night / resting: 7:30pm - 9am
+  return 0.5;
 }

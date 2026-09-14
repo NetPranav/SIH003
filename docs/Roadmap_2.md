@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 72 / 240+ Deliverables Completed (30.0% Deliverable Completion)  
+**Overall Velocity**: 76 / 240+ Deliverables Completed (31.7% Deliverable Completion)  
 **Phases Completed**: 4 / 20 (Phases 1, 2, 3 & 4 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 5 — Sub-Phases 5.1–5.5 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 5 — Sub-Phase 5.1 Complete, Sub-Phases 5.2–5.5 Pending)  
 **Phases Pending**: 15 / 20 (Phases 6 through 20)  
 **Milestones Achieved**: 4 / 20 (M1, M2, M3, M4 Signed Off; M5–M20 Pending)  
 
@@ -98,7 +98,7 @@ gantt
   - [x] Sub-Phase 4.4: Games 1–4 Core Implementation (4/4 tasks done)
   - [x] Sub-Phase 4.5: Anti-Agitation Circuit Breaker (AACB) (5/5 tasks done)
 - [ ] **Phase 5: Edge AI — DCDA & Federated Learning Engine** (Weeks 15–24) — **Milestone M5 Pending**
-  - [ ] Sub-Phase 5.1: Telemetry Extraction Pipeline (0/4 tasks done)
+  - [x] Sub-Phase 5.1: Telemetry Extraction Pipeline (4/4 tasks done)
   - [ ] Sub-Phase 5.2: Bayesian Knowledge Tracing (BKT) Engine (0/4 tasks done)
   - [ ] Sub-Phase 5.3: Difficulty Orchestrator & MMSE Proxy (0/4 tasks done)
   - [ ] Sub-Phase 5.4: Federated Learning Layer (Client Training & Packaging) (0/4 tasks done)
@@ -385,17 +385,17 @@ gantt
 ---
 
 # PHASE 5: EDGE AI — DCDA & FEDERATED LEARNING ENGINE 🧠
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 5.1–5.5 Pending)  
+**Phase Status**: [/] IN PROGRESS (20% Complete — Sub-Phase 5.1 Done, Sub-Phases 5.2–5.5 Pending)  
 **Duration**: Weeks 15–24 | **Objective**: Real-time adaptive difficulty plus privacy-preserving on-device model improvement.
 
 ### Sub-Phase 5.1 — Telemetry Extraction Pipeline
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Raw Touch Event Capture | Coordinates, timestamps, pressure | Touch event logger |
-| [ ] | Motor Hesitation Filter (τ) | Pre-tap wander distance → tremor estimate | Tremor extraction algorithm |
-| [ ] | Cognitive Deliberation Calc | RT_delib = RT_total − τ | Deliberation calculator |
-| [ ] | Session Telemetry Vector | [RT_total, τ, RT_delib, accuracy, difficulty, aacb_triggered, time_of_day] | Telemetry vector schema |
+| [x] | Raw Touch Event Capture | Coordinates, timestamps, pressure | Touch event logger |
+| [x] | Motor Hesitation Filter (τ) | Pre-tap wander distance → tremor estimate | Tremor extraction algorithm |
+| [x] | Cognitive Deliberation Calc | RT_delib = RT_total − τ | Deliberation calculator |
+| [x] | Session Telemetry Vector | [RT_total, τ, RT_delib, accuracy, difficulty, aacb_triggered, time_of_day] | Telemetry vector schema |
 
 ### Sub-Phase 5.2 — Bayesian Knowledge Tracing (BKT) Engine
 *Status: [ ] Pending*

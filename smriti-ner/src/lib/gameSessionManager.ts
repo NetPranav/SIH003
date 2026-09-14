@@ -110,6 +110,7 @@ class GameSessionManager {
     totalReactionTimeMs: number;
     touchCoordinates?: { x: number; y: number };
     targetCenter?: { x: number; y: number };
+    trajectoryMetrics?: import("./touchStreamLogger").TrajectoryMetrics;
   }): { session: GameSessionState; aacb: AACBEvaluation } {
     if (!this.activeSession) {
       throw new Error("No active game session found. Call startSession first.");
@@ -122,8 +123,8 @@ class GameSessionManager {
     const consecutiveSuccesses = isCorrect ? this.activeSession.consecutiveSuccesses + 1 : 0;
 
     // 2. Evaluate AACB (Anti-Agitation Circuit Breaker)
-    const simulatedWander = isCorrect ? 1.15 : 1.45;
-    const aacb = evaluateAACB(consecutiveErrors, simulatedWander);
+    const wander = params.trajectoryMetrics?.wanderIndex ?? (isCorrect ? 1.15 : 1.45);
+    const aacb = evaluateAACB(consecutiveErrors, wander);
 
     // 3. Create Trial Telemetry record
     const trial = createTrialTelemetry({
@@ -134,6 +135,7 @@ class GameSessionManager {
       totalReactionTimeMs: params.totalReactionTimeMs,
       touchCoordinates: params.touchCoordinates,
       targetCenter: params.targetCenter,
+      trajectoryMetrics: params.trajectoryMetrics,
       difficultyTier: this.activeSession.currentTier,
       aacbTriggered: aacb.triggered,
     });
