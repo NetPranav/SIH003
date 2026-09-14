@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 58 / 240+ Deliverables Completed (24.2% Deliverable Completion)  
+**Overall Velocity**: 63 / 240+ Deliverables Completed (26.3% Deliverable Completion)  
 **Phases Completed**: 3 / 20 (Phases 1, 2, 3 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 4 — Sub-Phases 4.1 & 4.2 Complete, Sub-Phases 4.3–4.5 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 4 — Sub-Phases 4.1, 4.2 & 4.3 Complete, Sub-Phases 4.4 & 4.5 Pending)  
 **Phases Pending**: 16 / 20 (Phases 5 through 20)  
 **Milestones Achieved**: 3 / 20 (M1, M2, M3 Signed Off; M4 In Progress; M5–M20 Pending)  
 
@@ -94,7 +94,7 @@ gantt
 - [ ] **Phase 4: Patient PWA Shell & Cognitive Game Engine** (Weeks 9–20) — **Milestone M4 In Progress**
   - [x] Sub-Phase 4.1: PWA Foundation & App Shell Architecture (5/5 tasks done)
   - [x] Sub-Phase 4.2: Patient Home & Navigation (5/5 tasks done)
-  - [ ] Sub-Phase 4.3: Shared Game Framework (0/5 tasks done)
+  - [x] Sub-Phase 4.3: Shared Game Framework (5/5 tasks done)
   - [ ] Sub-Phase 4.4: Games 1–4 Core Implementation (0/4 tasks done)
   - [ ] Sub-Phase 4.5: Anti-Agitation Circuit Breaker (AACB) (0/5 tasks done)
 - [ ] **Phase 5: Edge AI — DCDA & Federated Learning Engine** (Weeks 15–24) — **Milestone M5 Pending**
@@ -326,7 +326,7 @@ gantt
 ---
 
 # PHASE 4: PATIENT PWA SHELL & COGNITIVE GAME ENGINE 🎮
-**Phase Status**: [/] IN PROGRESS (40% Complete — Sub-Phases 4.1 & 4.2 Done, Sub-Phases 4.3–4.5 Pending)  
+**Phase Status**: [/] IN PROGRESS (60% Complete — Sub-Phases 4.1, 4.2 & 4.3 Done, Sub-Phases 4.4 & 4.5 Pending)  
 **Duration**: Weeks 9–20 | **Objective**: Build the patient-facing PWA and all 3 core cognitive games with the shared game engine.
 
 ### Sub-Phase 4.1 — PWA Foundation
@@ -350,14 +350,14 @@ gantt
 | [x] | Connectivity Status Indicator | Non-alarming online/offline dot | Status indicator component |
 
 ### Sub-Phase 4.3 — Shared Game Framework
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Game Session Manager | init → play → telemetry → BKT update → persist | Game session module |
-| [ ] | Telemetry Collector | Tap coordinates, RT, error count, bounding-box deviation | Telemetry collector module |
-| [ ] | Difficulty State Machine | 5-tier levels; accepts BKT + AACB overrides | Difficulty FSM |
-| [ ] | Cultural Asset Loader | Lazy-loads illustrations/audio by language | Asset loader with caching |
-| [ ] | Celebration Engine | Sparkle burst, folk cheer, spoken praise | Celebration effects module |
+| [x] | Game Session Manager | init → play → telemetry → BKT update → persist | Game session module |
+| [x] | Telemetry Collector | Tap coordinates, RT, error count, bounding-box deviation | Telemetry collector module |
+| [x] | Difficulty State Machine | 5-tier levels; accepts BKT + AACB overrides | Difficulty FSM |
+| [x] | Cultural Asset Loader | Lazy-loads illustrations/audio by language | Asset loader with caching |
+| [x] | Celebration Engine | Sparkle burst, folk cheer, spoken praise | Celebration effects module |
 
 ### Sub-Phase 4.4 — Games 1–3 (Dhol-Pepa, Kaziranga Safari, Weaver's Loom)
 *Status: [ ] Pending*

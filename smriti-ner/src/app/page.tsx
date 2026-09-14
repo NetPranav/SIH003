@@ -17,7 +17,7 @@ import CaregiverPinScreen from "@/components/screens/CaregiverPinScreen";
 import CaregiverDashboard from "@/components/screens/CaregiverDashboard";
 import AshaWorkerScreen from "@/components/screens/AshaWorkerScreen";
 import BottomNav from "@/components/ui/BottomNav";
-import SuccessModal from "@/components/ui/SuccessModal";
+import CelebrationOverlay from "@/components/ui/CelebrationOverlay";
 import styles from "./page.module.css";
 
 export default function App() {
@@ -113,17 +113,18 @@ export default function App() {
 
       {showBottomNav && <BottomNav active={screen} navigate={navigate} />}
 
-      <SuccessModal
-        open={successModal.open}
-        time={successModal.time}
-        accuracy={successModal.accuracy}
-        onNext={() => {
+      <CelebrationOverlay
+        isOpen={successModal.open}
+        accuracy={parseInt(successModal.accuracy) || 100}
+        timeSpentSeconds={parseInt(successModal.time) || 15}
+        language={language || "as"}
+        onContinue={() => {
           setSuccessModal({ open: false, time: "", accuracy: "" });
           successModal.onNext?.();
         }}
-        onDone={() => {
+        onHome={() => {
           setSuccessModal({ open: false, time: "", accuracy: "" });
-          setScreen("games");
+          setScreen("home");
         }}
       />
     </div>

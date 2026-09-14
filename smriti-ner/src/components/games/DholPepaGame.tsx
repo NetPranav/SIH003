@@ -5,6 +5,7 @@ import type { ScreenId } from "@/lib/types";
 import { INSTRUMENTS } from "@/lib/constants";
 import { playInstrumentSound, playSuccessJingle, playGentleChime } from "@/lib/audio";
 import { decomposeLatency, evaluateAACB, updateBKT, type BKTState } from "@/lib/dcdaEngine";
+import { sessionManager } from "@/lib/gameSessionManager";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -40,6 +41,15 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
   const startTimeRef = useRef<number>(Date.now());
   const tapStartRef = useRef<number>(Date.now());
   const consecutiveErrorsRef = useRef<number>(0);
+
+  // Initialize session on mount
+  useEffect(() => {
+    sessionManager.startSession({
+      gameId: "dhol-pepa",
+      conceptId: "auditory_folk_rhythm",
+      initialTier: 2,
+    });
+  }, []);
 
   // Play sequence on load or round start
   useEffect(() => {
@@ -87,7 +97,20 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
     const expectedIdx = sequence[playerStep];
 
     // Check against current step in sequence
-    if (idx === expectedIdx) {
+    const isMatch = idx === expectedIdx;
+
+    // Record interaction in Shared Game Framework
+    try {
+      sessionManager.recordInteraction({
+        targetId: String(expectedIdx),
+        selectedId: String(idx),
+        totalReactionTimeMs: totalReactionTime,
+      });
+    } catch {
+      // Graceful fallback
+    }
+
+    if (isMatch) {
       // Correct tap!
       consecutiveErrorsRef.current = 0;
       setBkt((prev) => updateBKT(prev, true));
@@ -103,10 +126,25 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
 
         if (round >= 3) {
           playSuccessJingle();
-          showSuccess(`${elapsedSec}s`, "100%", () => {
+          let summaryAccuracy = 100;
+          let summaryDuration = elapsedSec;
+          try {
+            const summary = sessionManager.endSession();
+            summaryAccuracy = summary.accuracy;
+            summaryDuration = summary.durationSeconds;
+          } catch {
+            // fallback
+          }
+
+          showSuccess(`${summaryDuration}s`, `${summaryAccuracy}%`, () => {
             setRound(1);
             setSequence([0, 1]);
             startTimeRef.current = Date.now();
+            sessionManager.startSession({
+              gameId: "dhol-pepa",
+              conceptId: "auditory_folk_rhythm",
+              initialTier: 2,
+            });
           });
         } else {
           setStatusMsg("Wonderful! Get ready for next sequence...");
