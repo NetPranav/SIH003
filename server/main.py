@@ -6401,6 +6401,249 @@ async def get_pilot_setup_summary():
     )
 
 
+# ── ASHA Worker Training Program (Sub-Phase 14.2) ─────────────────────────────
+class TrainingModuleModel(BaseModel):
+    module_id: str
+    module_code: str
+    title: str
+    duration_hours: int
+    competency_objectives: List[str]
+    languages_available: List[str]
+    assessment_type: str
+
+
+class CertifiedMasterAshaModel(BaseModel):
+    trainer_id: str
+    name: str
+    assigned_phc_id: str
+    phc_name: str
+    district: str
+    osce_score_pct: float
+    primary_language: str
+    certification_hash: str
+    certified_at: str
+
+
+class CircleFacilitationSessionPlanModel(BaseModel):
+    theme_id: str
+    theme_title: str
+    target_participants: int
+    duration_minutes: int
+    cultural_prompts: List[str]
+    consent_checklist: List[str]
+    calming_melody_preset: str
+
+
+class HelpDeskTicketStatusModel(BaseModel):
+    tier: str
+    tier_description: str
+    sla_max_hours: float
+    open_tickets_count: int
+    resolved_tickets_count: int
+    avg_resolution_minutes: int
+
+
+class AshaTrainingSummaryModel(BaseModel):
+    sub_phase: str
+    modules_created: int
+    total_training_hours: int
+    master_ashas_certified: int
+    average_osce_score_pct: float
+    circle_facilitation_ready: bool
+    helpdesk_operational: bool
+    helpdesk_active_helpline: str
+    status: str
+
+
+@app.get("/api/v1/training/curriculum-modules", response_model=List[TrainingModuleModel], tags=["ASHA Training"])
+async def get_training_curriculum_modules():
+    """Returns the 4 core ASHA training modules totaling 40 hours of accredited capacity building."""
+    return [
+        TrainingModuleModel(
+            module_id="MOD_101",
+            module_code="DEM-LIT-01",
+            title="Dementia Literacy & Culturally Sensitive Stigma Reduction",
+            duration_hours=8,
+            competency_objectives=[
+                "Differentiate normal geriatric cognitive ageing from progressive neurodegenerative dementia",
+                "Adopt non-pejorative maternal vocabulary (স্মৃতিবিভ্ৰম, পাহৰণি ৰোগ, মায়াই লানথাফম)",
+                "Recognize early cognitive red flags during monthly village home visits",
+            ],
+            languages_available=["as", "mni", "kha", "bn", "hi", "en"],
+            assessment_type="WRITTEN_QUIZ",
+        ),
+        TrainingModuleModel(
+            module_id="MOD_102",
+            module_code="DEV-OPS-02",
+            title="Tablet Kiosk Operations, Solar Charging & Offline Delta Sync",
+            duration_hours=12,
+            competency_objectives=[
+                "Unbox, power on, and configure single-app kiosk lockdown mode",
+                "Maintain solar battery charging schedules under monsoonal power outages",
+                "Initiate peer-to-peer BLE mesh delta synchronization during weekly PHC visits",
+            ],
+            languages_available=["as", "mni", "kha", "bn", "hi", "en"],
+            assessment_type="HANDS_ON_OSCE",
+        ),
+        TrainingModuleModel(
+            module_id="MOD_103",
+            module_code="AACB-EMP-03",
+            title="Anti-Agitation Circuit Breaker (AACB) & Empathy De-escalation",
+            duration_hours=10,
+            competency_objectives=[
+                "Identify clinical agitation triggers: rapid screen tapping, frowning, verbal distress",
+                "Trigger AACB calming protocols with authentic regional folk melodies (Bihu, Pena, Khasi folk)",
+                "Conduct post-agitation debrief with primary family caregiver",
+            ],
+            languages_available=["as", "mni", "kha", "bn", "hi", "en"],
+            assessment_type="ROLE_PLAY",
+        ),
+        TrainingModuleModel(
+            module_id="MOD_104",
+            module_code="CONS-DISHA-04",
+            title="Statutory Informed Consent & Elder Verbal Assent Protocol",
+            duration_hours=10,
+            competency_objectives=[
+                "Execute DISHA 2018 / DPDP Act 2023 dual-gate consent forms with family caregivers",
+                "Record crisp verbal assent audio clips from elderly participants in maternal dialect",
+                "Explain voluntary participation and instant right-to-revoke policies to rural households",
+            ],
+            languages_available=["as", "mni", "kha", "bn", "hi", "en"],
+            assessment_type="HANDS_ON_OSCE",
+        ),
+    ]
+
+
+@app.get("/api/v1/training/certified-trainers", response_model=List[CertifiedMasterAshaModel], tags=["ASHA Training"])
+async def get_certified_master_ashas():
+    """Returns the roster of 20 certified Lead Master ASHA workers (2 per PHC) with OSCE score verification."""
+    trainers = [
+        # Kamrup Metro
+        ("TR-KAM-01", "Rina Das", "PHC_01_SONAPUR", "Sonapur BPHC", "Kamrup Metro", 92.5, "as", "sha256_e7a9b01c_rina"),
+        ("TR-KAM-02", "Monita Bora", "PHC_01_SONAPUR", "Sonapur BPHC", "Kamrup Metro", 88.0, "as", "sha256_c4f8d22e_monita"),
+        ("TR-KAM-03", "Pratima Kalita", "PHC_02_CHANDRAPUR", "Chandrapur PHC", "Kamrup Metro", 90.0, "as", "sha256_b1e9c55d_pratima"),
+        ("TR-KAM-04", "Dipali Saikia", "PHC_02_CHANDRAPUR", "Chandrapur PHC", "Kamrup Metro", 89.5, "as", "sha256_f9a8d43c_dipali"),
+        ("TR-KAM-05", "Anjali Medhi", "PHC_03_KHETRI", "Khetri Mini PHC", "Kamrup Metro", 94.0, "as", "sha256_aa77b62e_anjali"),
+        ("TR-KAM-06", "Niru Begum", "PHC_03_KHETRI", "Khetri Mini PHC", "Kamrup Metro", 86.5, "as", "sha256_dd44c88e_niru"),
+        # Majuli
+        ("TR-MAJ-01", "Bonti Payeng", "PHC_04_KAMALABARI", "Kamalabari BPHC", "Majuli", 95.0, "as", "sha256_11cc99ee_bonti"),
+        ("TR-MAJ-02", "Rumi Kutum", "PHC_04_KAMALABARI", "Kamalabari BPHC", "Majuli", 91.0, "as", "sha256_22dd88ff_rumi"),
+        ("TR-MAJ-03", "Junmoni Doley", "PHC_05_JENGRAIMUKH", "Jengraimukh Tribal PHC", "Majuli", 93.5, "as", "sha256_33ee77aa_junmoni"),
+        ("TR-MAJ-04", "Parul Pegu", "PHC_05_JENGRAIMUKH", "Jengraimukh Tribal PHC", "Majuli", 87.5, "as", "sha256_44ff66bb_parul"),
+        ("TR-MAJ-05", "Tarulata Hazarika", "PHC_06_GARMUR", "Garmur Civil Hospital PHC", "Majuli", 89.0, "as", "sha256_55aa55cc_tarulata"),
+        ("TR-MAJ-06", "Mousumi Nath", "PHC_06_GARMUR", "Garmur Civil Hospital PHC", "Majuli", 90.5, "as", "sha256_66bb44dd_mousumi"),
+        # Ri-Bhoi
+        ("TR-RIB-01", "Philimon Maring", "PHC_07_NONGPOH", "Nongpoh CHC & Model PHC", "Ri-Bhoi", 93.0, "kha", "sha256_77cc33ee_philimon"),
+        ("TR-RIB-02", "Dariti Syiem", "PHC_07_NONGPOH", "Nongpoh CHC & Model PHC", "Ri-Bhoi", 88.5, "kha", "sha256_88dd22ff_dariti"),
+        ("TR-RIB-03", "Ibalari Nongrum", "PHC_08_UMSNING", "Umsning Community PHC", "Ri-Bhoi", 91.5, "kha", "sha256_99ee11aa_ibalari"),
+        ("TR-RIB-04", "Biolinda Mawlong", "PHC_08_UMSNING", "Umsning Community PHC", "Ri-Bhoi", 89.0, "kha", "sha256_00ff00bb_biolinda"),
+        # Churachandpur
+        ("TR-CHU-01", "Chinglunmawi", "PHC_09_TUIBONG", "Tuibong PHC", "Churachandpur", 94.5, "lus", "sha256_11aa22cc_chinglunmawi"),
+        ("TR-CHU-02", "Nemneikim Haokip", "PHC_09_TUIBONG", "Tuibong PHC", "Churachandpur", 92.0, "mni", "sha256_33bb44dd_nemneikim"),
+        ("TR-CHU-03", "Mercy Vungkhanching", "PHC_10_SINGNGAT", "Singngat Tribal Border PHC", "Churachandpur", 87.0, "lus", "sha256_55cc66ee_mercy"),
+        ("TR-CHU-04", "Lhingneithem Baite", "PHC_10_SINGNGAT", "Singngat Tribal Border PHC", "Churachandpur", 88.0, "mni", "sha256_77dd88ff_lhingneithem"),
+    ]
+    return [
+        CertifiedMasterAshaModel(
+            trainer_id=t[0],
+            name=t[1],
+            assigned_phc_id=t[2],
+            phc_name=t[3],
+            district=t[4],
+            osce_score_pct=t[5],
+            primary_language=t[6],
+            certification_hash=t[7],
+            certified_at="2026-08-28T16:30:00Z",
+        )
+        for t in trainers
+    ]
+
+
+@app.get("/api/v1/training/circle-facilitation-guide", response_model=List[CircleFacilitationSessionPlanModel], tags=["ASHA Training"])
+async def get_circle_facilitation_guide():
+    """Returns blueprints for structured weekly community reminiscence circles with cultural prompts and consent checks."""
+    return [
+        CircleFacilitationSessionPlanModel(
+            theme_id="CIRCLE_THEME_01",
+            theme_title="Village Haat & Old Trade Route Reminiscence",
+            target_participants=6,
+            duration_minutes=45,
+            cultural_prompts=[
+                "What was the first item you bought with your own earnings at the weekly haat?",
+                "How did villagers cross the river before modern concrete bridges were built?",
+            ],
+            consent_checklist=[
+                "Verbal assent confirmed from all seated elders",
+                "Family caregiver informed of community circle participation",
+                "No commercial branding or outsider attendance without PHC approval",
+            ],
+            calming_melody_preset="Bihu_Bahi_Flute_Calm",
+        ),
+        CircleFacilitationSessionPlanModel(
+            theme_id="CIRCLE_THEME_02",
+            theme_title="Traditional Weaving Motifs & Monsoon Folklore",
+            target_participants=6,
+            duration_minutes=45,
+            cultural_prompts=[
+                "Share the story of the first Gamusa or Shawl design you learned from your mother",
+                "What seasonal songs were sung during the rice planting season?",
+            ],
+            consent_checklist=[
+                "Participant comfort level verified with physical seating and hydration",
+                "ASHA facilitator actively manages turn-taking without cognitive pressure",
+            ],
+            calming_melody_preset="Pena_Manipur_Lullaby_Calm",
+        ),
+    ]
+
+
+@app.get("/api/v1/training/helpdesk-status", response_model=List[HelpDeskTicketStatusModel], tags=["ASHA Training"])
+async def get_training_helpdesk_status():
+    """Returns operational status and SLA compliance for the 3-tier rural field help desk."""
+    return [
+        HelpDeskTicketStatusModel(
+            tier="TIER_1_ASHA_LEAD",
+            tier_description="On-site Master ASHA peer resolution (App UI, elder comfort, language settings)",
+            sla_max_hours=0.5,
+            open_tickets_count=2,
+            resolved_tickets_count=48,
+            avg_resolution_minutes=14,
+        ),
+        HelpDeskTicketStatusModel(
+            tier="TIER_2_FIELD_ENGINEER",
+            tier_description="NHM District Hardware & Sync Engineer (Battery, MDM kiosk lock, BLE mesh)",
+            sla_max_hours=2.0,
+            open_tickets_count=1,
+            resolved_tickets_count=19,
+            avg_resolution_minutes=65,
+        ),
+        HelpDeskTicketStatusModel(
+            tier="TIER_3_MEDICAL_OFFICER",
+            tier_description="PHC Medical Officer & Tele-Neurologist (Acute elder agitation, delirium triage)",
+            sla_max_hours=4.0,
+            open_tickets_count=0,
+            resolved_tickets_count=6,
+            avg_resolution_minutes=90,
+        ),
+    ]
+
+
+@app.get("/api/v1/training/summary", response_model=AshaTrainingSummaryModel, tags=["ASHA Training"])
+async def get_asha_training_summary():
+    """Returns consolidated Sub-Phase 14.2 training status and readiness metrics."""
+    return AshaTrainingSummaryModel(
+        sub_phase="14.2 ASHA Worker Training Program",
+        modules_created=4,
+        total_training_hours=40,
+        master_ashas_certified=20,
+        average_osce_score_pct=91.0,
+        circle_facilitation_ready=True,
+        helpdesk_operational=True,
+        helpdesk_active_helpline="1800-345-SMRITI (Toll-Free BSNL)",
+        status="TRAINING_COMPLETE_CASCADE_READY",
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 

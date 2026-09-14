@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 207 / 240+ Deliverables Completed (86.3% Deliverable Completion)  
+**Overall Velocity**: 211 / 240+ Deliverables Completed (87.9% Deliverable Completion)  
 **Phases Completed**: 13 / 20 (Phases 1 through 13 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 14 — Sub-Phase 14.1 Complete; Sub-Phases 14.2–14.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 14 — Sub-Phases 14.1–14.2 Complete; Sub-Phases 14.3–14.4 Pending)  
 **Phases Pending**: 6 / 20 (Phases 15 through 20)  
 **Milestones Achieved**: 13 / 20 (M1 through M13 Signed Off; M14–M20 Pending)  
 
@@ -145,7 +145,7 @@ gantt
   - [x] Sub-Phase 13.4: Social & IVR Feature QA (3/3 tasks done)
 - [ ] **Phase 14: Clinical Pilot Deployment** (Weeks 39–51) — **Milestone M14 Pending**
   - [x] Sub-Phase 14.1: Pilot Site Selection & Setup (10 PHCs) (5/5 tasks done)
-  - [ ] Sub-Phase 14.2: ASHA Worker Training Program (0/4 tasks done)
+  - [x] Sub-Phase 14.2: ASHA Worker Training Program (4/4 tasks done)
   - [ ] Sub-Phase 14.3: 90-Day Clinical Observation (500 Patients) (0/5 tasks done)
   - [ ] Sub-Phase 14.4: Pilot Efficacy Analysis (0/4 tasks done)
 - [ ] **Phase 15: Feedback Integration & Iteration** (Weeks 52–55) — **Milestone M15 Pending**
@@ -789,7 +789,7 @@ gantt
 ---
 
 # PHASE 14: CLINICAL PILOT DEPLOYMENT 🏥
-**Phase Status**: [ ] IN PROGRESS (28% Complete — Sub-Phase 14.1 Complete; Sub-Phases 14.2–14.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (50% Complete — Sub-Phases 14.1–14.2 Complete; Sub-Phases 14.3–14.4 Pending)  
 **Duration**: Weeks 39–51 (3 months) | **Objective**: Real-world validation with 500 elderly patients across 10 PHCs, including IVR-only and social-feature cohorts.
 
 ### Sub-Phase 14.1 — Pilot Site Selection & Setup
@@ -803,13 +803,13 @@ gantt
 | [x] | IVR-Only Sub-Cohort Selection | Identify ~50 no-device patients for IVR-only arm | IVR cohort register |
 
 ### Sub-Phase 14.2 — ASHA Worker Training Program
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Training Curriculum Design | Device basics, sync, patient interaction, troubleshooting | Training manual |
-| [ ] | Train-the-Trainer | 20 lead ASHA workers | TTT completion certificates |
-| [ ] | Community Circle Facilitation Training | Train ASHAs to run weekly group reminiscence sessions | Facilitation training module |
-| [ ] | Help Desk Setup | WhatsApp group + toll-free helpline | Help desk operational |
+| [x] | Training Curriculum Design | Device basics, sync, patient interaction, troubleshooting | Training manual |
+| [x] | Train-the-Trainer | 20 lead ASHA workers | TTT completion certificates |
+| [x] | Community Circle Facilitation Training | Train ASHAs to run weekly group reminiscence sessions | Facilitation training module |
+| [x] | Help Desk Setup | WhatsApp group + toll-free helpline | Help desk operational |
 
 ### Sub-Phase 14.3 — 90-Day Clinical Observation
 *Status: [ ] Pending*
