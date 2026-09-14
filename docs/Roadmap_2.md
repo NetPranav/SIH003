@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 119 / 240+ Deliverables Completed (49.6% Deliverable Completion)  
+**Overall Velocity**: 122 / 240+ Deliverables Completed (50.8% Deliverable Completion)  
 **Phases Completed**: 7 / 20 (Phases 1, 2, 3, 4, 5, 6 & 7 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 8 — Sub-Phase 8.1 In Progress)  
+**Phases In Progress**: 1 / 20 (Phase 8 — Sub-Phase 8.1 Complete, Sub-Phases 8.2–8.4 Pending)  
 **Phases Pending**: 12 / 20 (Phases 9 through 20)  
 **Milestones Achieved**: 7 / 20 (M1, M2, M3, M4, M5, M6, M7 Signed Off; M8–M20 Pending)  
 
@@ -114,7 +114,7 @@ gantt
   - [x] Sub-Phase 7.3: Digital Legacy Storytelling (4/4 tasks done)
   - [x] Sub-Phase 7.4: Consent & Content Moderation for Social Features (2/2 tasks done)
 - [ ] **Phase 8: Zero-Smartphone Accessibility — IVR Cognitive Line** (Weeks 22–27) — **Milestone M8 Pending**
-  - [ ] Sub-Phase 8.1: IVR Cognitive Check-In Flow (0/3 tasks done)
+  - [x] Sub-Phase 8.1: IVR Cognitive Check-In Flow (3/3 tasks done)
   - [ ] Sub-Phase 8.2: IVR Reminder & Adherence Delivery (0/3 tasks done)
   - [ ] Sub-Phase 8.3: Multilingual IVR Content (0/2 tasks done)
   - [ ] Sub-Phase 8.4: IVR-to-Platform Data Bridge (0/2 tasks done)
@@ -527,16 +527,16 @@ gantt
 ---
 
 # PHASE 8: ZERO-SMARTPHONE ACCESSIBILITY — IVR COGNITIVE LINE 📞 (New Phase)
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 8.1–8.4 Pending)  
+**Phase Status**: [/] IN PROGRESS (27% Complete — Sub-Phase 8.1 Done, Sub-Phases 8.2–8.4 Pending)  
 **Duration**: Weeks 22–27 | **Objective**: Reach elders with no smartphone/tablet access via a toll-free, voice-only cognitive check-in and reminder line.
 
 ### Sub-Phase 8.1 — IVR Cognitive Check-In Flow
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Word-Recall Mini Check-In | Recorded voice presents 3 words; elder repeats after a delay via call | Word-recall IVR module |
-| [ ] | Orientation Question Flow | Simple day/place orientation question via keypress or voice response | Orientation IVR module |
-| [ ] | Response Scoring Pipeline | Convert IVR responses into a lightweight cognitive check-in score | IVR scoring pipeline |
+| [x] | Word-Recall Mini Check-In | Recorded voice presents 3 words; elder repeats after a delay via call | Word-recall IVR module |
+| [x] | Orientation Question Flow | Simple day/place orientation question via keypress or voice response | Orientation IVR module |
+| [x] | Response Scoring Pipeline | Convert IVR responses into a lightweight cognitive check-in score | IVR scoring pipeline |
 
 ### Sub-Phase 8.2 — IVR Reminder & Adherence Delivery
 *Status: [ ] Pending*

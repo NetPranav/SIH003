@@ -1308,6 +1308,195 @@ async def review_moderation_item(req: ModerationReviewRequest):
     return ModerationItemModel(**item)
 
 
+# ── IVR Cognitive Check-In Models & Storage ─────────────────────────────────
+class IVRCheckInStartRequest(BaseModel):
+    patient_id: str
+    patient_name: str
+    phone_number: str
+    language: Optional[str] = "as"
+
+
+class IVROrientationRequest(BaseModel):
+    session_id: str
+    input_method: str = "DTMF"  # "DTMF" | "VOICE"
+    dtmf_digit: Optional[str] = None
+    spoken_text: Optional[str] = None
+    current_hour: Optional[int] = 10
+
+
+class IVRRecallRequest(BaseModel):
+    session_id: str
+    recalled_words: List[str]
+
+
+class IVRCheckInSessionResponse(BaseModel):
+    session_id: str
+    patient_id: str
+    patient_name: str
+    phone_number: str
+    language: str
+    status: str
+    words_presented: List[str]
+    orientation_answered: bool
+    orientation_correct: bool
+    orientation_input_method: str
+    words_recalled: List[str]
+    recall_score: int
+    composite_score: int
+    status_label: str
+    started_at: str
+    completed_at: Optional[str] = None
+
+
+IVR_SESSIONS_STORE: Dict[str, dict] = {}
+
+IVR_CULTURAL_TRIPLETS = {
+    "as": {"words": ["গামোচা", "জাঁপী", "কাজিৰঙা"], "phonetics": ["Gamusa", "Jaapi", "Kaziranga"]},
+    "mni": {"words": ["ꯂꯩꯔꯨꯝ", "ꯄꯨꯡ", "ꯂꯣꯛꯇꯥꯛ"], "phonetics": ["Leirum", "Pung", "Loktak"]},
+    "bn": {"words": ["গামছা", "ঢাক", "সুন্দরবন"], "phonetics": ["Gamcha", "Dhaak", "Sundarban"]},
+    "brx": {"words": ["दखना", "सिफुं", "मानस"], "phonetics": ["Dokhona", "Sifung", "Manas"]},
+    "kha": {"words": ["Jainsem", "Duitara", "Umiam"], "phonetics": ["Jainsem", "Duitara", "Umiam"]},
+    "lus": {"words": ["Puanchei", "Khuang", "Reiek"], "phonetics": ["Puanchei", "Khuang", "Reiek"]},
+    "hi": {"words": ["शॉल", "ढोलक", "गंगा"], "phonetics": ["Shawl", "Dholak", "Ganga"]},
+    "en": {"words": ["Shawl", "Flute", "Mountain"], "phonetics": ["Shawl", "Flute", "Mountain"]},
+}
+
+
+@app.post("/api/v1/ivr/checkin/start", response_model=IVRCheckInSessionResponse, tags=["IVR Cognitive Line"])
+async def start_ivr_checkin(req: IVRCheckInStartRequest):
+    """Initiates an IVR cognitive check-in call session presenting the 3-word cultural triplet."""
+    import uuid
+    from datetime import datetime, timezone
+
+    session_id = f"ivr_sess_{uuid.uuid4().hex[:10]}"
+    lang = req.language if req.language in IVR_CULTURAL_TRIPLETS else "as"
+    triplet = IVR_CULTURAL_TRIPLETS[lang]
+
+    record = {
+        "session_id": session_id,
+        "patient_id": req.patient_id,
+        "patient_name": req.patient_name,
+        "phone_number": req.phone_number,
+        "language": lang,
+        "status": "WORD_PRESENTATION",
+        "words_presented": list(triplet["words"]),
+        "orientation_answered": False,
+        "orientation_correct": False,
+        "orientation_input_method": "NONE",
+        "words_recalled": [],
+        "recall_score": 0,
+        "composite_score": 0,
+        "status_label": "NORMAL_STABLE",
+        "started_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": None,
+    }
+
+    IVR_SESSIONS_STORE[session_id] = record
+    return IVRCheckInSessionResponse(**record)
+
+
+@app.post("/api/v1/ivr/checkin/orientation", response_model=IVRCheckInSessionResponse, tags=["IVR Cognitive Line"])
+async def submit_ivr_orientation(req: IVROrientationRequest):
+    """Submits orientation response via DTMF keypress (1=Morning, 2=Evening) or voice."""
+    if req.session_id not in IVR_SESSIONS_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"IVR session '{req.session_id}' not found.",
+        )
+
+    sess = IVR_SESSIONS_STORE[req.session_id]
+    hour = req.current_hour if req.current_hour is not None else 10
+    is_morning = 4 <= hour < 16
+
+    is_correct = False
+    if req.input_method == "DTMF":
+        if req.dtmf_digit == "1" and is_morning:
+            is_correct = True
+        elif req.dtmf_digit == "2" and not is_morning:
+            is_correct = True
+    else:
+        spoken = (req.spoken_text or "").lower()
+        morning_tokens = ["পুৱা", "ৰাতিপুৱা", "morning", "puwa", "সকাল", "ꯑꯌꯨꯛ", "सुबह"]
+        evening_tokens = ["গধূলি", "সন্ধিয়া", "evening", "godhuli", "সন্ধ্যা", "ꯅꯨꯃꯤꯗꯥꯡ", "शाम"]
+
+        has_morning = any(t in spoken for t in morning_tokens)
+        has_evening = any(t in spoken for t in evening_tokens)
+
+        if has_morning and is_morning:
+            is_correct = True
+        elif has_evening and not is_morning:
+            is_correct = True
+
+    sess["orientation_answered"] = True
+    sess["orientation_correct"] = is_correct
+    sess["orientation_input_method"] = req.input_method
+    sess["status"] = "DELAYED_RECALL"
+
+    IVR_SESSIONS_STORE[req.session_id] = sess
+    return IVRCheckInSessionResponse(**sess)
+
+
+@app.post("/api/v1/ivr/checkin/recall", response_model=IVRCheckInSessionResponse, tags=["IVR Cognitive Line"])
+async def submit_ivr_delayed_recall(req: IVRRecallRequest):
+    """Evaluates delayed word recall responses and computes composite cognitive score."""
+    from datetime import datetime, timezone
+
+    if req.session_id not in IVR_SESSIONS_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"IVR session '{req.session_id}' not found.",
+        )
+
+    sess = IVR_SESSIONS_STORE[req.session_id]
+    targets = [w.lower().strip() for w in sess["words_presented"]]
+    matched = []
+
+    for word in req.recalled_words:
+        clean = word.lower().strip()
+        match = next((t for t in targets if t in clean or clean in t), None)
+        if match and match not in matched:
+            matched.append(match)
+
+    recall_score = min(3, len(matched))
+    orient_val = 1.0 if sess["orientation_correct"] else 0.0
+    recall_val = recall_score / 3.0
+    composite = round((0.4 * orient_val + 0.6 * recall_val) * 100)
+
+    if composite >= 75:
+        label = "NORMAL_STABLE"
+    elif composite >= 50:
+        label = "MILD_FLUCTUATION"
+    else:
+        label = "ATTENTION_SUGGESTED"
+
+    sess["words_recalled"] = matched
+    sess["recall_score"] = recall_score
+    sess["composite_score"] = composite
+    sess["status_label"] = label
+    sess["status"] = "COMPLETED"
+    sess["completed_at"] = datetime.now(timezone.utc).isoformat()
+
+    IVR_SESSIONS_STORE[req.session_id] = sess
+    return IVRCheckInSessionResponse(**sess)
+
+
+@app.get("/api/v1/ivr/checkin/session/{session_id}", response_model=IVRCheckInSessionResponse, tags=["IVR Cognitive Line"])
+async def get_ivr_session(session_id: str):
+    """Retrieves current IVR cognitive session record."""
+    if session_id not in IVR_SESSIONS_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"IVR session '{session_id}' not found.",
+        )
+    return IVRCheckInSessionResponse(**IVR_SESSIONS_STORE[session_id])
+
+
+@app.get("/api/v1/ivr/checkin/triplets", tags=["IVR Cognitive Line"])
+async def get_ivr_word_triplets():
+    """Returns 3-word cultural recall triplets across 8 NER languages."""
+    return IVR_CULTURAL_TRIPLETS
+
+
 if __name__ == "__main__":
     import uvicorn
 
