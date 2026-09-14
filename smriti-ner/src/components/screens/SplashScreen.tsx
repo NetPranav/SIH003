@@ -7,8 +7,9 @@ export default function SplashScreen() {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      minHeight: "100dvh",
-      padding: "2rem",
+      flex: 1,
+      minHeight: "calc(100dvh - var(--status-bar-gap, 28px))",
+      padding: "2rem 1.5rem",
       backgroundColor: "var(--white)",
       textAlign: "center",
       position: "relative"

@@ -61,6 +61,24 @@
   --elder-duration: 240ms;
   --elder-easing: cubic-bezier(0.16, 1, 0.3, 1);
   --elder-golden-halo: 0 0 0 4px rgba(201, 168, 76, 0.45);
+
+  /* ── Mobile Safe Area Insets & Status Bar Protection ── */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  /* Leaves dedicated buffer so network/battery/clock status icons never overlap app */
+  --status-bar-gap: max(env(safe-area-inset-top, 0px), 28px);
+  --bottom-nav-safe-padding: max(env(safe-area-inset-bottom, 0px), 12px);
+}
+
+/* Status Bar Top Shield: guarantees system status bar icons (time, battery, 5G) never overlap app content */
+.status-bar-safe-shield {
+  width: 100%;
+  height: var(--status-bar-gap);
+  flex-shrink: 0;
+  pointer-events: none;
+  background: transparent;
 }
 
 /* Soothing Golden Halo anti-agitation breathing animation */

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Smriti</string>
+    <string name="title_activity_main">Smriti</string>
+    <string name="package_name">org.sih.smriti</string>
+    <string name="custom_url_scheme">org.sih.smriti</string>
+</resources>

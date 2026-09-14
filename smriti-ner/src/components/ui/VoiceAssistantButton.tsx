@@ -698,8 +698,8 @@ export default function VoiceAssistantButton({
         aria-label="Smriti Voice Assistant: Tap to speak and listen"
         style={{
           position: "fixed",
-          bottom: "5.5rem",
-          right: "1.25rem",
+          bottom: "calc(5.5rem + env(safe-area-inset-bottom, 0px))",
+          right: "max(env(safe-area-inset-right, 0px), 1.25rem)",
           zIndex: 40,
           background: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
           color: "#ffffff",

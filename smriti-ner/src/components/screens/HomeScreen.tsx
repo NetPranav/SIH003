@@ -251,9 +251,11 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
   return (
     <div
       style={{
-        padding: "1.25rem 1.25rem 6.5rem",
+        padding: "0.5rem clamp(0.75rem, 3.5vw, 1.25rem) 6.5rem",
         backgroundColor: "var(--white)",
-        minHeight: "100dvh",
+        minHeight: "100%",
+        boxSizing: "border-box",
+        width: "100%",
       }}
     >
       {/* ── Top Header with Reassurance, Language & Persona Controls ── */}
@@ -262,13 +264,14 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
           display: "flex",
           alignItems: "flex-start",
           justifyContent: "space-between",
+          flexWrap: "wrap",
           paddingBottom: "1rem",
           borderBottom: "1px solid var(--gray-200)",
           marginBottom: "1.25rem",
-          gap: "0.5rem"
+          gap: "0.75rem",
         }}
       >
-        <div>
+        <div style={{ flex: "1 1 200px", minWidth: "180px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.2rem" }}>
             <span
               style={{
@@ -286,21 +289,21 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
 
           <h1
             style={{
-              fontSize: "1.55rem",
+              fontSize: "clamp(1.25rem, 4vw, 1.55rem)",
               fontWeight: 800,
               color: "var(--gray-900)",
               lineHeight: 1.2,
-              margin: 0
+              margin: 0,
             }}
           >
             {loc.greeting}
           </h1>
           <p
             style={{
-              fontSize: "0.85rem",
+              fontSize: "clamp(0.8rem, 2.5vw, 0.85rem)",
               color: "var(--gray-500)",
               marginTop: "0.2rem",
-              marginBottom: 0
+              marginBottom: 0,
             }}
           >
             {loc.safeMessage}
@@ -308,8 +311,16 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
         </div>
 
         {/* Action Pills: Language Toggle, ASHA, Caregiver Lock */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.4rem" }}>
-          <div style={{ display: "flex", gap: "0.35rem" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            gap: "0.4rem",
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
             {/* 1-Tap Language Quick Switcher */}
             <button
               id="lang-switcher-btn"
@@ -328,7 +339,7 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
                 fontWeight: 700,
                 color: "#1e40af",
                 cursor: "pointer",
-                boxShadow: "var(--shadow-sm)"
+                boxShadow: "var(--shadow-sm)",
               }}
             >
               <span>🗣️</span>
@@ -441,8 +452,8 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "1rem",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gap: "clamp(0.6rem, 2.5vw, 0.85rem)",
           marginBottom: "1.75rem",
         }}
       >

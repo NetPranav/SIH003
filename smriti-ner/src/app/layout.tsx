@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_Bengali } from "next/font/google";
 import "./globals.css";
 
@@ -14,6 +14,15 @@ const notoBengali = Noto_Sans_Bengali({
   weight: ["400", "600"],
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#ffffff",
+};
 
 export const metadata: Metadata = {
   title: "Smriti-NER (স্মৃতি) — AI Cognitive Wellness Platform",
