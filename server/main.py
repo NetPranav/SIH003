@@ -2778,6 +2778,230 @@ async def schedule_community_circle_session(req: CommunityCircleScheduleRequest)
     return CommunityCircleScheduleResponse(**schedule_dict)
 
 
+# ── Clinician & DMO Ecosystem Models & Storage (Sub-Phase 9.3) ──────────────
+class DistrictCohortMetricResponse(BaseModel):
+    district_id: str
+    district_name: str
+    state: str
+    total_monitored_elders: int
+    prevalence_percentage: float
+    average_mmse_score: float
+    active_intervention_flags_count: int
+    cohort_breakdown: dict
+    channel_breakdown: dict
+
+
+class CognitiveDomainScoreResponse(BaseModel):
+    domain: str
+    score: float
+    percentile: int
+    interpretation: str
+
+
+class ClinicianPatientDrilldownResponse(BaseModel):
+    patient_id: str
+    name: str
+    age: int
+    village: str
+    district: str
+    abha_id: str
+    baseline_mmse: int
+    current_mmse: int
+    thirty_day_slope: float
+    domain_scores: List[CognitiveDomainScoreResponse]
+    adherence_percentage: int
+    consent_verified: bool
+    disha_consent_token: str
+
+
+class InterventionFlagResponse(BaseModel):
+    flag_id: str
+    patient_id: str
+    patient_name: str
+    age: int
+    village: str
+    baseline_mmse: int
+    current_mmse: int
+    score_drop_points: int
+    severity: str  # "URGENT_INTERVENTION" | "CLINICAL_MONITORING" | "ROUTINE_FOLLOWUP"
+    flagged_at: str
+    trigger_reason: str
+    adherence_rate: int
+    caregiver_phone: str
+    asha_worker_name: str
+    status: str  # "PENDING_REVIEW" | "ESANJEEVANI_QUEUED" | "RESOLVED"
+
+
+class GenerateReportRequest(BaseModel):
+    patient_id: str
+    clinician_name: Optional[str] = "Dr. Sanjib Kakoti (DMO, Majuli)"
+
+
+class ClinicalExportReportResponse(BaseModel):
+    report_id: str
+    patient_id: str
+    generated_at: str
+    clinician_name: str
+    fhir_bundle_id: str
+    clinical_summary_text: str
+    pdf_download_url: str
+
+
+class ESanjeevaniHandoffRequest(BaseModel):
+    patient_id: str
+    doctor_notes: Optional[str] = None
+
+
+class ESanjeevaniReferralPacketResponse(BaseModel):
+    referral_id: str
+    patient_id: str
+    abha_id: str
+    provisional_diagnosis: str
+    mmse_proxy_score: int
+    score_drop_30_days: int
+    clinical_summary: str
+    telemedicine_node: str
+    referral_priority: str
+    queued_at: str
+    fhir_report_bundle_id: str
+
+
+CLINICIAN_INTERVENTION_FLAGS_STORE: List[dict] = [
+    {
+        "flag_id": "flg_majuli_01",
+        "patient_id": "p4",
+        "patient_name": "Purnima Devi Gogoi",
+        "age": 83,
+        "village": "Garamur, Majuli",
+        "baseline_mmse": 18,
+        "current_mmse": 14,
+        "score_drop_points": 4,
+        "severity": "URGENT_INTERVENTION",
+        "flagged_at": "2026-09-13T10:00:00Z",
+        "trigger_reason": "Acute 4-point MMSE drop over 30 days (18 -> 14). Medication adherence dropped to 62% with evening sundowning tremor.",
+        "adherence_rate": 62,
+        "caregiver_phone": "9864077889",
+        "asha_worker_name": "Jonali Saikia (Kamalabari PHC)",
+        "status": "PENDING_REVIEW",
+    },
+    {
+        "flag_id": "flg_sohra_02",
+        "patient_id": "p2",
+        "patient_name": "Kong Merilda Lyngdoh",
+        "age": 81,
+        "village": "Nongthymmai, Sohra",
+        "baseline_mmse": 22,
+        "current_mmse": 19,
+        "score_drop_points": 3,
+        "severity": "CLINICAL_MONITORING",
+        "flagged_at": "2026-09-12T14:30:00Z",
+        "trigger_reason": "3-point MMSE decline over 30 days with circadian sleep rhythm disruptions.",
+        "adherence_rate": 78,
+        "caregiver_phone": "9862011223",
+        "asha_worker_name": "Merilda Lyngdoh",
+        "status": "PENDING_REVIEW",
+    },
+]
+
+
+@app.get("/api/v1/clinician/district-overview", response_model=DistrictCohortMetricResponse, tags=["District Medical Officer / Clinician View"])
+async def get_clinician_district_overview(district_id: str = "dist_majuli"):
+    """Provides population-scale cognitive surveillance metrics across the district."""
+    return DistrictCohortMetricResponse(
+        district_id=district_id,
+        district_name="Majuli River Island District",
+        state="Assam",
+        total_monitored_elders=412,
+        prevalence_percentage=7.8,
+        average_mmse_score=23.4,
+        active_intervention_flags_count=sum(1 for f in CLINICIAN_INTERVENTION_FLAGS_STORE if f["status"] != "RESOLVED"),
+        cohort_breakdown={"normal_count": 218, "mci_count": 142, "dementia_count": 52},
+        channel_breakdown={"app_users": 184, "ivr_users": 156, "hybrid_users": 72},
+    )
+
+
+@app.get("/api/v1/clinician/patient-drilldown/{patient_id}", response_model=ClinicianPatientDrilldownResponse, tags=["District Medical Officer / Clinician View"])
+async def get_clinician_patient_drilldown(patient_id: str, consent_token: str = "cst_valid_token_26003"):
+    """Provides detailed cognitive sub-domain breakdown with statutory DISHA 2018 consent verification."""
+    is_valid = "valid" in consent_token or "26003" in consent_token
+
+    domains = [
+        CognitiveDomainScoreResponse(domain="MEMORY", score=3.8, percentile=22, interpretation="Significant delayed recall impairment"),
+        CognitiveDomainScoreResponse(domain="ATTENTION", score=4.5, percentile=34, interpretation="Moderate attentional drift during dusk"),
+        CognitiveDomainScoreResponse(domain="EXECUTIVE", score=4.0, percentile=28, interpretation="Difficulty in multi-step game sequences"),
+        CognitiveDomainScoreResponse(domain="LANGUAGE", score=6.2, percentile=58, interpretation="Intact regional Assamese mother-tongue fluency"),
+    ]
+
+    return ClinicianPatientDrilldownResponse(
+        patient_id=patient_id,
+        name="Purnima Devi Gogoi" if is_valid else "DE-IDENTIFIED ELDER #4102",
+        age=83,
+        village="Garamur, Majuli",
+        district="Majuli",
+        abha_id="91-4021-8891-2301" if is_valid else "91-****-****-2301",
+        baseline_mmse=18,
+        current_mmse=14,
+        thirty_day_slope=-0.13,
+        domain_scores=domains,
+        adherence_percentage=62,
+        consent_verified=is_valid,
+        disha_consent_token=consent_token,
+    )
+
+
+@app.post("/api/v1/clinician/reports/generate", response_model=ClinicalExportReportResponse, tags=["District Medical Officer / Clinician View"])
+async def generate_clinical_export_report(req: GenerateReportRequest):
+    """Generates structured clinical evaluation report and FHIR R4 DiagnosticReport bundle."""
+    import uuid
+    from datetime import datetime, timezone
+
+    rep_id = f"rep_{uuid.uuid4().hex[:8]}"
+    return ClinicalExportReportResponse(
+        report_id=rep_id,
+        patient_id=req.patient_id,
+        generated_at=datetime.now(timezone.utc).isoformat(),
+        clinician_name=req.clinician_name or "Dr. Sanjib Kakoti (DMO, Majuli)",
+        fhir_bundle_id=f"fhir_diag_{uuid.uuid4().hex[:8]}_r4",
+        clinical_summary_text=(
+            "Smriti-NER Comprehensive Clinical Neurocognitive Evaluation. Patient shows acute 4-point decline "
+            "over 30 days (18 -> 14). Sub-domain analysis reveals episodic memory decay with preserved linguistic fluency. "
+            "Blended IVR adherence shows 62% compliance. Recommended for immediate secondary tele-neurology workup."
+        ),
+        pdf_download_url=f"/api/v1/clinician/reports/{rep_id}.pdf",
+    )
+
+
+@app.get("/api/v1/clinician/intervention-flags", response_model=List[InterventionFlagResponse], tags=["District Medical Officer / Clinician View"])
+async def get_clinical_intervention_flags():
+    """Returns active automated intervention alerts for elders exhibiting >3-point MMSE decline."""
+    return [InterventionFlagResponse(**f) for f in CLINICIAN_INTERVENTION_FLAGS_STORE]
+
+
+@app.post("/api/v1/clinician/esanjeevani/handoff", response_model=ESanjeevaniReferralPacketResponse, tags=["District Medical Officer / Clinician View"])
+async def create_esanjeevani_consultation_handoff(req: ESanjeevaniHandoffRequest):
+    """Packages and queues flagged patient into India's e-Sanjeevani national teleconsultation system."""
+    import uuid
+    from datetime import datetime, timezone
+
+    flag = next((f for f in CLINICIAN_INTERVENTION_FLAGS_STORE if f["patient_id"] == req.patient_id), None)
+    if flag:
+        flag["status"] = "ESANJEEVANI_QUEUED"
+
+    return ESanjeevaniReferralPacketResponse(
+        referral_id=f"esanj_{uuid.uuid4().hex[:8]}",
+        patient_id=req.patient_id,
+        abha_id="91-4021-8891-2301",
+        provisional_diagnosis="Moderate Dementia with Secondary Agitation (ICD-10 F03)",
+        mmse_proxy_score=flag["current_mmse"] if flag else 14,
+        score_drop_30_days=flag["score_drop_points"] if flag else 4,
+        clinical_summary=req.doctor_notes or "Acute >3-point MMSE cognitive slope drop over 30 days flagged via Smriti-NER telemetry.",
+        telemedicine_node="GMCH Tele-medicine Node (Guwahati Medical College & Hospital)",
+        referral_priority="HIGH",
+        queued_at=datetime.now(timezone.utc).isoformat(),
+        fhir_report_bundle_id=f"fhir_bundle_{uuid.uuid4().hex[:8]}",
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 

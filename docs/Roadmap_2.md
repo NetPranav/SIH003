@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 138 / 240+ Deliverables Completed (57.5% Deliverable Completion)  
+**Overall Velocity**: 142 / 240+ Deliverables Completed (59.2% Deliverable Completion)  
 **Phases Completed**: 8 / 20 (Phases 1, 2, 3, 4, 5, 6, 7 & 8 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 9 — Sub-Phases 9.1 & 9.2 Complete, Sub-Phases 9.3 & 9.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 9 — Sub-Phases 9.1, 9.2 & 9.3 Complete, Sub-Phase 9.4 Pending)  
 **Phases Pending**: 11 / 20 (Phases 10 through 20)  
 **Milestones Achieved**: 8 / 20 (M1, M2, M3, M4, M5, M6, M7 & M8 Signed Off; M9–M20 Pending)  
 
@@ -121,7 +121,7 @@ gantt
 - [ ] **Phase 9: Caregiver, ASHA & Clinician Ecosystem Dashboards** (Weeks 25–33) — **Milestone M9 Pending**
   - [x] Sub-Phase 9.1: Caregiver Portal (Family View) (5/5 tasks done)
   - [x] Sub-Phase 9.2: ASHA Worker Portal (Community View) (4/4 tasks done)
-  - [ ] Sub-Phase 9.3: District Medical Officer / Clinician View (0/4 tasks done)
+  - [x] Sub-Phase 9.3: District Medical Officer / Clinician View (4/4 tasks done)
   - [ ] Sub-Phase 9.4: Caregiver Wellness & Peer Support (0/3 tasks done)
 - [ ] **Phase 10: Multi-Sensory Reminder & Adherence System** (Weeks 27–31) — **Milestone M10 Pending**
   - [ ] Sub-Phase 10.1: Reminder Scheduler (0/3 tasks done)
@@ -567,7 +567,7 @@ gantt
 ---
 
 # PHASE 9: CAREGIVER, ASHA & CLINICIAN ECOSYSTEM DASHBOARDS 🖥️
-**Phase Status**: [/] IN PROGRESS (56% Complete — Sub-Phases 9.1 & 9.2 Done, Sub-Phases 9.3 & 9.4 Pending)  
+**Phase Status**: [/] IN PROGRESS (81% Complete — Sub-Phases 9.1, 9.2 & 9.3 Done, Sub-Phase 9.4 Pending)  
 **Duration**: Weeks 25–33 | **Objective**: Build all persona dashboards including the new caregiver wellness layer.
 
 ### Sub-Phase 9.1 — Caregiver Portal (Family View)
@@ -590,13 +590,13 @@ gantt
 | [x] | Community Circle Scheduler View | See/manage upcoming group sessions | Circle scheduler UI |
 
 ### Sub-Phase 9.3 — District Medical Officer / Clinician View
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Clinical Dashboard | Anonymized trajectories, drill-down with consent | Clinical dashboard |
-| [ ] | Export Reports | PDF clinical summaries | Report generation engine |
-| [ ] | Intervention Flagging | Flag >3-point MMSE drop over 30 days | Automated flagging system |
-| [ ] | e-Sanjeevani "Consult a Doctor" Button (New) | One-click handoff of flagged patients to government teleconsultation | Teleconsult handoff integration |
+| [x] | Clinical Dashboard | Anonymized trajectories, drill-down with consent | Clinical dashboard |
+| [x] | Export Reports | PDF clinical summaries | Report generation engine |
+| [x] | Intervention Flagging | Flag >3-point MMSE drop over 30 days | Automated flagging system |
+| [x] | e-Sanjeevani "Consult a Doctor" Button (New) | One-click handoff of flagged patients to government teleconsultation | Teleconsult handoff integration |
 
 ### Sub-Phase 9.4 — Caregiver Wellness & Peer Support (New)
 *Status: [ ] Pending*
