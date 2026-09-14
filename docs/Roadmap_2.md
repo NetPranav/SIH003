@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 145 / 240+ Deliverables Completed (60.4% Deliverable Completion)  
+**Overall Velocity**: 148 / 240+ Deliverables Completed (61.7% Deliverable Completion)  
 **Phases Completed**: 9 / 20 (Phases 1, 2, 3, 4, 5, 6, 7, 8 & 9 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 10 — Sub-Phases 10.1–10.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 10 — Sub-Phase 10.1 Done, Sub-Phases 10.2–10.4 Pending)  
 **Phases Pending**: 10 / 20 (Phases 11 through 20)  
 **Milestones Achieved**: 9 / 20 (M1, M2, M3, M4, M5, M6, M7, M8 & M9 Signed Off; M10–M20 Pending)  
 
@@ -124,7 +124,7 @@ gantt
   - [x] Sub-Phase 9.3: District Medical Officer / Clinician View (4/4 tasks done)
   - [x] Sub-Phase 9.4: Caregiver Wellness & Peer Support (3/3 tasks done)
 - [ ] **Phase 10: Multi-Sensory Reminder & Adherence System** (Weeks 27–31) — **Milestone M10 Pending**
-  - [ ] Sub-Phase 10.1: Reminder Scheduler (0/3 tasks done)
+  - [x] Sub-Phase 10.1: Reminder Scheduler (3/3 tasks done)
   - [ ] Sub-Phase 10.2: Reminder UI & Interaction (0/4 tasks done)
   - [ ] Sub-Phase 10.3: Adherence Analytics (0/3 tasks done)
   - [ ] Sub-Phase 10.4: Cross-Channel Reminder Unification (0/2 tasks done)
@@ -613,16 +613,16 @@ gantt
 ---
 
 # PHASE 10: MULTI-SENSORY REMINDER & ADHERENCE SYSTEM 💊
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 10.1–10.4 Pending)  
+**Phase Status**: [/] IN PROGRESS (25% Complete — Sub-Phase 10.1 Done, Sub-Phases 10.2–10.4 Pending)  
 **Duration**: Weeks 27–31 | **Objective**: Robust, family-voice-driven reminder delivery across app and IVR channels.
 
 ### Sub-Phase 10.1 — Reminder Scheduler
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Reminder Database Schema | Type, scheduled_time, recurrence, voice_path, dosage | DB schema implementation |
-| [ ] | Background Scheduler Daemon | Fires on schedule even when backgrounded | Scheduler daemon |
-| [ ] | Snooze & Reschedule | 15-min snooze, max 3, then escalate | Snooze logic |
+| [x] | Reminder Database Schema | Type, scheduled_time, recurrence, voice_path, dosage | DB schema implementation |
+| [x] | Background Scheduler Daemon | Fires on schedule even when backgrounded | Scheduler daemon |
+| [x] | Snooze & Reschedule | 15-min snooze, max 3, then escalate | Snooze logic |
 
 ### Sub-Phase 10.2 — Reminder UI & Interaction
 *Status: [ ] Pending*

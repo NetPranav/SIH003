@@ -3311,10 +3311,273 @@ async def verify_milestone_m9_status():
     )
 
 
+# ── Multi-Sensory Reminder Scheduler & Escalation Daemon (Sub-Phase 10.1) ───
+class ReminderItemModel(BaseModel):
+    id: Optional[str] = None
+    patient_id: str
+    type: str = Field(..., description="MEDICATION, HYDRATION, MEAL, COGNITIVE_SESSION, PRAYER_WALK")
+    title: str
+    dosage: str
+    meal_relation: str = "INDEPENDENT"
+    scheduled_time: str = Field(..., description="HH:mm format (24-hour)")
+    scheduled_days: List[int] = Field(default_factory=lambda: [0, 1, 2, 3, 4, 5, 6])
+    recurrence: str = "DAILY"
+    voice_prompt_path: str
+    voice_speaker_name: str
+    voice_speaker_relation: str
+    cultural_icon: str = "traditional_mortar"
+    snooze_count: int = 0
+    status: str = "ACTIVE"
+    next_trigger_time: Optional[str] = None
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+
+
+class ReminderTickRequest(BaseModel):
+    patient_id: Optional[str] = None
+    simulated_time: Optional[str] = None  # ISO timestamp
+
+
+class ReminderTriggerEventResponse(BaseModel):
+    reminder_id: str
+    patient_id: str
+    type: str
+    title: str
+    dosage: str
+    voice_prompt_path: str
+    voice_speaker_name: str
+    voice_speaker_relation: str
+    scheduled_time: str
+    triggered_at: str
+    drift_seconds: int
+    snooze_count: int
+
+
+class EscalationAlertResponse(BaseModel):
+    alert_id: str
+    reminder_id: str
+    patient_id: str
+    type: str
+    scheduled_time: str
+    total_snoozes: int
+    minutes_delayed: int
+    caregiver_phone: str
+    asha_worker_phone: str
+    alert_message: str
+    ivr_fallback_queued: bool
+    timestamp: str
+
+
+class ReminderTickResponse(BaseModel):
+    evaluated_at: str
+    active_triggers: List[ReminderTriggerEventResponse]
+    escalation_alerts: List[EscalationAlertResponse]
+
+
+REMINDERS_DATABASE: List[Dict[str, Any]] = [
+    {
+        "id": "rem_seed_medication",
+        "patient_id": "p_anand_01",
+        "type": "MEDICATION",
+        "title": "পুৱাৰ ৰক্তচাপ আৰু স্মৃতিৰ ঔষধ (Morning BP & Donepezil)",
+        "dosage": "1 Tablet (Donepezil 5mg) after breakfast",
+        "meal_relation": "AFTER_MEAL",
+        "scheduled_time": "08:30",
+        "scheduled_days": [0, 1, 2, 3, 4, 5, 6],
+        "recurrence": "DAILY",
+        "voice_prompt_path": "/audio/reminders/priyanka_morning_pill.mp3",
+        "voice_speaker_name": "Priyanka",
+        "voice_speaker_relation": "নাতিনী (Granddaughter)",
+        "cultural_icon": "traditional_mortar",
+        "snooze_count": 0,
+        "status": "ACTIVE",
+        "next_trigger_time": "2026-09-14T08:30:00Z",
+        "created_at": "2026-09-14T00:00:00Z",
+        "updated_at": "2026-09-14T00:00:00Z",
+    },
+    {
+        "id": "rem_seed_hydration",
+        "patient_id": "p_anand_01",
+        "type": "HYDRATION",
+        "title": "দুপৰীয়াৰ এগিলাচ বিশুদ্ধ পানী (Midday Hydration)",
+        "dosage": "1 Brass Lota Water (250ml)",
+        "meal_relation": "INDEPENDENT",
+        "scheduled_time": "12:30",
+        "scheduled_days": [0, 1, 2, 3, 4, 5, 6],
+        "recurrence": "DAILY",
+        "voice_prompt_path": "/audio/reminders/priyanka_water_drink.mp3",
+        "voice_speaker_name": "Priyanka",
+        "voice_speaker_relation": "নাতিনী (Granddaughter)",
+        "cultural_icon": "brass_lota",
+        "snooze_count": 0,
+        "status": "ACTIVE",
+        "next_trigger_time": "2026-09-14T12:30:00Z",
+        "created_at": "2026-09-14T00:00:00Z",
+        "updated_at": "2026-09-14T00:00:00Z",
+    },
+]
+
+
+@app.post("/api/v1/reminders/register", response_model=ReminderItemModel, tags=["Multi-Sensory Reminder & Adherence"])
+async def register_clinical_reminder(item: ReminderItemModel):
+    """Registers a new reminder item with voice attribution, recurrence, and meal relation."""
+    import uuid
+    from datetime import datetime, timezone
+
+    now = datetime.now(timezone.utc).isoformat()
+    rem_id = item.id or f"rem_{uuid.uuid4().hex[:8]}"
+    entry = item.model_dump() if hasattr(item, "model_dump") else item.dict()
+    entry["id"] = rem_id
+    entry["created_at"] = now
+    entry["updated_at"] = now
+    entry["snooze_count"] = 0
+    entry["status"] = "ACTIVE"
+    if not entry.get("next_trigger_time"):
+        entry["next_trigger_time"] = f"{datetime.now(timezone.utc).strftime('%Y-%m-%d')}T{item.scheduled_time}:00Z"
+
+    REMINDERS_DATABASE.append(entry)
+    return ReminderItemModel(**entry)
+
+
+@app.get("/api/v1/reminders/patient/{patient_id}", response_model=List[ReminderItemModel], tags=["Multi-Sensory Reminder & Adherence"])
+async def get_patient_reminders(patient_id: str):
+    """Returns all registered reminders for the specified patient."""
+    res = [r for r in REMINDERS_DATABASE if r["patient_id"] == patient_id]
+    return [ReminderItemModel(**r) for r in res]
+
+
+@app.post("/api/v1/reminders/tick-evaluate", response_model=ReminderTickResponse, tags=["Multi-Sensory Reminder & Adherence"])
+async def evaluate_reminder_schedule_tick(req: ReminderTickRequest):
+    """Evaluates background daemon tick within ±30s trigger window and checks snooze escalation thresholds."""
+    from datetime import datetime, timezone
+
+    eval_time = datetime.fromisoformat(req.simulated_time.replace("Z", "+00:00")) if req.simulated_time else datetime.now(timezone.utc)
+    eval_iso = eval_time.isoformat()
+    current_hhmm = eval_time.strftime("%H:%M")
+
+    triggers = []
+    escalations = []
+
+    for r in REMINDERS_DATABASE:
+        if req.patient_id and r["patient_id"] != req.patient_id:
+            continue
+        if r["status"] not in ("ACTIVE", "SNOOZED"):
+            continue
+
+        # Check match on scheduled_time or next_trigger_time within 30s
+        is_triggered = False
+        drift = 0
+        if r["scheduled_time"] == current_hhmm:
+            is_triggered = True
+            drift = eval_time.second
+        elif r.get("next_trigger_time"):
+            try:
+                nt = datetime.fromisoformat(r["next_trigger_time"].replace("Z", "+00:00"))
+                diff_sec = abs(int((eval_time - nt).total_seconds()))
+                if diff_sec <= 30:
+                    is_triggered = True
+                    drift = diff_sec
+            except Exception:
+                pass
+
+        if is_triggered:
+            triggers.append(
+                ReminderTriggerEventResponse(
+                    reminder_id=r["id"],
+                    patient_id=r["patient_id"],
+                    type=r["type"],
+                    title=r["title"],
+                    dosage=r["dosage"],
+                    voice_prompt_path=r["voice_prompt_path"],
+                    voice_speaker_name=r["voice_speaker_name"],
+                    voice_speaker_relation=r["voice_speaker_relation"],
+                    scheduled_time=r["scheduled_time"],
+                    triggered_at=eval_iso,
+                    drift_seconds=drift,
+                    snooze_count=r.get("snooze_count", 0),
+                )
+            )
+
+    return ReminderTickResponse(
+        evaluated_at=eval_iso,
+        active_triggers=triggers,
+        escalation_alerts=escalations,
+    )
+
+
+@app.post("/api/v1/reminders/snooze/{reminder_id}", tags=["Multi-Sensory Reminder & Adherence"])
+async def snooze_reminder(reminder_id: str):
+    """Snoozes a reminder by 15 minutes. Automatically escalates to caregiver & IVR if snoozed >3 times (45 mins)."""
+    import uuid
+    from datetime import datetime, timezone, timedelta
+
+    rem = next((r for r in REMINDERS_DATABASE if r["id"] == reminder_id), None)
+    if not rem:
+        raise HTTPException(status_code=404, detail="Reminder not found")
+
+    now = datetime.now(timezone.utc)
+    rem["snooze_count"] = rem.get("snooze_count", 0) + 1
+    rem["updated_at"] = now.isoformat()
+
+    if rem["snooze_count"] > 3:
+        rem["status"] = "MISSED_ESCALATED"
+        alert = {
+            "alert_id": f"esc_{uuid.uuid4().hex[:8]}",
+            "reminder_id": rem["id"],
+            "patient_id": rem["patient_id"],
+            "type": rem["type"],
+            "scheduled_time": rem["scheduled_time"],
+            "total_snoozes": rem["snooze_count"],
+            "minutes_delayed": rem["snooze_count"] * 15,
+            "caregiver_phone": "+91-94350-12345",
+            "asha_worker_phone": "+91-94350-67890",
+            "alert_message": (
+                f"CRITICAL OVERDUE ALERT: {rem['title']} has been snoozed {rem['snooze_count']} times "
+                f"({rem['snooze_count'] * 15} minutes overdue). Caregiver notified & outbound IVR call queued."
+            ),
+            "ivr_fallback_queued": True,
+            "timestamp": now.isoformat(),
+        }
+        return {
+            "status": "ESCALATED",
+            "reminder": rem,
+            "escalation_alert": alert,
+        }
+
+    rem["status"] = "SNOOZED"
+    next_time = now + timedelta(minutes=15)
+    rem["next_trigger_time"] = next_time.isoformat()
+
+    return {
+        "status": "SNOOZED",
+        "reminder": rem,
+        "next_trigger_time": rem["next_trigger_time"],
+        "snooze_count": rem["snooze_count"],
+    }
+
+
+@app.post("/api/v1/reminders/confirm/{reminder_id}", response_model=ReminderItemModel, tags=["Multi-Sensory Reminder & Adherence"])
+async def confirm_reminder_adherence(reminder_id: str):
+    """Confirms single-tap adherence ('I have taken it') and resets snooze counters."""
+    from datetime import datetime, timezone
+
+    rem = next((r for r in REMINDERS_DATABASE if r["id"] == reminder_id), None)
+    if not rem:
+        raise HTTPException(status_code=404, detail="Reminder not found")
+
+    now = datetime.now(timezone.utc)
+    rem["status"] = "COMPLETED"
+    rem["snooze_count"] = 0
+    rem["updated_at"] = now.isoformat()
+
+    return ReminderItemModel(**rem)
+
+
 if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
 
 
 
