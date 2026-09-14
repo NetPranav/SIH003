@@ -75,3 +75,7 @@ secrets/
 *.swp
 *.swo
 *~
+
+# Android Releases & APKs
+apk-release/
+*.apk
