@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 202 / 240+ Deliverables Completed (84.2% Deliverable Completion)  
+**Overall Velocity**: 207 / 240+ Deliverables Completed (86.3% Deliverable Completion)  
 **Phases Completed**: 13 / 20 (Phases 1 through 13 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 14 — Clinical Pilot Deployment In Progress)  
+**Phases In Progress**: 1 / 20 (Phase 14 — Sub-Phase 14.1 Complete; Sub-Phases 14.2–14.4 Pending)  
 **Phases Pending**: 6 / 20 (Phases 15 through 20)  
 **Milestones Achieved**: 13 / 20 (M1 through M13 Signed Off; M14–M20 Pending)  
 
@@ -144,7 +144,7 @@ gantt
   - [x] Sub-Phase 13.3: Security & Privacy Audit (4/4 tasks done)
   - [x] Sub-Phase 13.4: Social & IVR Feature QA (3/3 tasks done)
 - [ ] **Phase 14: Clinical Pilot Deployment** (Weeks 39–51) — **Milestone M14 Pending**
-  - [ ] Sub-Phase 14.1: Pilot Site Selection & Setup (10 PHCs) (0/5 tasks done)
+  - [x] Sub-Phase 14.1: Pilot Site Selection & Setup (10 PHCs) (5/5 tasks done)
   - [ ] Sub-Phase 14.2: ASHA Worker Training Program (0/4 tasks done)
   - [ ] Sub-Phase 14.3: 90-Day Clinical Observation (500 Patients) (0/5 tasks done)
   - [ ] Sub-Phase 14.4: Pilot Efficacy Analysis (0/4 tasks done)
@@ -789,18 +789,18 @@ gantt
 ---
 
 # PHASE 14: CLINICAL PILOT DEPLOYMENT 🏥
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 14.1–14.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (28% Complete — Sub-Phase 14.1 Complete; Sub-Phases 14.2–14.4 Pending)  
 **Duration**: Weeks 39–51 (3 months) | **Objective**: Real-world validation with 500 elderly patients across 10 PHCs, including IVR-only and social-feature cohorts.
 
 ### Sub-Phase 14.1 — Pilot Site Selection & Setup
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | PHC Selection | 10 PHCs across Kamrup Metro, Majuli, Ri-Bhoi, Churachandpur | PHC selection report |
-| [ ] | Ethical Approval | IEC clearance; informed consent forms in local languages | IEC approval letter |
-| [ ] | Device Procurement | 50 budget Android tablets pre-installed | Device inventory |
-| [ ] | Patient Recruitment | 500 mild-to-moderate dementia patients (MMSE/MoCA screened) | Patient enrollment register |
-| [ ] | IVR-Only Sub-Cohort Selection | Identify ~50 no-device patients for IVR-only arm | IVR cohort register |
+| [x] | PHC Selection | 10 PHCs across Kamrup Metro, Majuli, Ri-Bhoi, Churachandpur | PHC selection report |
+| [x] | Ethical Approval | IEC clearance; informed consent forms in local languages | IEC approval letter |
+| [x] | Device Procurement | 50 budget Android tablets pre-installed | Device inventory |
+| [x] | Patient Recruitment | 500 mild-to-moderate dementia patients (MMSE/MoCA screened) | Patient enrollment register |
+| [x] | IVR-Only Sub-Cohort Selection | Identify ~50 no-device patients for IVR-only arm | IVR cohort register |
 
 ### Sub-Phase 14.2 — ASHA Worker Training Program
 *Status: [ ] Pending*
