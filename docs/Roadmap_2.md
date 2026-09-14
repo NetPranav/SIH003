@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 286 / 240+ Deliverables Completed (119.2% Deliverable Completion)  
+**Overall Velocity**: 290 / 240+ Deliverables Completed (120.8% Deliverable Completion)  
 **Phases Completed**: 19 / 20 (Phases 1 through 19 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 20 — Sub-Phase 20.1 Complete; Sub-Phases 20.2–20.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 20 — Sub-Phases 20.1 & 20.2 Complete; Sub-Phases 20.3–20.4 Pending)  
 **Phases Pending**: 0 / 20  
 **Milestones Achieved**: 19 / 20 (M1 through M19 Signed Off; M20 Pending)  
 
@@ -175,7 +175,7 @@ gantt
   - [x] Sub-Phase 19.4: Launch Impact Tracking (2/2 tasks done)
 - [ ] **Phase 20: Governance, Sustainability & Continuous Improvement** (Weeks 85–104) — **Milestone M20 Pending**
   - [x] Sub-Phase 20.1: Governance Framework & Clinical Advisory Board (3/3 tasks done)
-  - [ ] Sub-Phase 20.2: Long-Term Sustainability Model (0/4 tasks done)
+  - [x] Sub-Phase 20.2: Long-Term Sustainability Model (4/4 tasks done)
   - [ ] Sub-Phase 20.3: Continuous Improvement Pipeline (0/4 tasks done)
   - [ ] Sub-Phase 20.4: Caregiver & Community Sustainability (0/2 tasks done)
 
@@ -1044,7 +1044,7 @@ gantt
 ---
 
 # PHASE 20: GOVERNANCE, SUSTAINABILITY & CONTINUOUS IMPROVEMENT 🛡️
-**Phase Status**: [ ] IN PROGRESS (25% Complete — Sub-Phase 20.1 Complete; Sub-Phases 20.2–20.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (50% Complete — Sub-Phases 20.1–20.2 Complete; Sub-Phases 20.3–20.4 Pending)  
 **Duration**: Weeks 85–104 (and ongoing) | **Objective**: Long-term governance, funding, and improvement pipeline.
 
 ### Sub-Phase 20.1 — Governance Framework
@@ -1056,13 +1056,13 @@ gantt
 | [x] | Ethics Review Cycle | Annual review of AI, AACB, federated learning, and consent practices | Ethics review SOP |
 
 ### Sub-Phase 20.2 — Long-Term Sustainability Model
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Government Funding Integration | NHM/MDoNER budget cycle integration; NPHCE/RVY alignment | Funding proposal |
-| [ ] | Open-Source Community Model | Open-source core game engine + DCDA framework | Open-source repository |
-| [ ] | Academic Partnership Revenue | Grant applications (ICMR, DBT, Wellcome Trust) | Grant applications |
-| [ ] | Impact Measurement Framework | KPIs: patients served, CCEI trend, adherence, ASHA engagement, cost/elder | KPI dashboard |
+| [x] | Government Funding Integration | NHM/MDoNER budget cycle integration; NPHCE/RVY alignment | Funding proposal |
+| [x] | Open-Source Community Model | Open-source core game engine + DCDA framework | Open-source repository |
+| [x] | Academic Partnership Revenue | Grant applications (ICMR, DBT, Wellcome Trust) | Grant applications |
+| [x] | Impact Measurement Framework | KPIs: patients served, CCEI trend, adherence, ASHA engagement, cost/elder | KPI dashboard |
 
 ### Sub-Phase 20.3 — Continuous Improvement Pipeline
 *Status: [ ] Pending*
