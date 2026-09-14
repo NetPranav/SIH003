@@ -22,6 +22,7 @@ export interface CompanionResponse {
   language: string;
   suggestedScreen?: ScreenId;
   emotionTone: "CALMING" | "VALIDATING" | "REMINISCING" | "REASSURING";
+  transcript?: string;
 }
 
 // ── Curated Multilingual Elderly Reassurance Knowledge Base ─────────
@@ -250,6 +251,7 @@ export async function generateGeminiCompanionReply(
           language: data.language || language,
           suggestedScreen: data.suggestedScreen,
           emotionTone: data.emotionTone || "CALMING",
+          transcript: data.transcript || prompt,
         };
       }
     }
@@ -259,7 +261,46 @@ export async function generateGeminiCompanionReply(
 
   // 2. Offline Geriatric Reassurance Engine fallback
   const langDict = OFFLINE_REASSURANCE_MAP[langKey] || OFFLINE_REASSURANCE_MAP.en;
-  return langDict[cat] || langDict.default;
+  const fallback = langDict[cat] || langDict.default;
+  return { ...fallback, transcript: prompt };
+}
+
+/**
+ * Sends recorded audio directly to Gemini multimodal API for transcription & reassurance
+ */
+export async function generateGeminiCompanionAudioReply(
+  audioBase64: string,
+  mimeType: string = "audio/webm",
+  language: string = "en"
+): Promise<CompanionResponse> {
+  const langKey = OFFLINE_REASSURANCE_MAP[language] ? language : "en";
+
+  try {
+    const res = await fetch("/api/ai/companion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ audioBase64, mimeType, language }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.replyText) {
+        return {
+          replyText: data.replyText,
+          englishTranslation: data.englishTranslation || data.replyText,
+          language: data.language || language,
+          suggestedScreen: data.suggestedScreen,
+          emotionTone: data.emotionTone || "CALMING",
+          transcript: data.transcript,
+        };
+      }
+    }
+  } catch {
+    // Network offline or endpoint unavailable — use fallback
+  }
+
+  const langDict = OFFLINE_REASSURANCE_MAP[langKey] || OFFLINE_REASSURANCE_MAP.en;
+  return langDict.default;
 }
 
 /**

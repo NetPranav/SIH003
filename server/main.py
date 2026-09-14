@@ -12260,7 +12260,9 @@ async def get_community_sustainability_summary():
 # =====================================================================
 
 class AICompanionRequest(BaseModel):
-    prompt: str
+    prompt: Optional[str] = None
+    audio_base64: Optional[str] = None
+    mime_type: Optional[str] = "audio/webm"
     language: Optional[str] = "en"
 
 class AICompanionResponse(BaseModel):
@@ -12308,10 +12310,12 @@ AI_COMPANION_RESPONSES = {
 async def query_ai_companion(req: AICompanionRequest):
     """Conversational text-to-text Gemini AI companion returning calming responses for speech synthesis."""
     lang = req.language if req.language in AI_COMPANION_RESPONSES else "en"
-    p = req.prompt.lower()
+    p = (req.prompt or "").lower()
 
     cat = "default"
-    if any(w in p for w in ["where", "home", "house", "कहाँ", "घर", "ক'ত", "কোথায়", "বাড়ি"]):
+    if req.audio_base64 and not req.prompt:
+        cat = "location"
+    elif any(w in p for w in ["where", "home", "house", "कहाँ", "घर", "ক'ত", "কোথায়", "বাড়ি"]):
         cat = "location"
     elif any(w in p for w in ["medicine", "pill", "water", "दवा", "पानी", "ঔষধ", "ওষুধ", "দৰব", "জল", "পানী"]):
         cat = "medicine"

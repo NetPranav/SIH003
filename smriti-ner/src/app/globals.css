@@ -179,3 +179,43 @@ body.circadian-sundowning-active button {
   border-color: #d4af37 !important;
 }
 
+/* ── Elder Voice Assistant Listening Pulses ── */
+@keyframes micListeningPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 18px rgba(220, 38, 38, 0);
+    transform: scale(1.05);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+    transform: scale(1);
+  }
+}
+
+.mic-listening-pulse {
+  animation: micListeningPulse 1.6s infinite cubic-bezier(0.4, 0, 0.6, 1) !important;
+}
+
+@keyframes micIdleBreath {
+  0% {
+    box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(2, 132, 199, 0);
+    transform: scale(1.03);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.4);
+    transform: scale(1);
+  }
+}
+
+.mic-idle-pulse {
+  animation: micIdleBreath 2.4s infinite ease-in-out !important;
+}
+
+

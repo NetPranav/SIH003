@@ -22,14 +22,16 @@ Rules:
    - "englishTranslation": string (accurate English translation for caregiver display)
    - "emotionTone": "CALMING" | "VALIDATING" | "REMINISCING" | "REASSURING"
    - "suggestedScreen": "home" | "games" | "reminders" | "album" | "connect" (optional)
+   - "transcript": string (the words spoken by the elder in the audio, or the prompt if text)
 `;
 
 export async function POST(request: Request) {
   try {
-    const { prompt, language = "en" } = await request.json();
+    const body = await request.json();
+    const { prompt, audioBase64, mimeType = "audio/webm", language = "en" } = body;
 
-    if (!prompt || typeof prompt !== "string") {
-      return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
+    if (!prompt && !audioBase64) {
+      return NextResponse.json({ error: "Prompt or audioBase64 is required" }, { status: 400 });
     }
 
     const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
@@ -37,6 +39,24 @@ export async function POST(request: Request) {
     if (apiKey) {
       try {
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        
+        const contentParts: any[] = [];
+        if (audioBase64) {
+          contentParts.push({
+            inlineData: {
+              mimeType: mimeType.split(";")[0],
+              data: audioBase64
+            }
+          });
+          contentParts.push({
+            text: `Target Language: ${language}. The elder spoke into the microphone in the audio above. Transcribe what they said in "transcript" and provide your soothing, compassionate JSON response in "replyText" and "englishTranslation".`
+          });
+        } else {
+          contentParts.push({
+            text: `Target Language: ${language}. Elder says: "${prompt}". Provide JSON response with transcript="${prompt}".`
+          });
+        }
+
         const response = await fetch(geminiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -46,17 +66,13 @@ export async function POST(request: Request) {
             },
             contents: [
               {
-                parts: [
-                  {
-                    text: `Target Language: ${language}. Elder says: "${prompt}". Provide JSON response.`
-                  }
-                ]
+                parts: contentParts
               }
             ],
             generationConfig: {
               response_mime_type: "application/json",
               temperature: 0.3,
-              maxOutputTokens: 300,
+              maxOutputTokens: 350,
             }
           }),
         });
@@ -72,6 +88,7 @@ export async function POST(request: Request) {
               language,
               emotionTone: parsed.emotionTone || "CALMING",
               suggestedScreen: parsed.suggestedScreen || null,
+              transcript: parsed.transcript || prompt || "",
             });
           }
         }
@@ -81,7 +98,7 @@ export async function POST(request: Request) {
     }
 
     // Heuristic Fallback Engine for zero-latency / offline response
-    const p = prompt.toLowerCase();
+    const p = (prompt || "").toLowerCase();
     let replyText = "आप अपने प्यारे परिवार के साथ अपने घर पर पूरी तरह सुरक्षित हैं।";
     let english = "You are completely safe at home with your loving family.";
     let screen = "home";
@@ -95,6 +112,15 @@ export async function POST(request: Request) {
     } else if (language === "mni") {
       replyText = "ꯏꯄꯥ ꯅꯍꯥꯛ ꯃꯌꯨꯃꯗꯥ ꯅꯨꯡꯉꯥꯏꯅꯥ ꯂꯩꯔꯤ꯫ ꯋꯥꯈꯜ ꯋꯥꯒꯅꯨ꯫";
       english = "Grandfather, you are resting peacefully at home. Please do not worry.";
+    } else if (language === "brx") {
+      replyText = "नोंथाङा नखराव मोजाङैनो दं, जेबो गिनां गैया।";
+      english = "You are completely safe at home with your loving family.";
+    } else if (language === "kha") {
+      replyText = "Phi shngain bha ha iing bad kiba ha iing jong phi.";
+      english = "You are completely safe at home with your loving family.";
+    } else if (language === "lus") {
+      replyText = "In chhungte bulah inah him takin i awm e.";
+      english = "You are completely safe at home with your loving family.";
     } else if (language === "en") {
       replyText = "You are resting safely in your warm home with family who love you.";
       english = "You are resting safely in your warm home with family who love you.";
@@ -123,6 +149,7 @@ export async function POST(request: Request) {
       language,
       emotionTone: "CALMING",
       suggestedScreen: screen,
+      transcript: prompt || "",
     });
   } catch (error) {
     return NextResponse.json(
