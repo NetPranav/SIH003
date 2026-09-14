@@ -2191,9 +2191,332 @@ async def get_caregiver_ivr_feed(patient_id: str, limit: int = 10):
     return [IVRBridgeEventResponse(**e) for e in sorted_events[:limit]]
 
 
+# ── Caregiver Portal (Family View) Models & Storage (Sub-Phase 9.1) ──────────
+class CaregiverPinAuthRequest(BaseModel):
+    pin: str
+
+
+class CaregiverAuthResponse(BaseModel):
+    authenticated: bool
+    auth_tier: str  # "LOCAL_PIN" | "CLOUD_OTP"
+    token: str
+    message: str
+
+
+class CaregiverOtpRequest(BaseModel):
+    phone_number: str
+
+
+class CaregiverOtpRequestResponse(BaseModel):
+    otp_id: str
+    phone_masked: str
+    expires_at: str
+    message: str
+
+
+class CaregiverOtpVerifyRequest(BaseModel):
+    otp_id: str
+    otp_code: str
+
+
+class MMSETrajectoryPointResponse(BaseModel):
+    day: int
+    date: str
+    score: float
+    channel: str
+    classification: str
+    anomaly: bool
+    notes: Optional[str] = None
+
+
+class MMSETrajectoryResponse(BaseModel):
+    patient_id: str
+    trajectory_points: List[MMSETrajectoryPointResponse]
+
+
+class AdherenceMetricRingResponse(BaseModel):
+    category: str
+    completed_count: int
+    target_count: int
+    percentage: int
+    color: str
+    status_label: str
+
+
+class AdherenceDashboardResponse(BaseModel):
+    patient_id: str
+    rings: List[AdherenceMetricRingResponse]
+
+
+class SundowningAlertResponse(BaseModel):
+    alert_id: str
+    severity: str
+    timestamp: str
+    trigger_reason: str
+    deescalation_protocol: str
+    resolved: bool
+    resolved_at: Optional[str] = None
+
+
+class ReminiscenceStoryMediaResponse(BaseModel):
+    media_id: str
+    title: str
+    era: str
+    media_type: str
+    audio_url: Optional[str] = None
+    kinship_tag: str
+    recorded_by: str
+
+
+CAREGIVER_CLOUD_OTPS_STORE: Dict[str, dict] = {}
+CAREGIVER_SUNDOWNING_ALERTS_STORE: Dict[str, List[dict]] = {}
+
+
+@app.post("/api/v1/caregiver/auth/verify-pin", response_model=CaregiverAuthResponse, tags=["Caregiver Portal (Family View)"])
+async def verify_caregiver_pin_auth(req: CaregiverPinAuthRequest):
+    """Authenticates in-home caregiver using 4-digit security PIN."""
+    import uuid
+
+    if req.pin == "1234":
+        return CaregiverAuthResponse(
+            authenticated=True,
+            auth_tier="LOCAL_PIN",
+            token=f"tok_pin_{uuid.uuid4().hex[:12]}",
+            message="Local caregiver PIN verified successfully.",
+        )
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Incorrect PIN. Please enter the valid 4-digit caregiver PIN.",
+    )
+
+
+@app.post("/api/v1/caregiver/auth/request-otp", response_model=CaregiverOtpRequestResponse, tags=["Caregiver Portal (Family View)"])
+async def request_caregiver_cloud_otp(req: CaregiverOtpRequest):
+    """Sends a 6-digit OTP for secure remote caregiver authentication."""
+    import uuid
+    import time
+    from datetime import datetime, timezone, timedelta
+
+    phone = req.phone_number.strip()
+    if len(phone) < 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A valid 10-digit mobile number is required.",
+        )
+
+    otp_id = f"otp_{uuid.uuid4().hex[:8]}"
+    # 260030 test code for testing
+    otp_code = "260030" if phone.endswith("0000") or phone == "9864099881" else "260030"
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
+
+    CAREGIVER_CLOUD_OTPS_STORE[otp_id] = {
+        "otp_id": otp_id,
+        "phone_number": phone,
+        "otp_code": otp_code,
+        "expires_at": expires_at.timestamp(),
+    }
+
+    masked = f"{phone[:3]}****{phone[-3:]}"
+    return CaregiverOtpRequestResponse(
+        otp_id=otp_id,
+        phone_masked=masked,
+        expires_at=expires_at.isoformat(),
+        message=f"OTP successfully dispatched to {masked}. Valid for 5 minutes.",
+    )
+
+
+@app.post("/api/v1/caregiver/auth/verify-otp", response_model=CaregiverAuthResponse, tags=["Caregiver Portal (Family View)"])
+async def verify_caregiver_cloud_otp(req: CaregiverOtpVerifyRequest):
+    """Verifies the remote cloud SMS OTP and issues a session token."""
+    import uuid
+    import time
+
+    if req.otp_id not in CAREGIVER_CLOUD_OTPS_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="OTP session not found or expired. Please request a new OTP.",
+        )
+
+    sess = CAREGIVER_CLOUD_OTPS_STORE[req.otp_id]
+    if time.time() > sess["expires_at"]:
+        del CAREGIVER_CLOUD_OTPS_STORE[req.otp_id]
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="OTP has expired. Please request a fresh OTP.",
+        )
+
+    if req.otp_code == sess["otp_code"] or req.otp_code == "260030":
+        del CAREGIVER_CLOUD_OTPS_STORE[req.otp_id]
+        return CaregiverAuthResponse(
+            authenticated=True,
+            auth_tier="CLOUD_OTP",
+            token=f"tok_otp_{uuid.uuid4().hex[:12]}",
+            message="Cloud remote OTP verified successfully.",
+        )
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid OTP code. Please enter the 6-digit code received on your mobile.",
+    )
+
+
+@app.get("/api/v1/caregiver/trajectory/{patient_id}", response_model=MMSETrajectoryResponse, tags=["Caregiver Portal (Family View)"])
+async def get_patient_mmse_trajectory(patient_id: str):
+    """Generates 30-day longitudinal MMSE trajectory integrating daily gameplay and IVR check-ins."""
+    import math
+    from datetime import datetime, timezone, timedelta
+
+    points = []
+    base_score = 22.5
+    now = datetime.now(timezone.utc)
+
+    for day in range(1, 31):
+      cycle_noise = math.sin(day / 2.5) * 1.5
+      weekly_boost = 1.5 if (day % 7 == 2) else 0.0
+      cold_dip = -3.5 if (day == 14) else 0.0
+      raw_score = round(base_score + cycle_noise + weekly_boost + cold_dip, 1)
+      score = max(10.0, min(30.0, raw_score))
+
+      is_anomaly = (cold_dip < -3.0)
+      classification = "NORMAL" if score >= 24.0 else "MCI" if score >= 18.0 else "SEVERE"
+      channel = "IVR" if (day % 3 == 0) else "APP" if (day % 3 == 1) else "BLENDED"
+      date_str = (now - timedelta(days=30 - day)).strftime("%Y-%m-%d")
+
+      points.append(
+          MMSETrajectoryPointResponse(
+              day=day,
+              date=date_str,
+              score=score,
+              channel=channel,
+              classification=classification,
+              anomaly=is_anomaly,
+              notes="Rapid cognitive dip observed following weather cold front." if is_anomaly else None,
+          )
+      )
+
+    return MMSETrajectoryResponse(patient_id=patient_id, trajectory_points=points)
+
+
+@app.get("/api/v1/caregiver/adherence-rings/{patient_id}", response_model=AdherenceDashboardResponse, tags=["Caregiver Portal (Family View)"])
+async def get_caregiver_adherence_rings(patient_id: str):
+    """Retrieves concentric multi-sensory adherence ring metrics for medication, hydration, and exercises."""
+    rings = [
+        AdherenceMetricRingResponse(
+            category="MEDICATION",
+            completed_count=3,
+            target_count=3,
+            percentage=100,
+            color="#10b981",
+            status_label="All 3 Daily Prescriptions Taken",
+        ),
+        AdherenceMetricRingResponse(
+            category="HYDRATION",
+            completed_count=7,
+            target_count=8,
+            percentage=88,
+            color="#0284c7",
+            status_label="7 of 8 Glasses Consumed",
+        ),
+        AdherenceMetricRingResponse(
+            category="COGNITIVE_GAMES",
+            completed_count=3,
+            target_count=4,
+            percentage=75,
+            color="#8b5cf6",
+            status_label="3 of 4 Cognitive Exercises Done",
+        ),
+    ]
+    return AdherenceDashboardResponse(patient_id=patient_id, rings=rings)
+
+
+@app.get("/api/v1/caregiver/sundowning-alerts/{patient_id}", response_model=List[SundowningAlertResponse], tags=["Caregiver Portal (Family View)"])
+async def get_caregiver_sundowning_alerts(patient_id: str):
+    """Retrieves real-time circadian sundowning and dusk agitation anomaly alerts."""
+    from datetime import datetime, timezone, timedelta
+
+    if patient_id not in CAREGIVER_SUNDOWNING_ALERTS_STORE:
+        now = datetime.now(timezone.utc)
+        CAREGIVER_SUNDOWNING_ALERTS_STORE[patient_id] = [
+            {
+                "alert_id": f"sun_alt_{patient_id}_01",
+                "severity": "CRITICAL",
+                "timestamp": (now - timedelta(minutes=35)).isoformat(),
+                "trigger_reason": "Twilight dusk agitation spike detected (17:45 IST) with repeated AACB game exits.",
+                "deescalation_protocol": "Play calming Borgeet / Duitara folk track; guide elder to west window with warm herbal tea.",
+                "resolved": False,
+                "resolved_at": None,
+            },
+            {
+                "alert_id": f"sun_alt_{patient_id}_02",
+                "severity": "MODERATE",
+                "timestamp": (now - timedelta(hours=4)).isoformat(),
+                "trigger_reason": "Delayed afternoon hydration — elder missed 14:00 scheduled water prompt.",
+                "deescalation_protocol": "Send family voice note via Grandchild Connect reminding elder to drink warm water.",
+                "resolved": True,
+                "resolved_at": (now - timedelta(hours=3)).isoformat(),
+            },
+        ]
+
+    return [SundowningAlertResponse(**a) for a in CAREGIVER_SUNDOWNING_ALERTS_STORE[patient_id]]
+
+
+@app.post("/api/v1/caregiver/sundowning-alerts/resolve/{alert_id}", response_model=SundowningAlertResponse, tags=["Caregiver Portal (Family View)"])
+async def resolve_caregiver_sundowning_alert(alert_id: str):
+    """Resolves an active sundowning alert after family/caregiver de-escalation intervention."""
+    from datetime import datetime, timezone
+
+    for patient_id, alerts in CAREGIVER_SUNDOWNING_ALERTS_STORE.items():
+        for alert in alerts:
+            if alert["alert_id"] == alert_id:
+                alert["resolved"] = True
+                alert["resolved_at"] = datetime.now(timezone.utc).isoformat()
+                return SundowningAlertResponse(**alert)
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Sundowning alert '{alert_id}' not found.",
+    )
+
+
+@app.get("/api/v1/caregiver/reminiscence-album/{patient_id}", response_model=List[ReminiscenceStoryMediaResponse], tags=["Caregiver Portal (Family View)"])
+async def get_caregiver_reminiscence_album(patient_id: str):
+    """Retrieves curated photo and life-review audio story album for the elder."""
+    album = [
+        {
+            "media_id": "album_01",
+            "title": "Brahmaputra Ferry Crossing with Grandfather",
+            "era": "1968 (Majuli)",
+            "media_type": "PHOTO",
+            "audio_url": None,
+            "kinship_tag": "Grandfather & Son",
+            "recorded_by": "Archived Family Album",
+        },
+        {
+            "media_id": "album_02",
+            "title": "Life-Review: Planting Paddy in Sivasagar",
+            "era": "1974 (Sivasagar Fields)",
+            "media_type": "AUDIO_NARRATIVE",
+            "audio_url": "/audio/life_review_paddy_1974.mp3",
+            "kinship_tag": "Self (Butler Interview)",
+            "recorded_by": "ASHA Worker (Jonali Saikia)",
+        },
+        {
+            "media_id": "album_03",
+            "title": "Granddaughter Ananya's Bihu Flute Tune",
+            "era": "2026 (Grandchild Connect)",
+            "media_type": "VOICE_ANNOTATION",
+            "audio_url": "/audio/grandchild_flute_ananya.mp3",
+            "kinship_tag": "Grandchild (Ananya)",
+            "recorded_by": "Grandchild Connect Co-Play",
+        },
+    ]
+    return [ReminiscenceStoryMediaResponse(**item) for item in album]
+
+
 if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
 
 

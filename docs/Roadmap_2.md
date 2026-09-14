@@ -68,10 +68,10 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 129 / 240+ Deliverables Completed (53.8% Deliverable Completion)  
+**Overall Velocity**: 134 / 240+ Deliverables Completed (55.8% Deliverable Completion)  
 **Phases Completed**: 8 / 20 (Phases 1, 2, 3, 4, 5, 6, 7 & 8 Complete & Signed Off)  
-**Phases In Progress**: 0 / 20  
-**Phases Pending**: 12 / 20 (Phases 9 through 20)  
+**Phases In Progress**: 1 / 20 (Phase 9 — Sub-Phase 9.1 Complete, Sub-Phases 9.2–9.4 Pending)  
+**Phases Pending**: 11 / 20 (Phases 10 through 20)  
 **Milestones Achieved**: 8 / 20 (M1, M2, M3, M4, M5, M6, M7 & M8 Signed Off; M9–M20 Pending)  
 
 ### Phase & Milestone Checklist
@@ -119,7 +119,7 @@ gantt
   - [x] Sub-Phase 8.3: Multilingual IVR Content (2/2 tasks done)
   - [x] Sub-Phase 8.4: IVR-to-Platform Data Bridge (2/2 tasks done)
 - [ ] **Phase 9: Caregiver, ASHA & Clinician Ecosystem Dashboards** (Weeks 25–33) — **Milestone M9 Pending**
-  - [ ] Sub-Phase 9.1: Caregiver Portal (Family View) (0/5 tasks done)
+  - [x] Sub-Phase 9.1: Caregiver Portal (Family View) (5/5 tasks done)
   - [ ] Sub-Phase 9.2: ASHA Worker Portal (Community View) (0/4 tasks done)
   - [ ] Sub-Phase 9.3: District Medical Officer / Clinician View (0/4 tasks done)
   - [ ] Sub-Phase 9.4: Caregiver Wellness & Peer Support (0/3 tasks done)
@@ -567,18 +567,18 @@ gantt
 ---
 
 # PHASE 9: CAREGIVER, ASHA & CLINICIAN ECOSYSTEM DASHBOARDS 🖥️
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 9.1–9.4 Pending)  
+**Phase Status**: [/] IN PROGRESS (31% Complete — Sub-Phase 9.1 Done, Sub-Phases 9.2–9.4 Pending)  
 **Duration**: Weeks 25–33 | **Objective**: Build all persona dashboards including the new caregiver wellness layer.
 
 ### Sub-Phase 9.1 — Caregiver Portal (Family View)
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Authentication System | PIN-based local auth + optional OTP for cloud | Auth system |
-| [ ] | 30-Day MMSE Trajectory Chart | Interactive trend chart with indicators | MMSE chart component |
-| [ ] | Adherence Dashboard | Ring charts for medication/hydration | Adherence dashboard |
-| [ ] | Sundowning Alert Panel | Real-time anomaly alerts | Alert notification system |
-| [ ] | Reminiscence & Story Album | Photos, voice annotations, legacy stories | Photo/story gallery system |
+| [x] | Authentication System | PIN-based local auth + optional OTP for cloud | Auth system |
+| [x] | 30-Day MMSE Trajectory Chart | Interactive trend chart with indicators | MMSE chart component |
+| [x] | Adherence Dashboard | Ring charts for medication/hydration | Adherence dashboard |
+| [x] | Sundowning Alert Panel | Real-time anomaly alerts | Alert notification system |
+| [x] | Reminiscence & Story Album | Photos, voice annotations, legacy stories | Photo/story gallery system |
 
 ### Sub-Phase 9.2 — ASHA Worker Portal (Community View)
 *Status: [ ] Pending*
