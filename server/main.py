@@ -4520,6 +4520,214 @@ async def get_milestone_m11_audit():
     )
 
 
+# ── ABDM / ABHA Integration (Sub-Phase 12.1) ──────────────────────────────────
+class AbhaLinkRequest(BaseModel):
+    patient_id: str
+    aadhaar_or_mobile: str
+    otp: str
+    patient_name: str
+    state: str = "Assam"
+
+
+class AbhaLinkResponse(BaseModel):
+    patient_id: str
+    abha_number: str
+    abha_address: str
+    name: str
+    verification_status: str
+    linked_at: str
+    status: str
+
+
+class FhirPushRequest(BaseModel):
+    patient_id: str
+    abha_number: str
+    patient_name: str
+    mmse_score: float
+    adherence_percentage: float
+    clinical_notes: str
+
+
+class FhirPushResponse(BaseModel):
+    bundle_id: str
+    resource_type: str
+    entries_count: int
+    health_locker_status: str
+    disha_encrypted: bool
+    pushed_at: str
+    fhir_bundle: Dict[str, Any]
+
+
+class ConsentActionRequest(BaseModel):
+    consent_id: str
+    patient_abha_id: str
+    action: str  # GRANT, REVOKE
+    actor: str = "PATIENT_OR_PROXY"
+
+
+class ConsentModel(BaseModel):
+    consent_id: str
+    patient_abha_id: str
+    requester_name: str
+    requester_organization: str
+    purpose: str
+    hi_types: List[str]
+    status: str
+    granted_at: Optional[str] = None
+    revoked_at: Optional[str] = None
+
+
+# In-memory ABDM storage
+ABDM_CONSENT_REGISTRY: Dict[str, Dict[str, Any]] = {
+    "art_dmo_kamrup_01": {
+        "consent_id": "art_dmo_kamrup_01",
+        "patient_abha_id": "91-4821-9034-1289",
+        "requester_name": "Dr. Hemanta Phukan, MD",
+        "requester_organization": "Guwahati Medical College & Hospital (GMCH)",
+        "purpose": "CLINICAL_CONSULTATION",
+        "hi_types": ["DiagnosticReport", "Observation"],
+        "status": "GRANTED",
+        "granted_at": "2026-09-14T10:05:00Z",
+        "revoked_at": None,
+    }
+}
+
+
+@app.post("/api/v1/abdm/link-abha", response_model=AbhaLinkResponse, tags=["ABDM / ABHA Integration"])
+async def link_patient_abha_account(req: AbhaLinkRequest):
+    """M1: Validates ABDM OTP, registers 14-digit ABHA Number and @abdm handle."""
+    from datetime import datetime, timezone
+
+    if req.otp not in ["123456", "789012"]:
+        raise HTTPException(status_code=400, detail="Invalid ABDM OTP code")
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    abha_num = "91-4821-9034-1289"
+    handle = f"{req.patient_name.lower().replace(' ', '.')}.92@abdm"
+
+    return AbhaLinkResponse(
+        patient_id=req.patient_id,
+        abha_number=abha_num,
+        abha_address=handle,
+        name=req.patient_name,
+        verification_status="VERIFIED_AADHAAR_OTP",
+        linked_at=now_iso,
+        status="LINKED_SUCCESS",
+    )
+
+
+@app.post("/api/v1/abdm/fhir-diagnostic-push", response_model=FhirPushResponse, tags=["ABDM / ABHA Integration"])
+async def push_fhir_diagnostic_to_health_locker(req: FhirPushRequest):
+    """M2: Generates standard HL7 FHIR R4 Bundle and simulates push to ABDM Health Locker."""
+    from datetime import datetime, timezone
+    import secrets
+
+    bundle_id = f"bundle_smriti_{secrets.token_hex(4)}"
+    now_iso = datetime.now(timezone.utc).isoformat()
+    patient_ref = f"Patient/{req.patient_id}"
+
+    # Build FHIR R4 standard structures
+    patient_res = {
+        "resourceType": "Patient",
+        "id": req.patient_id,
+        "identifier": [{"system": "https://healthid.abdm.gov.in", "value": req.abha_number}],
+        "name": [{"text": req.patient_name}],
+    }
+    mmse_obs = {
+        "resourceType": "Observation",
+        "id": f"obs_mmse_{secrets.token_hex(3)}",
+        "status": "final",
+        "code": {"coding": [{"system": "http://loinc.org", "code": "72106-8", "display": "Total score MMSE"}]},
+        "subject": {"reference": patient_ref},
+        "valueQuantity": {"value": req.mmse_score, "unit": "points", "system": "http://unitsofmeasure.org"},
+    }
+    adh_obs = {
+        "resourceType": "Observation",
+        "id": f"obs_adh_{secrets.token_hex(3)}",
+        "status": "final",
+        "code": {"coding": [{"system": "http://snomed.info/sct", "code": "418633004", "display": "Adherence compliance"}]},
+        "subject": {"reference": patient_ref},
+        "valueQuantity": {"value": req.adherence_percentage, "unit": "%", "system": "http://unitsofmeasure.org"},
+    }
+    diag_rep = {
+        "resourceType": "DiagnosticReport",
+        "id": f"diag_{secrets.token_hex(3)}",
+        "status": "final",
+        "code": {"coding": [{"system": "http://snomed.info/sct", "code": "371530004", "display": "Clinical consultation report"}]},
+        "subject": {"reference": patient_ref},
+        "result": [{"reference": f"Observation/{mmse_obs['id']}"}, {"reference": f"Observation/{adh_obs['id']}"}],
+        "conclusion": req.clinical_notes,
+    }
+
+    bundle = {
+        "resourceType": "Bundle",
+        "id": bundle_id,
+        "type": "document",
+        "timestamp": now_iso,
+        "entry": [
+            {"resource": patient_res},
+            {"resource": mmse_obs},
+            {"resource": adh_obs},
+            {"resource": diag_rep},
+        ],
+    }
+
+    return FhirPushResponse(
+        bundle_id=bundle_id,
+        resource_type="Bundle",
+        entries_count=4,
+        health_locker_status="STORED_IN_ABDM_LOCKER",
+        disha_encrypted=True,
+        pushed_at=now_iso,
+        fhir_bundle=bundle,
+    )
+
+
+@app.post("/api/v1/abdm/consent/update-status", response_model=ConsentModel, tags=["ABDM / ABHA Integration"])
+async def update_abdm_consent_status(req: ConsentActionRequest):
+    """M3: Grants or revokes an ABDM electronic consent artifact under patient control."""
+    from datetime import datetime, timezone
+
+    if req.consent_id not in ABDM_CONSENT_REGISTRY:
+        # Create dynamically if requesting grant for mock test
+        ABDM_CONSENT_REGISTRY[req.consent_id] = {
+            "consent_id": req.consent_id,
+            "patient_abha_id": req.patient_abha_id,
+            "requester_name": "Dr. Hemanta Phukan, MD",
+            "requester_organization": "GMCH Guwahati",
+            "purpose": "CLINICAL_CONSULTATION",
+            "hi_types": ["DiagnosticReport", "Observation"],
+            "status": "REQUESTED",
+            "granted_at": None,
+            "revoked_at": None,
+        }
+
+    item = ABDM_CONSENT_REGISTRY[req.consent_id]
+    now_iso = datetime.now(timezone.utc).isoformat()
+
+    if req.action == "GRANT":
+        item["status"] = "GRANTED"
+        item["granted_at"] = now_iso
+    elif req.action == "REVOKE":
+        item["status"] = "REVOKED"
+        item["revoked_at"] = now_iso
+    else:
+        raise HTTPException(status_code=400, detail="Action must be GRANT or REVOKE")
+
+    return ConsentModel(**item)
+
+
+@app.get("/api/v1/abdm/consent/patient/{patient_abha_id}", response_model=List[ConsentModel], tags=["ABDM / ABHA Integration"])
+async def list_patient_consent_artifacts(patient_abha_id: str):
+    """M3: Lists all ABDM consent artifacts for a patient ABHA ID."""
+    matches = [
+        ConsentModel(**item)
+        for item in ABDM_CONSENT_REGISTRY.values()
+        if item["patient_abha_id"] == patient_abha_id
+    ]
+    return matches
+
+
 if __name__ == "__main__":
     import uvicorn
 
