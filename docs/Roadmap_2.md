@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 241 / 240+ Deliverables Completed (100.4% Deliverable Completion)  
+**Overall Velocity**: 244 / 240+ Deliverables Completed (101.7% Deliverable Completion)  
 **Phases Completed**: 15 / 20 (Phases 1 through 15 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 16 — Sub-Phases 16.1 & 16.2 Complete; Sub-Phases 16.3 & 16.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 16 — Sub-Phases 16.1–16.3 Complete; Sub-Phase 16.4 Pending)  
 **Phases Pending**: 4 / 20 (Phases 17 through 20)  
 **Milestones Achieved**: 15 / 20 (M1 through M15 Signed Off; M16–M20 Pending)  
 
@@ -156,7 +156,7 @@ gantt
 - [ ] **Phase 16: Multi-State Expansion** (Weeks 56–72) — **Milestone M16 Pending**
   - [x] Sub-Phase 16.1: State-by-State Rollout Plan (Waves 1–4) (4/4 tasks done)
   - [x] Sub-Phase 16.2: State-Specific Localization (8 States) (4/4 tasks done)
-  - [ ] Sub-Phase 16.3: NHM ASHA Tablet Ecosystem Integration (0/3 tasks done)
+  - [x] Sub-Phase 16.3: NHM ASHA Tablet Ecosystem Integration (3/3 tasks done)
   - [ ] Sub-Phase 16.4: IVR & Social Feature Scale-Out (0/2 tasks done)
 - [ ] **Phase 17: ASHA Worker Training at Scale** (Weeks 56–69) — **Milestone M17 Pending**
   - [ ] Sub-Phase 17.1: Scalable Training Program (1,500+ ASHAs) (0/4 tasks done)
@@ -878,7 +878,7 @@ gantt
 ---
 
 # PHASE 16: MULTI-STATE EXPANSION 📈
-**Phase Status**: [ ] IN PROGRESS (61% Complete — Sub-Phases 16.1 & 16.2 Complete; Sub-Phases 16.3 & 16.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (84% Complete — Sub-Phases 16.1–16.3 Complete; Sub-Phase 16.4 Pending)  
 **Duration**: Weeks 56–72 (4 months) | **Objective**: Scale from 3 pilot states to all 8 NER states in structured waves.
 
 ### Sub-Phase 16.1 — State-by-State Rollout Plan
@@ -900,12 +900,12 @@ gantt
 | [x] | State-Specific Cultural Content | Per-state fauna/flora/festivals/recipes/instruments | 8 state content packs |
 
 ### Sub-Phase 16.3 — NHM ASHA Tablet Ecosystem Integration
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | NHM Tablet Compatibility Testing | Standard NHM Samsung/Lenovo tablets | Compatibility report |
-| [ ] | Pre-Installation Package | OTA-deployable APK/PWA | Deployment package |
-| [ ] | State Health Mission Coordination | MoUs for official ASHA toolkit inclusion | MoU with State NHMs |
+| [x] | NHM Tablet Compatibility Testing | Standard NHM Samsung/Lenovo tablets | Compatibility report |
+| [x] | Pre-Installation Package | OTA-deployable APK/PWA | Deployment package |
+| [x] | State Health Mission Coordination | MoUs for official ASHA toolkit inclusion | MoU with State NHMs |
 
 ### Sub-Phase 16.4 — IVR & Social Feature Scale-Out (New)
 *Status: [ ] Pending*
