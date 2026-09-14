@@ -9018,6 +9018,333 @@ async def get_field_support_summary():
     )
 
 
+# ── ASHA Training at Scale: Community Facilitation Training (Sub-Phase 17.3) ──
+class CircleFacilitatorCurriculumModuleModel(BaseModel):
+    module_id: str
+    title: str
+    duration_hours: int
+    learning_objectives: List[str]
+    practical_exercises: List[str]
+    required_materials: List[str]
+
+
+class OsceClinicalStationModel(BaseModel):
+    station_id: str
+    competency_name: str
+    test_scenario: str
+    max_points: int
+    passing_score: int
+    clinical_checklist: List[str]
+
+
+class FacilitationCertificationProgramModel(BaseModel):
+    curriculum_modules: List[CircleFacilitatorCurriculumModuleModel]
+    osce_stations: List[OsceClinicalStationModel]
+    overall_pass_mark_pct: float
+    total_training_hours: int
+
+
+class StorytellingConsentTierModel(BaseModel):
+    tier_level: int
+    tier_name: str
+    description: str
+    verification_mechanism: str
+    data_retention_rule: str
+
+
+class FolklorePromptItemModel(BaseModel):
+    prompt_id: str
+    theme: str
+    regional_focus: str
+    opening_question_vernacular: str
+    opening_question_english: str
+    tactile_stimulus: str
+    suggested_duration_minutes: int
+
+
+class StorytellingCaptureTrainingModel(BaseModel):
+    consent_tiers: List[StorytellingConsentTierModel]
+    regional_folklore_prompts: List[FolklorePromptItemModel]
+    on_device_encryption: str
+    microphone_distance_cm: int
+    max_story_duration_minutes: int
+
+
+class CommunityFacilitationSummaryModel(BaseModel):
+    sub_phase: str
+    total_certified_facilitators: int
+    target_facilitators: int
+    total_storytelling_trained_ashas: int
+    phcs_covered: int
+    states_covered: int
+    mean_osce_score_pct: float
+    osce_pass_mark_pct: float
+    consent_audit_compliance_pct: float
+    status: str
+
+
+@app.get("/api/v1/training/facilitation-certification", response_model=FacilitationCertificationProgramModel, tags=["Community Facilitation"])
+async def get_facilitation_certification():
+    """Returns the 4-module curriculum and 5-station OSCE evaluation rubric for Circle Facilitators."""
+    return FacilitationCertificationProgramModel(
+        curriculum_modules=[
+            CircleFacilitatorCurriculumModuleModel(
+                module_id="MOD-CF-01",
+                title="Circle Seating & Multi-Generational Group Dynamics",
+                duration_hours=4,
+                learning_objectives=[
+                    "Arrange circular non-hierarchical seating geometry in village community halls",
+                    "Integrate grandchildren and youth volunteers into the Grandchild Connect co-play loop",
+                    "Recognize non-verbal elder cues of fatigue, anxiety, and social withdrawal",
+                ],
+                practical_exercises=[
+                    "Room layout simulation using low wooden stools and floor cushions (Bira / Mora)",
+                    "Youth orientation roleplay: coaching teenagers to listen without correcting",
+                ],
+                required_materials=["Mora / Bamboo Stools", "Floor Mats", "Grandchild Orientation Handouts"],
+            ),
+            CircleFacilitatorCurriculumModuleModel(
+                module_id="MOD-CF-02",
+                title="Culturally Anchored Sensory Stimuli & Tactile Baskets",
+                duration_hours=4,
+                learning_objectives=[
+                    "Assemble regionally specific sensory stimulation baskets (silk, tea, bamboo, herbs)",
+                    "Introduce multi-sensory triggers to evoke autobiographical memories",
+                    "Calibrate acoustic folk songs and instruments to comfortable decibel levels (<=65 dB)",
+                ],
+                practical_exercises=[
+                    "Blind tactile recognition exercise with raw Eri cocoon and handloom cloth",
+                    "Acoustic calibration test using tablet sound meter and bamboo flute recordings",
+                ],
+                required_materials=["Raw Muga/Eri Silk", "Fresh Green Tea Shoots", "Woven Cane Baskets", "Tablet Audio Calibrator"],
+            ),
+            CircleFacilitatorCurriculumModuleModel(
+                module_id="MOD-CF-03",
+                title="Trauma-Informed Dementia Grounding & Validation Therapy",
+                duration_hours=4,
+                learning_objectives=[
+                    "Apply Naomi Feil validation principles: never confront or invalidate inaccurate memories",
+                    "De-escalate catastrophic reactions and emotional overwhelm during reminiscence",
+                    "Guide agitated participants to quiet grounding corners using calming herbal tea transitions",
+                ],
+                practical_exercises=[
+                    "Roleplay: responding to an elder searching for a deceased spouse or distant child",
+                    "Simulated quiet-corner decompression using gentle aromatherapy and warm beverage service",
+                ],
+                required_materials=["Validation Phrase Pocket Guide", "Camphor & Lavender Balm", "Brass Tea Service Set"],
+            ),
+            CircleFacilitatorCurriculumModuleModel(
+                module_id="MOD-CF-04",
+                title="Digital Attendance, Turn-Taking Scoring & Telemetry Logging",
+                duration_hours=4,
+                learning_objectives=[
+                    "Log participant presence and spontaneous verbal contributions on the Smriti-NER tablet",
+                    "Record affective facial valence (calm, joyful, neutral, agitated) without disturbing session flow",
+                    "Synchronize circle session telemetry with PHC server using offline-first SQLite queue",
+                ],
+                practical_exercises=[
+                    "Speed logging drill: entering turn-taking metrics for 8 elders within 90 seconds",
+                    "Offline Bluetooth mesh peer sync between facilitator tablet and PHC gateway",
+                ],
+                required_materials=["Smriti-NER Tablet", "Stylus Pen", "Offline SQLite Database Emulator"],
+            ),
+        ],
+        osce_stations=[
+            OsceClinicalStationModel(
+                station_id="OSCE-01",
+                competency_name="Group Welcome & Non-Verbal Attunement",
+                test_scenario="Initiate a circle session with 6 simulated elders, establish calm presence, and introduce the session topic in native dialect.",
+                max_points=20,
+                passing_score=17,
+                clinical_checklist=[
+                    "Greets each elder by name with traditional respectful salutation",
+                    "Maintains relaxed seated eye level without standing over participants",
+                    "Speaks in clear, unhurried cadence with appropriate pause intervals",
+                    "Assesses group sensory readiness and ambient lighting/noise conditions",
+                ],
+            ),
+            OsceClinicalStationModel(
+                station_id="OSCE-02",
+                competency_name="Tactile Cueing & Sensory Activation",
+                test_scenario="Introduce a tea leaves and woven silk basket to evoke childhood memories without interrogative questioning.",
+                max_points=20,
+                passing_score=17,
+                clinical_checklist=[
+                    "Passes tactile item gently into the hands of each elder",
+                    "Uses open-ended sensory prompts rather than factual quiz questions",
+                    "Allows sufficient silence (>=10s) for cognitive memory processing",
+                    "Connects shared responses across participants to encourage mutual dialogue",
+                ],
+            ),
+            OsceClinicalStationModel(
+                station_id="OSCE-03",
+                competency_name="Validation Therapy & Agitation Grounding",
+                test_scenario="A participant becomes anxious believing they must immediately catch the village ferry from 40 years ago.",
+                max_points=20,
+                passing_score=18,
+                clinical_checklist=[
+                    "Does not argue, correct, or challenge the temporal misconception",
+                    "Validates the underlying feeling of urgency and responsibility",
+                    "Uses gentle physical reassurance with informed verbal assent",
+                    "Offers a comforting transition (warm tea, quiet seating) until calm is restored",
+                ],
+            ),
+            OsceClinicalStationModel(
+                station_id="OSCE-04",
+                competency_name="Storytelling Capture & Consent Protocol",
+                test_scenario="Obtain informed cultural consent from an elder and family caregiver, and position the tablet for audio capture.",
+                max_points=20,
+                passing_score=18,
+                clinical_checklist=[
+                    "Explains oral archive purpose and family sharing choices in native dialect",
+                    "Records verbal consent timestamp with elder voice affirmation",
+                    "Secures written/thumbprint co-assent from attending caregiver",
+                    "Positions tablet microphone at 30cm distance and verifies audio levels",
+                ],
+            ),
+            OsceClinicalStationModel(
+                station_id="OSCE-05",
+                competency_name="Tablet Observation Logging & Telemetry",
+                test_scenario="Log attendance, verbal contributions, and emotional reactions for 8 participants on the offline Smriti-NER tablet.",
+                max_points=20,
+                passing_score=18,
+                clinical_checklist=[
+                    "Navigates to Circle Telemetry screen without error",
+                    "Logs all 8 participant records within 90 seconds",
+                    "Accurately tallies verbal turn-taking frequency categories",
+                    "Confirms offline local record commit and zero pending write errors",
+                ],
+            ),
+        ],
+        overall_pass_mark_pct=85.0,
+        total_training_hours=16,
+    )
+
+
+@app.get("/api/v1/training/storytelling-capture", response_model=StorytellingCaptureTrainingModel, tags=["Community Facilitation"])
+async def get_storytelling_capture_training():
+    """Returns 3-tier informed cultural consent protocol and regional folklore prompts."""
+    return StorytellingCaptureTrainingModel(
+        consent_tiers=[
+            StorytellingConsentTierModel(
+                tier_level=1,
+                tier_name="Vernacular Verbal Explanation",
+                description="ASHA explains in the elder's primary language the purpose of recording, who can listen, and that they can stop at any time.",
+                verification_mechanism="Standardized Vernacular Consent Script Checklist (8 regional languages)",
+                data_retention_rule="Must precede every audio recording session",
+            ),
+            StorytellingConsentTierModel(
+                tier_level=2,
+                tier_name="Audio-Recorded Elder Affirmation",
+                description="Elder speaks a brief 10-15 second recorded affirmation confirming voluntary participation and story ownership.",
+                verification_mechanism="Encrypted 16-bit WAV audio snippet prepended to story metadata header",
+                data_retention_rule="Permanently bound to audio file; encrypted on-device via AES-256",
+            ),
+            StorytellingConsentTierModel(
+                tier_level=3,
+                tier_name="Caregiver Co-Signature & Sovereignty Rights",
+                description="Primary caregiver signs digital co-assent, selecting distribution scope: Private Family Vault vs. Regional Oral History Archive.",
+                verification_mechanism="In-app digital signature or OTP verification with Aadhaar/ABHA link",
+                data_retention_rule="Revocable at any time; deletion request purges audio within 24 hours",
+            ),
+        ],
+        regional_folklore_prompts=[
+            FolklorePromptItemModel(
+                prompt_id="PROMPT-AS-01",
+                theme="Village Harvest & Rongali Bihu Feasts",
+                regional_focus="Assam & BTR (Brahmaputra Valley)",
+                opening_question_vernacular="আপোনাৰ সৰুকালৰ বিহুৰ পিঠা আৰু ঢোলৰ শব্দ মনত আছেনে?",
+                opening_question_english="Can you tell us about how your village prepared for the Rongali Bihu harvest feast when you were young?",
+                tactile_stimulus="Raw Muga silk swath and fresh Bihu gamosa",
+                suggested_duration_minutes=5,
+            ),
+            FolklorePromptItemModel(
+                prompt_id="PROMPT-ML-01",
+                theme="Sacred Groves & Living Root Bridges",
+                regional_focus="Meghalaya (Khasi & Jaintia Hills)",
+                opening_question_vernacular="Phi kynmaw kumno ki kpa tymmen ki shna ia ki jingkieng jri?",
+                opening_question_english="What stories did your grandparents share about the sacred groves and living root bridges in your valley?",
+                tactile_stimulus="Ficus elastica root twig and natural cane fiber",
+                suggested_duration_minutes=5,
+            ),
+            FolklorePromptItemModel(
+                prompt_id="PROMPT-MN-01",
+                theme="Loktak Lake Floating Huts & Pena Ballads",
+                regional_focus="Manipur (Imphal & Bishnupur)",
+                opening_question_vernacular="লকপাক পাটকী ফুমদি অমসুং পেনাগী ইশৈগী ৱারী নীংশিংবীরিব্রা?",
+                opening_question_english="Can you share a memory of life near Loktak lake and the evening Pena ballads of the elders?",
+                tactile_stimulus="Dried lotus pod and miniature Pena string bow",
+                suggested_duration_minutes=6,
+            ),
+            FolklorePromptItemModel(
+                prompt_id="PROMPT-MZ-01",
+                theme="Chapchar Kut Spring Dances & Handloom Weaving",
+                regional_focus="Mizoram (Aizawl & Lunglei)",
+                opening_question_vernacular="Chapchar Kut hun laia cheraw lam leh puan tah chungchang i la hria em?",
+                opening_question_english="Tell us about the songs sung during the Chapchar Kut spring festival and the patterns in your first Puanchei handloom weave.",
+                tactile_stimulus="Polished bamboo clapper and Puanchei woven border sample",
+                suggested_duration_minutes=5,
+            ),
+            FolklorePromptItemModel(
+                prompt_id="PROMPT-TR-01",
+                theme="Garia Puja Rituals & Hill Bamboo Flutes",
+                regional_focus="Tripura (West Tripura & Gomati)",
+                opening_question_vernacular="গড়িয়া পূজার বাঁশের দেবতা আর পাহাড়ি সুরের কথা মনে পড়ে কি?",
+                opening_question_english="How did your village celebrate the sacred Garia festival with fresh harvest bamboo and traditional dancing?",
+                tactile_stimulus="Carved bamboo wand and terracotta lamp",
+                suggested_duration_minutes=5,
+            ),
+            FolklorePromptItemModel(
+                prompt_id="PROMPT-AR-01",
+                theme="Highland Yak Herding & Monpa Monastery Tales",
+                regional_focus="Arunachal Pradesh (Tawang & West Kameng)",
+                opening_question_vernacular="གངས་རིའི་སྟེང་གཡག་འཚོ་བའི་གཏམ་རྒྱུད་དྲན་གྱི་འདུག་གས?",
+                opening_question_english="Share a story from the high snow pastures and the butter lamp offerings at your local Gompa monastery.",
+                tactile_stimulus="Highland sheep wool tassel and wooden prayer bead",
+                suggested_duration_minutes=6,
+            ),
+            FolklorePromptItemModel(
+                prompt_id="PROMPT-NL-01",
+                theme="Village Gate Raising & Hornbill Legends",
+                regional_focus="Nagaland (Kohima & Mokokchung)",
+                opening_question_vernacular="Kiphire / Morung kinu gari paji hornbill ratha manu bhabishe?",
+                opening_question_english="Can you recount the stories told around the Morung hearth about bravery, community farming, and seasonal feasts?",
+                tactile_stimulus="Carved pine wood totem and red hornbill feather replica",
+                suggested_duration_minutes=5,
+            ),
+            FolklorePromptItemModel(
+                prompt_id="PROMPT-SK-01",
+                theme="Cardamom Orchards & Kanchenjunga Lore",
+                regional_focus="Sikkim (East & West Sikkim)",
+                opening_question_vernacular="कञ्चनजङ्घाको फेदीमा अलैँची टिप्दा गाउने गीतहरू याद छन्?",
+                opening_question_english="What are your cherished memories of the autumn black cardamom harvest and the mountain guardian tales?",
+                tactile_stimulus="Dried black cardamom pod and Lepcha woven sash",
+                suggested_duration_minutes=5,
+            ),
+        ],
+        on_device_encryption="AES-256-GCM-HARDWARE-ACCELERATED",
+        microphone_distance_cm=30,
+        max_story_duration_minutes=7,
+    )
+
+
+@app.get("/api/v1/training/facilitation-summary", response_model=CommunityFacilitationSummaryModel, tags=["Community Facilitation"])
+async def get_facilitation_summary():
+    """Consolidated summary metrics for Community Reminiscence Facilitation and Storytelling Capture."""
+    return CommunityFacilitationSummaryModel(
+        sub_phase="17.3 Community Facilitation Training",
+        total_certified_facilitators=640,
+        target_facilitators=600,
+        total_storytelling_trained_ashas=1510,
+        phcs_covered=90,
+        states_covered=8,
+        mean_osce_score_pct=92.4,
+        osce_pass_mark_pct=85.0,
+        consent_audit_compliance_pct=100.0,
+        status="COMMUNITY_FACILITATION_ACTIVE",
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 
