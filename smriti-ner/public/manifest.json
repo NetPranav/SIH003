@@ -1,13 +1,13 @@
 {
   "name": "Smriti-NER (স্মৃতি / ꯁ꯭ꯃ꯭ꯔꯤꯇꯤ) — AI Cognitive Wellness",
   "short_name": "Smriti-NER",
-  "description": "AI-Enabled Culturally-Rooted Cognitive Wellness Platform for Dementia Patients in North East India (SIH 2026 / MDoNER PS ID: 26003)",
+  "description": "AI-Enabled Culturally-Rooted Cognitive Wellness Platform for Dementia Patients in North East India (SIH 2026 / MDoNER PS ID: 26003) — Available in 8 Regional Languages",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#FFFFFF",
-  "theme_color": "#FFFFFF",
+  "background_color": "#F8FAFC",
+  "theme_color": "#0D9488",
   "dir": "ltr",
   "lang": "as-IN",
   "categories": ["health", "medical", "accessibility", "wellness", "education"],
@@ -29,7 +29,7 @@
     {
       "name": "Daily Games",
       "short_name": "খেল",
-      "description": "Cultural Cognitive Wellness Games (Dhol-Pepa, Kaziranga, Loom)",
+      "description": "Cultural Cognitive Wellness Games (Dhol-Pepa, Kaziranga, Loom, Haat)",
       "url": "/?screen=games",
       "icons": [{ "src": "/globe.svg", "sizes": "96x96" }]
     },
@@ -38,6 +38,13 @@
       "short_name": "তত্ত্বাৱধায়ক",
       "description": "Caregiver and ASHA Worker Longitudinal Analytics Dashboard",
       "url": "/?screen=caregiver",
+      "icons": [{ "src": "/globe.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Toll-Free IVR Support",
+      "short_name": "IVR সহায়",
+      "description": "Zero-Smartphone Toll-Free Cognitive Line: 1800-890-SMRITI / Tele-MANAS 14416",
+      "url": "/?screen=connect",
       "icons": [{ "src": "/globe.svg", "sizes": "96x96" }]
     }
   ],

@@ -11,7 +11,7 @@
  * - Background sync for deferred offline session synchronization
  */
 
-const CACHE_VERSION = "v1.0.0";
+const CACHE_VERSION = "v2.5.0-lts";
 const STATIC_CACHE_NAME = `smriti-static-${CACHE_VERSION}`;
 const AUDIO_CACHE_NAME = `smriti-audio-${CACHE_VERSION}`;
 const DYNAMIC_CACHE_NAME = `smriti-dynamic-${CACHE_VERSION}`;
