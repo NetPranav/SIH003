@@ -4,6 +4,8 @@ import { useState } from "react";
 import type { ScreenId } from "@/lib/types";
 import { DEFAULT_REMINDERS } from "@/lib/constants";
 import { playGentleChime, playBeep } from "@/lib/audio";
+import FullScreenReminderCard from "@/components/ui/FullScreenReminderCard";
+import { reminderSchedulerDaemon, type ReminderItem } from "@/lib/reminderSchedulerService";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -14,12 +16,18 @@ export default function RemindersScreen({ navigate }: Props) {
     DEFAULT_REMINDERS.map((r, i) => ({ ...r, completed: i === 0 }))
   );
   const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
+  const [fullScreenReminder, setFullScreenReminder] = useState<ReminderItem | null>(null);
 
   const toggleComplete = (id: string) => {
     playGentleChime();
     setReminders((prev) =>
       prev.map((r) => (r.id === id ? { ...r, completed: !r.completed } : r))
     );
+    try {
+      reminderSchedulerDaemon.confirmReminder(id);
+    } catch {
+      // Ignored for UI mock items
+    }
   };
 
   const handlePlayVoice = (id: string) => {
@@ -28,6 +36,57 @@ export default function RemindersScreen({ navigate }: Props) {
     setTimeout(() => {
       setPlayingVoiceId(null);
     }, 3200);
+  };
+
+  const openFullScreenFor = (id: string) => {
+    const daemonRem = reminderSchedulerDaemon.getReminder(id);
+    if (daemonRem) {
+      setFullScreenReminder({ ...daemonRem });
+    } else {
+      // Fallback synthetic ReminderItem for DEFAULT_REMINDERS
+      const item = reminders.find((r) => r.id === id);
+      setFullScreenReminder({
+        id,
+        patientId: "p_anand_01",
+        type: id.includes("water") ? "HYDRATION" : "MEDICATION",
+        title: item?.title || "পুৱাৰ ৰক্তচাপ আৰু স্মৃতিৰ ঔষধ",
+        dosage: item?.description || "1 Tablet (Donepezil 5mg)",
+        mealRelation: "AFTER_MEAL",
+        scheduledTime: item?.time || "08:30 AM",
+        scheduledDays: [0, 1, 2, 3, 4, 5, 6],
+        recurrence: "DAILY",
+        voicePromptPath: "/audio/reminders/priyanka_morning_pill.mp3",
+        voiceSpeakerName: "Priyanka",
+        voiceSpeakerRelation: "নাতিনী (Granddaughter)",
+        culturalIcon: id.includes("water") ? "brass_lota" : "traditional_mortar",
+        snoozeCount: 0,
+        status: "ACTIVE",
+        nextTriggerTime: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    }
+  };
+
+  const handleConfirmFullScreen = (id: string) => {
+    toggleComplete(id);
+    setFullScreenReminder(null);
+  };
+
+  const handleSnoozeFullScreen = (id: string) => {
+    try {
+      const res = reminderSchedulerDaemon.snoozeReminder(id);
+      setFullScreenReminder({ ...res.reminder });
+    } catch {
+      if (fullScreenReminder) {
+        const nextCount = fullScreenReminder.snoozeCount + 1;
+        setFullScreenReminder({
+          ...fullScreenReminder,
+          snoozeCount: nextCount,
+          status: nextCount >= 3 ? "MISSED_ESCALATED" : "SNOOZED",
+        });
+      }
+    }
   };
 
   return (
@@ -105,7 +164,7 @@ export default function RemindersScreen({ navigate }: Props) {
         gap: "0.85rem"
       }}>
         <div style={{ fontSize: "1.8rem" }}>🎙️</div>
-        <div>
+        <div style={{ flex: 1 }}>
           <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "#1e40af" }}>
             Familiar Family Voice Engine
           </div>
@@ -113,6 +172,22 @@ export default function RemindersScreen({ navigate }: Props) {
             All medicine reminders speak in your granddaughter Priya’s voice in Assamese.
           </div>
         </div>
+        <button
+          onClick={() => openFullScreenFor("rem_med_1")}
+          style={{
+            padding: "0.45rem 0.85rem",
+            backgroundColor: "#2563eb",
+            color: "#ffffff",
+            border: "none",
+            borderRadius: "10px",
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          🔔 Full-Screen Alert
+        </button>
       </div>
 
       {/* Reminders List */}
@@ -205,24 +280,45 @@ export default function RemindersScreen({ navigate }: Props) {
                 paddingTop: "0.5rem",
                 borderTop: "1px solid var(--gray-100)"
               }}>
-                <button
-                  onClick={() => handlePlayVoice(r.id)}
-                  style={{
-                    background: "none",
-                    border: "1px solid var(--gray-300)",
-                    borderRadius: "var(--radius-sm)",
-                    padding: "0.35rem 0.75rem",
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    color: "var(--gray-700)",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.35rem"
-                  }}
-                >
-                  <span>🗣️ Play Voice</span>
-                </button>
+                <div style={{ display: "flex", gap: "0.4rem" }}>
+                  <button
+                    onClick={() => openFullScreenFor(r.id)}
+                    style={{
+                      background: "#f0fdf4",
+                      border: "1px solid #86efac",
+                      borderRadius: "var(--radius-sm)",
+                      padding: "0.35rem 0.65rem",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      color: "#166534",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.25rem"
+                    }}
+                  >
+                    <span>📱 Full Card</span>
+                  </button>
+
+                  <button
+                    onClick={() => handlePlayVoice(r.id)}
+                    style={{
+                      background: "none",
+                      border: "1px solid var(--gray-300)",
+                      borderRadius: "var(--radius-sm)",
+                      padding: "0.35rem 0.65rem",
+                      fontSize: "0.75rem",
+                      fontWeight: 600,
+                      color: "var(--gray-700)",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.25rem"
+                    }}
+                  >
+                    <span>🗣️ Voice</span>
+                  </button>
+                </div>
 
                 <button
                   onClick={() => toggleComplete(r.id)}
@@ -247,6 +343,16 @@ export default function RemindersScreen({ navigate }: Props) {
           );
         })}
       </div>
+
+      {/* Full-Screen Reminder Modal Overlay */}
+      <FullScreenReminderCard
+        isOpen={!!fullScreenReminder}
+        reminder={fullScreenReminder}
+        language="as"
+        onConfirm={handleConfirmFullScreen}
+        onSnooze={handleSnoozeFullScreen}
+        onDismiss={() => setFullScreenReminder(null)}
+      />
     </div>
   );
 }
