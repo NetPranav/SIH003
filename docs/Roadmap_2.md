@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 80 / 240+ Deliverables Completed (33.3% Deliverable Completion)  
+**Overall Velocity**: 84 / 240+ Deliverables Completed (35.0% Deliverable Completion)  
 **Phases Completed**: 4 / 20 (Phases 1, 2, 3 & 4 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 5 — Sub-Phases 5.1 & 5.2 Complete, Sub-Phases 5.3–5.5 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 5 — Sub-Phases 5.1, 5.2 & 5.3 Complete, Sub-Phases 5.4 & 5.5 Pending)  
 **Phases Pending**: 15 / 20 (Phases 6 through 20)  
 **Milestones Achieved**: 4 / 20 (M1, M2, M3, M4 Signed Off; M5–M20 Pending)  
 
@@ -100,7 +100,7 @@ gantt
 - [ ] **Phase 5: Edge AI — DCDA & Federated Learning Engine** (Weeks 15–24) — **Milestone M5 Pending**
   - [x] Sub-Phase 5.1: Telemetry Extraction Pipeline (4/4 tasks done)
   - [x] Sub-Phase 5.2: Bayesian Knowledge Tracing (BKT) Engine (4/4 tasks done)
-  - [ ] Sub-Phase 5.3: Difficulty Orchestrator & MMSE Proxy (0/4 tasks done)
+  - [x] Sub-Phase 5.3: Difficulty Orchestrator & MMSE Proxy (4/4 tasks done)
   - [ ] Sub-Phase 5.4: Federated Learning Layer (Client Training & Packaging) (0/4 tasks done)
   - [ ] Sub-Phase 5.5: Circadian-Aware Content Engine (0/3 tasks done)
 - [ ] **Phase 6: Multilingual Voice & Bhashini Integration** (Weeks 15–22) — **Milestone M6 Pending**
@@ -385,7 +385,7 @@ gantt
 ---
 
 # PHASE 5: EDGE AI — DCDA & FEDERATED LEARNING ENGINE 🧠
-**Phase Status**: [/] IN PROGRESS (40% Complete — Sub-Phases 5.1 & 5.2 Done, Sub-Phases 5.3–5.5 Pending)  
+**Phase Status**: [/] IN PROGRESS (60% Complete — Sub-Phases 5.1, 5.2 & 5.3 Done, Sub-Phases 5.4 & 5.5 Pending)  
 **Duration**: Weeks 15–24 | **Objective**: Real-time adaptive difficulty plus privacy-preserving on-device model improvement.
 
 ### Sub-Phase 5.1 — Telemetry Extraction Pipeline
@@ -407,13 +407,13 @@ gantt
 | [x] | Edge Optimization | <5ms compute on 2GB RAM Android | Performance benchmarks |
 
 ### Sub-Phase 5.3 — Difficulty Orchestrator & MMSE Proxy
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Difficulty Level Manager | Smooth transitions, no >1 level jumps | Difficulty manager |
-| [ ] | Circadian Adjustment | Reduce difficulty during sundowning window | Circadian adjustment module |
-| [ ] | MMSE Proxy Calculator | Regression model with 95% CI | Regression model + CI calc |
-| [ ] | Longitudinal Trajectory | Rolling 7-day/30-day trend computation | Trajectory computation |
+| [x] | Difficulty Level Manager | Smooth transitions, no >1 level jumps | Difficulty manager |
+| [x] | Circadian Adjustment | Reduce difficulty during sundowning window | Circadian adjustment module |
+| [x] | MMSE Proxy Calculator | Regression model with 95% CI | Regression model + CI calc |
+| [x] | Longitudinal Trajectory | Rolling 7-day/30-day trend computation | Trajectory computation |
 
 ### Sub-Phase 5.4 — Federated Learning Layer (New)
 *Status: [ ] Pending*
