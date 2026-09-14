@@ -15,6 +15,7 @@ import { getTierConfig, type DifficultyTier } from "@/lib/difficultyStateMachine
 import { aacbEngine, type AACBState } from "@/lib/aacbEngine";
 import ElderCard from "@/components/ui/ElderCard";
 import AACBBanner from "@/components/ui/AACBBanner";
+import { offlineMobileStore } from "@/lib/offlineMobileStorage";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -163,6 +164,16 @@ export default function DholPepaGame({ navigate, showSuccess, language = "en" }:
             // fallback
           }
 
+          offlineMobileStore.recordGameSession({
+            gameId: "dhol-pepa",
+            gameName: "Dhol-Pepa Rhythm",
+            accuracy: summaryAccuracy,
+            durationSeconds: summaryDuration,
+            reactionTimeMs: 450,
+            tier: tier,
+            aacbTriggered: aacbState.triggered,
+          });
+
           showSuccess(`${summaryDuration}s`, `${summaryAccuracy}%`, () => {
             setRound(1);
             setSequence([0, 1]);
@@ -193,7 +204,7 @@ export default function DholPepaGame({ navigate, showSuccess, language = "en" }:
         gameId: "dhol-pepa",
         targetId: String(expectedIdx),
         deliberationMs: latencyReport.deliberationLatencyMs,
-        language: "as",
+        language: language || "en",
       });
 
       if (updated.triggered) {

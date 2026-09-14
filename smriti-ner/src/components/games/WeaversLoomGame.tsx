@@ -12,6 +12,7 @@ import { sessionManager } from "@/lib/gameSessionManager";
 import { type DifficultyTier, getTierConfig } from "@/lib/difficultyStateMachine";
 import { aacbEngine, type AACBState } from "@/lib/aacbEngine";
 import AACBBanner from "@/components/ui/AACBBanner";
+import { offlineMobileStore } from "@/lib/offlineMobileStorage";
 
 import { GAMES_SCREEN_LOCALES } from "@/lib/screenLocalizations";
 
@@ -123,6 +124,14 @@ export default function WeaversLoomGame({ navigate, showSuccess, language = "en"
               // fallback
             }
 
+            offlineMobileStore.recordGameSession({
+              gameId: "weavers-loom",
+              accuracy: summaryAccuracy,
+              durationSeconds: summaryDuration,
+              tier: tier,
+              aacbTriggered: aacbState.triggered,
+            });
+
             showSuccess(`${summaryDuration}s`, `${summaryAccuracy}%`, () => {
               setPatternIndex(0);
               setWovenSequence([]);
@@ -149,7 +158,7 @@ export default function WeaversLoomGame({ navigate, showSuccess, language = "en"
         gameId: "weavers-loom",
         targetId: String(expectedColor),
         deliberationMs: totalReactionTime,
-        language: "as",
+        language: language as any,
       });
     }
   };

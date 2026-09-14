@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ScreenId } from "@/lib/types";
 import { DEFAULT_REMINDERS } from "@/lib/constants";
 import { playGentleChime, playBeep } from "@/lib/audio";
 import FullScreenReminderCard from "@/components/ui/FullScreenReminderCard";
 import { reminderSchedulerDaemon, type ReminderItem } from "@/lib/reminderSchedulerService";
 import { REMINDERS_SCREEN_LOCALES } from "@/lib/screenLocalizations";
+import { offlineMobileStore, type OfflineReminder } from "@/lib/offlineMobileStorage";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -16,17 +17,20 @@ interface Props {
 export default function RemindersScreen({ navigate, language = "en" }: Props) {
   const loc = REMINDERS_SCREEN_LOCALES[language] || REMINDERS_SCREEN_LOCALES.en;
 
-  const [reminders, setReminders] = useState(
-    DEFAULT_REMINDERS.map((r, i) => ({ ...r, completed: i === 0 }))
-  );
+  const [reminders, setReminders] = useState<OfflineReminder[]>(() => offlineMobileStore.getReminders());
   const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
   const [fullScreenReminder, setFullScreenReminder] = useState<ReminderItem | null>(null);
 
+  useEffect(() => {
+    const unsub = offlineMobileStore.subscribe(() => {
+      setReminders(offlineMobileStore.getReminders());
+    });
+    return unsub;
+  }, []);
+
   const toggleComplete = (id: string) => {
     playGentleChime();
-    setReminders((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, completed: !r.completed } : r))
-    );
+    offlineMobileStore.toggleReminder(id);
     try {
       reminderSchedulerDaemon.confirmReminder(id);
     } catch {
@@ -78,6 +82,7 @@ export default function RemindersScreen({ navigate, language = "en" }: Props) {
   };
 
   const handleSnoozeFullScreen = (id: string) => {
+    offlineMobileStore.snoozeReminder(id);
     try {
       const res = reminderSchedulerDaemon.snoozeReminder(id);
       setFullScreenReminder({ ...res.reminder });

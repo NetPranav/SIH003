@@ -60,6 +60,7 @@ import CognitiveProgressRing from "@/components/ui/CognitiveProgressRing";
 import AppShellSkeleton from "@/components/ui/AppShellSkeleton";
 import OrientationGuard from "@/components/ui/OrientationGuard";
 import { announceToScreenReader, triggerHaptic } from "@/lib/accessibilityMiddleware";
+import { offlineMobileStore } from "@/lib/offlineMobileStorage";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -75,6 +76,28 @@ export default function CaregiverDashboard({ navigate }: Props) {
   const [wellnessHydration, setWellnessHydration] = useState<number>(6);
   const [wellnessSundowning, setWellnessSundowning] = useState<boolean>(false);
   const [wellnessSaved, setWellnessSaved] = useState<boolean>(false);
+  const [offlineStats, setOfflineStats] = useState(() => ({
+    adherenceRate: offlineMobileStore.getAdherenceRate(),
+    completedGames: offlineMobileStore.getTodayCompletedGamesCount(),
+    totalSessions: offlineMobileStore.getGameSessions().length,
+    vitalityScore: offlineMobileStore.getCognitiveVitalityScore(),
+    audit: offlineMobileStore.getStorageAudit(),
+    latestWellness: offlineMobileStore.getLatestWellness(),
+  }));
+
+  useEffect(() => {
+    return offlineMobileStore.subscribe(() => {
+      setOfflineStats({
+        adherenceRate: offlineMobileStore.getAdherenceRate(),
+        completedGames: offlineMobileStore.getTodayCompletedGamesCount(),
+        totalSessions: offlineMobileStore.getGameSessions().length,
+        vitalityScore: offlineMobileStore.getCognitiveVitalityScore(),
+        audit: offlineMobileStore.getStorageAudit(),
+        latestWellness: offlineMobileStore.getLatestWellness(),
+      });
+    });
+  }, []);
+
   const [tremorAcceptedClicks, setTremorAcceptedClicks] = useState<number>(0);
   const [tremorBlockedClicks, setTremorBlockedClicks] = useState<number>(0);
   const [haloActive, setHaloActive] = useState<boolean>(true);
@@ -748,7 +771,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
             </div>
           </div>
 
-          {/* Adherence Cards */}
+          {/* Dynamic Adherence & Offline Metrics Cards */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
             <div style={{
               background: "#f0fdf4",
@@ -760,10 +783,10 @@ export default function CaregiverDashboard({ navigate }: Props) {
                 Game Adherence
               </div>
               <div style={{ fontSize: "1.4rem", fontWeight: 800, color: "#166534", margin: "0.25rem 0" }}>
-                94%
+                {offlineStats.vitalityScore}%
               </div>
               <div style={{ fontSize: "0.7rem", color: "#15803d" }}>
-                14/15 sessions completed
+                {offlineStats.completedGames}/4 today ({offlineStats.totalSessions} total)
               </div>
             </div>
 
@@ -774,14 +797,129 @@ export default function CaregiverDashboard({ navigate }: Props) {
               padding: "0.85rem"
             }}>
               <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#1e40af" }}>
-                Medicine Taken
+                Medicine Adherence
               </div>
               <div style={{ fontSize: "1.4rem", fontWeight: 800, color: "#1e40af", margin: "0.25rem 0" }}>
-                91%
+                {offlineStats.adherenceRate}%
               </div>
               <div style={{ fontSize: "0.7rem", color: "#2563eb" }}>
-                21/23 family voice verified
+                Persisted in Mobile Offline Store
               </div>
+            </div>
+          </div>
+
+          {/* 📱 100% On-Device Mobile Storage State & Audit Card */}
+          <div style={{
+            background: "var(--white)",
+            border: "1.5px solid var(--gray-200)",
+            borderRadius: "var(--radius-lg)",
+            padding: "1.1rem",
+            boxShadow: "var(--shadow-sm)"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.6rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                <span style={{ fontSize: "1.2rem" }}>💾</span>
+                <span style={{ fontSize: "0.92rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                  On-Device Offline Storage
+                </span>
+              </div>
+              <span style={{
+                fontSize: "0.68rem",
+                fontWeight: 800,
+                color: "#059669",
+                background: "#ecfdf5",
+                padding: "0.2rem 0.6rem",
+                borderRadius: "999px",
+                border: "1px solid #a7f3d0"
+              }}>
+                100% Zero-Backend
+              </span>
+            </div>
+
+            <p style={{ fontSize: "0.75rem", color: "var(--gray-600)", lineHeight: 1.4, marginBottom: "0.85rem" }}>
+              Every piece of patient data—cognitive scores, medication logs, daily routines, wellness entries, and reminiscence records—is securely preserved right on this mobile device without needing an external backend.
+            </p>
+
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "0.5rem",
+              marginBottom: "0.85rem",
+              fontSize: "0.75rem"
+            }}>
+              <div style={{ background: "var(--gray-50)", padding: "0.55rem", borderRadius: "var(--radius)", border: "1px solid var(--gray-200)" }}>
+                <div style={{ color: "var(--gray-500)", fontSize: "0.68rem" }}>Storage Keys</div>
+                <div style={{ fontWeight: 800, color: "var(--gray-900)", fontSize: "0.95rem" }}>
+                  {offlineStats.audit.totalKeys} keys
+                </div>
+              </div>
+              <div style={{ background: "var(--gray-50)", padding: "0.55rem", borderRadius: "var(--radius)", border: "1px solid var(--gray-200)" }}>
+                <div style={{ color: "var(--gray-500)", fontSize: "0.68rem" }}>Approximate Footprint</div>
+                <div style={{ fontWeight: 800, color: "var(--gray-900)", fontSize: "0.95rem" }}>
+                  {(offlineStats.audit.approximateBytes / 1024).toFixed(1)} KB
+                </div>
+              </div>
+            </div>
+
+            {offlineStats.latestWellness && (
+              <div style={{
+                background: "#fdf8f6",
+                border: "1px solid #fed7aa",
+                borderRadius: "var(--radius)",
+                padding: "0.6rem",
+                fontSize: "0.72rem",
+                color: "#9a3412",
+                marginBottom: "0.85rem"
+              }}>
+                <strong>Latest Wellness Note:</strong> Mood: {offlineStats.latestWellness.mood} · Sleep: {offlineStats.latestWellness.sleepHours}h · Hydration: {offlineStats.latestWellness.hydrationGlasses} glasses · Sundowning: {offlineStats.latestWellness.sundowningObserved ? "Observed" : "Calm"}
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <button
+                onClick={() => {
+                  const dataStr = offlineMobileStore.exportOfflineDataJson();
+                  const blob = new Blob([dataStr], { type: "application/json" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `smriti_offline_backup_${new Date().toISOString().slice(0, 10)}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                style={{
+                  flex: 1,
+                  padding: "0.5rem",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  backgroundColor: "var(--primary)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "var(--radius)",
+                  cursor: "pointer"
+                }}
+              >
+                📥 Export JSON Backup
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm("Reset local storage back to clean initial states?")) {
+                    offlineMobileStore.resetToDefaults();
+                  }
+                }}
+                style={{
+                  padding: "0.5rem 0.8rem",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  backgroundColor: "var(--gray-100)",
+                  color: "var(--gray-700)",
+                  border: "1px solid var(--gray-300)",
+                  borderRadius: "var(--radius)",
+                  cursor: "pointer"
+                }}
+              >
+                🔄 Reset State
+              </button>
             </div>
           </div>
         </div>
@@ -2818,12 +2956,19 @@ export default function CaregiverDashboard({ navigate }: Props) {
                   variant="primary"
                   fullWidth
                   onPress={() => {
+                    offlineMobileStore.saveWellnessLog({
+                      mood: wellnessMood,
+                      sleepHours: wellnessSleep,
+                      hydrationGlasses: wellnessHydration,
+                      sundowningObserved: wellnessSundowning,
+                      notes: `Recorded via Mobile Caregiver Dashboard at ${new Date().toLocaleTimeString()}`,
+                    });
                     setWellnessSaved(true);
                     playAudioFeedback("success");
                     setTimeout(() => setWellnessSaved(false), 3000);
                   }}
                 >
-                  Save Daily Wellness Observation
+                  Save Daily Wellness Observation (Offline)
                 </ElderButton>
 
                 {wellnessSaved && (

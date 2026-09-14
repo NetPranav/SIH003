@@ -8,6 +8,7 @@ import type { ScreenId } from "@/lib/types";
 import { playAudioFeedback } from "@/lib/audio";
 import ElderButton from "@/components/ui/ElderButton";
 import { AshaPortalService, AshaCohortPatient, CommunityCircleSchedule } from "@/lib/ashaPortalService";
+import { offlineMobileStore } from "@/lib/offlineMobileStorage";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -28,6 +29,7 @@ export default function AshaWorkerScreen({ navigate }: Props) {
     fallRiskInspected: false,
   });
   const [escalated, setEscalated] = useState<boolean>(false);
+  const [visitSaved, setVisitSaved] = useState<boolean>(false);
 
   // Circle Scheduler State
   const [circleSchedules, setCircleSchedules] = useState<CommunityCircleSchedule[]>(
@@ -66,6 +68,16 @@ export default function AshaWorkerScreen({ navigate }: Props) {
 
     const added = AshaPortalService.scheduleCircleSession({
       circleId: `cir_${Date.now().toString(36)}`,
+      circleName: newCircleName.trim(),
+      villageVenue: newVenue.trim(),
+      scheduledDate: new Date(newDate).toISOString(),
+      facilitatorAsha: "Jonali Saikia (ASHA)",
+      registeredEldersCount: 8,
+      culturalTheme: newTheme.trim() || "Traditional Weaving & River Folklore",
+      status: "UPCOMING",
+    });
+
+    offlineMobileStore.addCircleSchedule({
       circleName: newCircleName.trim(),
       villageVenue: newVenue.trim(),
       scheduledDate: new Date(newDate).toISOString(),
@@ -425,6 +437,52 @@ export default function AshaWorkerScreen({ navigate }: Props) {
                 >
                   ⚠️ Flag for District Tele-Neurologist Referral
                 </button>
+              )}
+            </div>
+
+            {/* Save Visit to Offline Mobile Store */}
+            <div style={{ marginTop: "0.85rem" }}>
+              <button
+                onClick={() => {
+                  offlineMobileStore.saveAshaVisit({
+                    patientId: selectedPatientId,
+                    patientName: activePatient.name,
+                    checklist: checklist,
+                    escalationTriggered: escalated,
+                    notes: `In-person village home visit completed. MMSE: ${activePatient.mmse}/30. Sundowning: ${activePatient.sundowningRisk}.`,
+                  });
+                  setVisitSaved(true);
+                  playAudioFeedback("success");
+                  setTimeout(() => setVisitSaved(false), 3000);
+                }}
+                style={{
+                  width: "100%",
+                  padding: "0.65rem",
+                  borderRadius: "8px",
+                  border: "1.5px solid #065f46",
+                  background: "#ecfdf5",
+                  color: "#065f46",
+                  fontSize: "0.8rem",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                💾 Save Home Visit Checklist (Offline Encrypted)
+              </button>
+              {visitSaved && (
+                <div style={{
+                  padding: "0.5rem",
+                  background: "#d1fae5",
+                  border: "1px solid #6ee7b7",
+                  borderRadius: "6px",
+                  color: "#065f46",
+                  fontSize: "0.72rem",
+                  fontWeight: 700,
+                  textAlign: "center",
+                }}>
+                  ✅ Visit Checklist Persisted to On-Device Offline Records.
+                </div>
               )}
             </div>
           </div>

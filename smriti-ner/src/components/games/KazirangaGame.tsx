@@ -14,6 +14,7 @@ import { sessionManager } from "@/lib/gameSessionManager";
 import { type DifficultyTier, getTierConfig } from "@/lib/difficultyStateMachine";
 import { aacbEngine, type AACBState } from "@/lib/aacbEngine";
 import AACBBanner from "@/components/ui/AACBBanner";
+import { offlineMobileStore } from "@/lib/offlineMobileStorage";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -113,6 +114,14 @@ export default function KazirangaGame({ navigate, showSuccess, language = "en" }
             // fallback
           }
 
+          offlineMobileStore.recordGameSession({
+            gameId: "kaziranga",
+            accuracy: summaryAccuracy,
+            durationSeconds: summaryDuration,
+            tier: tier,
+            aacbTriggered: aacbState.triggered,
+          });
+
           showSuccess(`${summaryDuration}s`, `${summaryAccuracy}%`, () => {
             setCurrentIndex(0);
             setSelectedAnimalId(null);
@@ -140,12 +149,21 @@ export default function KazirangaGame({ navigate, showSuccess, language = "en" }
         gameId: "kaziranga",
         targetId: targetAnimal.id,
         deliberationMs: latency.deliberationLatencyMs,
-        language: "as",
+        language: language as any,
       });
+
+      const errorMsg =
+        language === "hi"
+          ? `कोई बात नहीं, ध्यान से देखें: ${targetAnimal.name}`
+          : language === "as"
+          ? `অকণো চিন্তা নকৰিব, লক্ষ্য কৰক: ${targetAnimal.name} (${targetAnimal.native})`
+          : language === "bn"
+          ? `কোনো চিন্তা নেই, লক্ষ্য করুন: ${targetAnimal.name}`
+          : `No worries, take your time to spot: ${targetAnimal.name}`;
 
       setFeedback({
         isCorrect: false,
-        msg: `অকণো চিন্তা নকৰিব, লক্ষ্য কৰক: ${targetAnimal.name} (${targetAnimal.native})`,
+        msg: errorMsg,
       });
       setTimeout(() => setFeedback(null), 2500);
     }

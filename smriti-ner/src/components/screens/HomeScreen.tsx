@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { ScreenId } from "@/lib/types";
 import { DEFAULT_SCHEDULE, getLocalizedSchedule } from "@/lib/constants";
-import { playBeep } from "@/lib/audio";
+import { playBeep, playGentleChime } from "@/lib/audio";
 import ElderCard from "@/components/ui/ElderCard";
 import CognitiveProgressRing from "@/components/ui/CognitiveProgressRing";
 import ConnectivityIndicator from "@/components/ui/ConnectivityIndicator";
 import LanguageSelectorModal from "@/components/ui/LanguageSelectorModal";
 import VoiceAssistantButton from "@/components/ui/VoiceAssistantButton";
 import ModeSwitchGuard from "@/components/ui/ModeSwitchGuard";
+import { offlineMobileStore, type OfflineScheduleItem, type OfflineReminder } from "@/lib/offlineMobileStorage";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -231,11 +232,32 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
   const [isLangModalOpen, setIsLangModalOpen] = useState<boolean>(false);
   const [isPinModalOpen, setIsPinModalOpen] = useState<boolean>(false);
 
+  // 100% On-Device Offline Mobile Storage Subscriptions
+  const [scheduleItems, setScheduleItems] = useState<OfflineScheduleItem[]>(() => offlineMobileStore.getSchedule());
+  const [reminders, setReminders] = useState<OfflineReminder[]>(() => offlineMobileStore.getReminders());
+  const [todayGamesCount, setTodayGamesCount] = useState<number>(() => offlineMobileStore.getTodayCompletedGamesCount());
+  const [completedScheduleCount, setCompletedScheduleCount] = useState<number>(() => offlineMobileStore.getCompletedScheduleCount());
+
+  useEffect(() => {
+    const unsub = offlineMobileStore.subscribe(() => {
+      setScheduleItems(offlineMobileStore.getSchedule());
+      setReminders(offlineMobileStore.getReminders());
+      setTodayGamesCount(offlineMobileStore.getTodayCompletedGamesCount());
+      setCompletedScheduleCount(offlineMobileStore.getCompletedScheduleCount());
+    });
+    return unsub;
+  }, []);
+
   const loc = LOCALIZED_HOME[language] || LOCALIZED_HOME.en;
 
   const handleNav = (target: ScreenId) => {
     playBeep(440, 100);
     navigate(target);
+  };
+
+  const handleToggleScheduleItem = (id: string) => {
+    playGentleChime();
+    offlineMobileStore.toggleScheduleItem(id);
   };
 
   const handleCaregiverRequest = () => {
@@ -247,6 +269,13 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
     setIsPinModalOpen(false);
     navigate("caregiver");
   };
+
+  const totalScheduleCount = scheduleItems.length || 5;
+  const progressPercent = Math.round((completedScheduleCount / totalScheduleCount) * 100);
+
+  const nextPendingReminder = reminders.find((r) => !r.completed);
+  const dynamicReminderBadge = nextPendingReminder ? `Next: ${nextPendingReminder.time}` : "All Done ✓";
+  const dynamicGamesBadge = `${todayGamesCount} / 4 Games Done`;
 
   return (
     <div
@@ -416,20 +445,40 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
               {loc.comfortTitle}
             </div>
             <div style={{ fontSize: "0.85rem", color: "#15803d", marginTop: "0.1rem" }}>
-              {loc.comfortDesc}
+              {language === "as"
+                ? `আজি ${totalScheduleCount} টাৰ ভিতৰত ${completedScheduleCount} টা কাৰ্যসূচী সম্পন্ন হৈছে`
+                : language === "hi"
+                ? `आज ${totalScheduleCount} में से ${completedScheduleCount} गतिविधियां पूरी हुईं`
+                : `Today ${completedScheduleCount} of ${totalScheduleCount} activities completed`}
+            </div>
+            <div style={{
+              marginTop: "0.35rem",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.3rem",
+              background: "#ffffff",
+              border: "1px solid #86efac",
+              borderRadius: "999px",
+              padding: "0.15rem 0.5rem",
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              color: "#166534"
+            }}>
+              <span>💾</span>
+              <span>100% On-Device Offline Storage</span>
             </div>
           </div>
         </div>
 
         {/* Cognitive Progress Ring - Strictly and cleanly contained inside the card folder */}
         <CognitiveProgressRing
-          percentage={50}
+          percentage={progressPercent}
           size={56}
           strokeWidth={6}
           color="#16a34a"
           trackColor="#bbf7d0"
           language={language}
-          label="2/4"
+          label={`${completedScheduleCount}/${totalScheduleCount}`}
         />
       </div>
 
@@ -489,7 +538,7 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "0.35rem" }}>
               <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#2563eb", background: "#eff6ff", padding: "0.2rem 0.5rem", borderRadius: "999px" }}>
-                {loc.gamesDoneBadge}
+                {dynamicGamesBadge}
               </span>
               <span style={{ fontSize: "0.9rem", color: "#2563eb", fontWeight: 700 }}>→</span>
             </div>
@@ -528,7 +577,7 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "0.35rem" }}>
               <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#b45309", background: "#fef3c7", padding: "0.2rem 0.5rem", borderRadius: "999px" }}>
-                {loc.nextReminderBadge}
+                {dynamicReminderBadge}
               </span>
               <span style={{ fontSize: "0.9rem", color: "#d97706", fontWeight: 700 }}>→</span>
             </div>
@@ -647,62 +696,67 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem" }}>
-          {getLocalizedSchedule(language || "en").map((item, idx) => (
-            <div
-              key={idx}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "0.65rem 0.85rem",
-                background: "var(--white)",
-                borderRadius: "var(--radius)",
-                border: "1px solid var(--gray-200)",
-                fontSize: "0.85rem",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-                <span style={{ fontSize: "1.25rem" }}>{item.icon}</span>
-                <div>
-                  <div style={{ fontWeight: 700, color: "var(--gray-900)" }}>
-                    {item.title}
+          {scheduleItems.map((item) => {
+            const isDone = item.status === "done";
+            return (
+              <div
+                key={item.id}
+                onClick={() => handleToggleScheduleItem(item.id)}
+                role="button"
+                tabIndex={0}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "0.75rem 0.95rem",
+                  background: isDone ? "#f0fdf4" : "var(--white)",
+                  borderRadius: "var(--radius)",
+                  border: isDone ? "1.5px solid #86efac" : "1px solid var(--gray-200)",
+                  fontSize: "0.85rem",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  boxShadow: "var(--shadow-sm)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
+                  <span style={{ fontSize: "1.35rem" }}>{item.icon}</span>
+                  <div>
+                    <div style={{
+                      fontWeight: 700,
+                      color: isDone ? "#166534" : "var(--gray-900)",
+                      textDecoration: isDone ? "line-through" : "none",
+                    }}>
+                      {item.title}
+                    </div>
+                    <div style={{ fontSize: "0.75rem", color: "var(--gray-500)" }}>
+                      {item.description}
+                    </div>
                   </div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--gray-500)" }}>
-                    {item.description}
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div
+                    style={{
+                      fontWeight: 800,
+                      fontSize: "0.8rem",
+                      color: "var(--primary)",
+                    }}
+                  >
+                    {item.time}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "0.72rem",
+                      color: isDone ? "var(--green)" : "#d97706",
+                      fontWeight: 800,
+                      marginTop: "0.15rem",
+                    }}
+                  >
+                    {isDone ? "✓ Done" : "● Tap to Complete"}
                   </div>
                 </div>
               </div>
-              <div style={{ textAlign: "right" }}>
-                <div
-                  style={{
-                    fontWeight: 800,
-                    fontSize: "0.8rem",
-                    color: "var(--primary)",
-                  }}
-                >
-                  {item.time}
-                </div>
-                <div
-                  style={{
-                    fontSize: "0.7rem",
-                    color:
-                      item.status === "done"
-                        ? "var(--green)"
-                        : item.status === "pending"
-                        ? "#d97706"
-                        : "var(--gray-400)",
-                    fontWeight: 700,
-                  }}
-                >
-                  {item.status === "done"
-                    ? "✓ Done"
-                    : item.status === "pending"
-                    ? "● Current"
-                    : "Upcoming"}
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

@@ -324,7 +324,7 @@ export class BhashiniTTS {
     userId: process.env.NEXT_PUBLIC_BHASHINI_USER_ID || "smriti_ner_asha_01",
     pipelineEndpoint: "https://dhruva-api.bhashini.gov.in/services/inference/pipeline",
     useMockInDev: true,
-    offlineMode: false,
+    offlineMode: true,
   };
 
   public static configure(custom: Partial<BhashiniPipelineConfig>): void {

@@ -13,6 +13,7 @@ import { type DifficultyTier, getTierConfig } from "@/lib/difficultyStateMachine
 import { aacbEngine, type AACBState } from "@/lib/aacbEngine";
 import ElderCard from "@/components/ui/ElderCard";
 import AACBBanner from "@/components/ui/AACBBanner";
+import { offlineMobileStore } from "@/lib/offlineMobileStorage";
 import { GAMES_SCREEN_LOCALES } from "@/lib/screenLocalizations";
 
 interface Props {
@@ -350,7 +351,7 @@ export default function DailyHaatGame({ navigate, showSuccess, language = "en" }
         gameId: "daily-haat",
         targetId: missingId,
         deliberationMs: totalReactionTime,
-        language: "as",
+        language: language as any,
       });
     }
   };
@@ -377,6 +378,14 @@ export default function DailyHaatGame({ navigate, showSuccess, language = "en" }
         } catch {
           // fallback
         }
+
+        offlineMobileStore.recordGameSession({
+          gameId: "daily-haat",
+          accuracy: summaryAccuracy,
+          durationSeconds: summaryDuration,
+          tier: tier,
+          aacbTriggered: aacbState.triggered,
+        });
 
         showSuccess(`${summaryDuration}s`, `${summaryAccuracy}%`, () => {
           // Advance to next recipe

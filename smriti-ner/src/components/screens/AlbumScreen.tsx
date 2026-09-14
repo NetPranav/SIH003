@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { ScreenId } from "@/lib/types";
 import { playBeep, playGentleChime } from "@/lib/audio";
 import { ALBUM_SCREEN_LOCALES } from "@/lib/screenLocalizations";
+import { offlineMobileStore } from "@/lib/offlineMobileStorage";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -47,6 +48,10 @@ export default function AlbumScreen({ navigate, language = "en" }: Props) {
   const handlePlayStory = (id: number) => {
     playGentleChime();
     setPlayingStoryId(id);
+    const photo = photos.find((p) => p.id === id);
+    if (photo) {
+      offlineMobileStore.recordReminiscence(String(id), photo.title);
+    }
     setTimeout(() => setPlayingStoryId(null), 3500);
   };
 
