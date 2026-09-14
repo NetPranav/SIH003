@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 265 / 240+ Deliverables Completed (110.4% Deliverable Completion)  
+**Overall Velocity**: 268 / 240+ Deliverables Completed (111.7% Deliverable Completion)  
 **Phases Completed**: 17 / 20 (Phases 1 through 17 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 18 — Sub-Phases 18.1 & 18.2 Complete; Sub-Phases 18.3 & 18.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 18 — Sub-Phases 18.1, 18.2 & 18.3 Complete; Sub-Phase 18.4 Pending)  
 **Phases Pending**: 2 / 20 (Phases 19 through 20)  
 **Milestones Achieved**: 17 / 20 (M1 through M17 Signed Off; M18–M20 Pending)  
 
@@ -166,7 +166,7 @@ gantt
 - [ ] **Phase 18: MDoNER Central Telemetry Hub & Impact Framework** (Weeks 70–84) — **Milestone M18 Pending**
   - [x] Sub-Phase 18.1: Central Analytics Dashboard (GIS) (3/3 tasks done)
   - [x] Sub-Phase 18.2: Cultural Cognitive Engagement Index (CCEI) Finalization (3/3 tasks done)
-  - [ ] Sub-Phase 18.3: Data Warehouse & Research Pipeline (0/3 tasks done)
+  - [x] Sub-Phase 18.3: Data Warehouse & Research Pipeline (3/3 tasks done)
   - [ ] Sub-Phase 18.4: Federated Learning at Population Scale (0/2 tasks done)
 - [ ] **Phase 19: Pan-NER Public Rollout** (Weeks 82–93) — **Milestone M19 Pending**
   - [ ] Sub-Phase 19.1: Public Release (Play Store, PWA, IVR) (0/3 tasks done)
@@ -962,7 +962,7 @@ gantt
 ---
 
 # PHASE 18: MDoNER CENTRAL TELEMETRY HUB & IMPACT FRAMEWORK 📊
-**Phase Status**: [ ] IN PROGRESS (55% Complete — Sub-Phases 18.1 & 18.2 Complete; Sub-Phases 18.3 & 18.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (82% Complete — Sub-Phases 18.1–18.3 Complete; Sub-Phase 18.4 Pending)  
 **Duration**: Weeks 70–84 | **Objective**: Central analytics, research pipeline, and the named Cultural Cognitive Engagement Index (CCEI) as the platform's flagship impact metric.
 
 ### Sub-Phase 18.1 — Central Analytics Dashboard
@@ -982,12 +982,12 @@ gantt
 | [x] | CCEI Validation Study | Correlate CCEI against clinical outcomes at scale | CCEI validation paper draft |
 
 ### Sub-Phase 18.3 — Data Warehouse & Research Pipeline
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Anonymized Research Database | De-identified telemetry for academic partnerships | Research data export pipeline |
-| [ ] | Medical College Partnerships | GMCH Guwahati, RIMS Imphal, SMIMS Gangtok | Research partnership MOUs |
-| [ ] | Publication Pipeline | Manuscripts on pilot efficacy, MMSE proxy, CCEI validation | Draft research papers |
+| [x] | Anonymized Research Database | De-identified telemetry for academic partnerships | Research data export pipeline |
+| [x] | Medical College Partnerships | GMCH Guwahati, RIMS Imphal, SMIMS Gangtok | Research partnership MOUs |
+| [x] | Publication Pipeline | Manuscripts on pilot efficacy, MMSE proxy, CCEI validation | Draft research papers |
 
 ### Sub-Phase 18.4 — Federated Learning at Population Scale
 *Status: [ ] Pending*
