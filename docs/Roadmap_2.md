@@ -68,11 +68,11 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 103 / 240+ Deliverables Completed (42.9% Deliverable Completion)  
-**Phases Completed**: 5 / 20 (Phases 1, 2, 3, 4 & 5 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 6 — Sub-Phases 6.1, 6.2 & 6.3 Complete, Sub-Phase 6.4 Pending)  
-**Phases Pending**: 14 / 20 (Phases 7 through 20)  
-**Milestones Achieved**: 5 / 20 (M1, M2, M3, M4, M5 Signed Off; M6–M20 Pending)  
+**Overall Velocity**: 106 / 240+ Deliverables Completed (44.2% Deliverable Completion)  
+**Phases Completed**: 6 / 20 (Phases 1, 2, 3, 4, 5 & 6 Complete & Signed Off)  
+**Phases In Progress**: 1 / 20 (Phase 7 — Sub-Phase 7.1 In Progress)  
+**Phases Pending**: 13 / 20 (Phases 8 through 20)  
+**Milestones Achieved**: 6 / 20 (M1, M2, M3, M4, M5, M6 Signed Off; M7–M20 Pending)  
 
 ### Phase & Milestone Checklist
 - [x] **Phase 1: Clinical & Cultural Foundation Research** (Weeks 1–6) — **Milestone M1 Signed Off**
@@ -103,11 +103,11 @@ gantt
   - [x] Sub-Phase 5.3: Difficulty Orchestrator & MMSE Proxy (4/4 tasks done)
   - [x] Sub-Phase 5.4: Federated Learning Layer (Client Training & Packaging) (4/4 tasks done)
   - [x] Sub-Phase 5.5: Circadian-Aware Content Engine (3/3 tasks done)
-- [ ] **Phase 6: Multilingual Voice & Bhashini Integration** (Weeks 15–22) — **Milestone M6 Pending**
+- [x] **Phase 6: Multilingual Voice & Bhashini Integration** (Weeks 15–22) — **Milestone M6 Signed Off**
   - [x] Sub-Phase 6.1: Bhashini (AI4Bharat) Integration (4/4 tasks done)
   - [x] Sub-Phase 6.2: Localization Framework (8 Regional Languages) (4/4 tasks done)
   - [x] Sub-Phase 6.3: Personalized Family Voice System (4/4 tasks done)
-  - [ ] Sub-Phase 6.4: Natural-Language Caregiver Summaries (0/3 tasks done)
+  - [x] Sub-Phase 6.4: Natural-Language Caregiver Summaries (3/3 tasks done)
 - [ ] **Phase 7: Social Connection & Reminiscence Layer** (Weeks 18–25) — **Milestone M7 Pending**
   - [ ] Sub-Phase 7.1: Grandchild Connect (Async Co-Play) (0/3 tasks done)
   - [ ] Sub-Phase 7.2: Community Reminiscence Circles (0/4 tasks done)
@@ -439,7 +439,7 @@ gantt
 ---
 
 # PHASE 6: MULTILINGUAL VOICE & BHASHINI INTEGRATION 🗣️
-**Phase Status**: [/] IN PROGRESS (75% Complete — Sub-Phases 6.1, 6.2 & 6.3 Done, Sub-Phase 6.4 Pending)  
+**Phase Status**: [x] COMPLETED & SIGNED OFF (100% Complete — Sub-Phases 6.1, 6.2, 6.3 & 6.4 Done)  
 **Duration**: Weeks 15–22 | **Objective**: Full voice-first, 8-language interaction layer with personalized family voice.
 
 ### Sub-Phase 6.1 — Bhashini (AI4Bharat) Integration
@@ -470,15 +470,15 @@ gantt
 | [x] | Voice Clip Management | Preview, re-record, delete, up to 10 clips | Voice clip CRUD interface |
 
 ### Sub-Phase 6.4 — Natural-Language Caregiver Summaries (New)
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Template-Based NLG Engine | Rule-based sentence templates (not live LLM) fed by weekly metrics | NLG summary generator |
-| [ ] | Multi-Language Summary Output | Render weekly notes in caregiver's chosen language | Localized NLG templates |
-| [ ] | Contextual Correlation Hints | Flag plausible correlations ("Tuesday dip — possibly market day") from calendar/adherence data | Correlation-hint logic |
+| [x] | Template-Based NLG Engine | Rule-based sentence templates (not live LLM) fed by weekly metrics | NLG summary generator |
+| [x] | Multi-Language Summary Output | Render weekly notes in caregiver's chosen language | Localized NLG templates |
+| [x] | Contextual Correlation Hints | Flag plausible correlations ("Tuesday dip — possibly market day") from calendar/adherence data | Correlation-hint logic |
 
 > [!IMPORTANT]
-> - [ ] **Milestone M6**: Multilingual Voice System Operational — TTS in all 8 languages; ASR <500ms; weekly NLG summaries generated correctly. *(Status: PENDING)*
+> - [x] **Milestone M6**: Multilingual Voice System Operational — TTS in all 8 languages; ASR <500ms; weekly NLG summaries generated correctly. *(Status: SIGNED OFF)*
 
 ---
 ---

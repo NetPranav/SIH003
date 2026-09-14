@@ -435,6 +435,223 @@ async def spot_bhashini_keywords(req: BhashiniASRSpotRequest):
     )
 
 
+# ── Caregiver NLG Summary Models & Logic ────────────────────────────────────
+class CaregiverSummaryRequest(BaseModel):
+    patient_name: Optional[str] = "আইতা"
+    kinship_title: Optional[str] = "আইতা"
+    language: str = "as"
+    current_mmse_proxy: float = 24.5
+    mmse_delta_7d: float = 0.5
+    avg_reaction_time_ms: Optional[float] = 1250.0
+    adherence_rate_percent: float = 85.0
+    sundowning_incidents_count: int = 1
+    notable_day_pattern: Optional[str] = "NONE"
+
+
+class CaregiverSummaryResponse(BaseModel):
+    language: str
+    status_category: str
+    headline: str
+    cognitive_paragraph: str
+    adherence_paragraph: str
+    correlation_hint_paragraph: str
+    action_item: str
+    full_summary_text: str
+    generated_at: str
+
+
+NLG_HEADLINES = {
+    "POSITIVE": {
+        "as": "সুখবৰ: এই সপ্তাহত {kinship}ৰ স্মৃতি শক্তিত সুন্দৰ উন্নতি দেখা গৈছে",
+        "mni": "ꯄꯥꯎ ꯐꯕꯥ: ꯆꯌꯣꯜ ꯑꯁꯤꯗꯥ {kinship}ꯒꯤ ꯋꯥꯈꯜ ꯆꯦꯠꯄꯗꯥ ꯐꯒꯠꯂꯛꯄꯥ ꯎꯕꯥ ꯐꯪꯏ",
+        "bn": "সুখবর: এই সপ্তাহে {kinship}র স্মৃতিশক্তি ও একাগ্রতায় ইতিবাচক উন্নতি দেখা গেছে",
+        "brx": "गोजोनथाव: बे सप्ताहाव {kinship}नि गोसोखांनायाव मोजां दावगानाय नुनो मोनदों",
+        "kha": "Khabar babha: Ha kane ka taiew ka jingkynmaw jong {kinship} ka la nang kham bha",
+        "lus": "Chanchin tha: Kar kalta chhung khan {kinship} hriatrengna a tha hle",
+        "hi": "शुभ समाचार: इस सप्ताह {kinship} की स्मृति और एकाग्रता में सराहनीय सुधार देखा गया",
+        "en": "Positive Progress: {kinship}'s cognitive scores demonstrated notable improvement this week",
+    },
+    "STABLE": {
+        "as": "সুস্থিৰ অগ্ৰগতি: {kinship}ৰ সাপ্তাহিক মানসিক অৱস্থা সম্পূৰ্ণ নিয়ন্ত্ৰণত আছে",
+        "mni": "ꯆꯌꯣꯜ ꯑꯁꯤꯗꯥ {kinship}ꯒꯤ ꯋꯥꯈꯜ ꯂꯦꯡꯗꯅꯥ ꯐꯅꯥ ꯂꯩꯔꯤ",
+        "bn": "স্থিতিশীল অবস্থা: {kinship}র সাপ্তাহিক মানসিক স্বাস্থ্য নিয়ন্ত্রণে রয়েছে",
+        "brx": "गोजोनै थासारि: {kinship}नि सप्ताहानि गोसोखां दावगानाया थाद'नानै मोजां दं",
+        "kha": "Ka jinglong ba thikna: Ka jingkoit jingkhiah jingmut jong {kinship} ka la neh kaba biang",
+        "lus": "Dinhmun ngai: {kinship} hriatna dinhmun chu a ngai reng a a tha e",
+        "hi": "स्थिर स्थिति: इस सप्ताह {kinship} का संज्ञानात्मक स्वास्थ्य पूरी तरह स्थिर और सामान्य रहा",
+        "en": "Stable Health: {kinship}'s cognitive baseline remained steady and well-preserved this week",
+    },
+    "MILD_VARIATION": {
+        "as": "নজৰ ৰাখিবলগীয়া: {kinship}ৰ স্মৃতি শক্তিত সামান্য তাৰতম্য লক্ষ্য কৰা গৈছে",
+        "mni": "ꯌꯦꯡꯁꯤꯅꯕꯤꯌꯨ: {kinship}ꯒꯤ ꯋꯥꯈꯜ ꯈꯔꯥ ꯈꯦꯠꯅꯕꯥ ꯎꯕꯥ ꯐꯪꯏ",
+        "bn": "মনোযোগ দিন: {kinship}র কার্যকলাপে মৃদু পরিবর্তন লক্ষ্য করা গেছে",
+        "brx": "गोसो होनाय: {kinship}नि गोसोखांथिआव इसे सोलायनाय नुनो मोनदों",
+        "kha": "Donkam jingiarap: Ka don ka jingkylla khyndiat ha ka jingmut jong {kinship}",
+        "lus": "Ngaihtuah deuh a ngai: {kinship} hriatrengnaah danglamna tlem a awm",
+        "hi": "हल्का बदलाव: {kinship} के प्रदर्शन में हल्का सा उतार-चढ़ाव देखा गया है",
+        "en": "Mild Fluctuation: {kinship} exhibited slight day-to-day variance within acceptable limits",
+    },
+    "NEEDS_REVIEW": {
+        "as": "বিশেষ সতৰ্কতা: {kinship}ৰ স্মৃতিৰ স্ক'ৰ হ্ৰাস পাইছে, আশাকৰ্মীৰ পৰামৰ্শ লওক",
+        "mni": "ꯑꯀꯛꯅꯕꯥ ꯆꯦꯛꯁꯤꯅꯕꯥ: {kinship}ꯒꯤ ꯋꯥꯈꯜ ꯍꯟꯊꯔꯛꯄꯥ ꯎꯕꯥ ꯐꯪꯏ",
+        "bn": "সতর্কতা: {kinship}র স্কোরে উল্লেখযোগ্য পতন ঘটেছে, স্বাস্থ্যকর্মীর পরামর্শ নিন",
+        "brx": "सांग्रांथि: {kinship}नि गोसोखांथि खम जाबाय, आशा हेफाजाबगिरिनि रायज्लाय",
+        "kha": "Ka jingmaham: Ka jingkynmaw jong {kinship} ka la hiar, pyntip ia ka ASHA",
+        "lus": "Fimkhur a ngai: {kinship} hriatrengna a tlahniam, ASHA worker rawn rawh",
+        "hi": "समीक्षा आवश्यक: {kinship} के स्कोर में गिरावट दर्ज हुई है, आशा दीदी से परामर्श लें",
+        "en": "Clinical Review Suggested: {kinship}'s scores dropped notably; consider an ASHA check-in",
+    },
+}
+
+NLG_COGNITIVE_TEMPLATES = {
+    "as": "{kinship}ৰ সামগ্ৰিক মানসিক সক্ষমতা স্ক'ৰ (MMSE প্ৰক্সি) এই সপ্তাহত ৩০ ৰ ভিতৰত {mmse} আছিল (যোৱা সপ্তাহৰ তুলনাত {deltaStr})। পৰম্পৰাগত খেলসমূহত তেওঁৰ মনযোগ আৰু দৃশ্য স্মৃতি যথেষ্ট সক্ৰিয় আছিল।",
+    "mni": "{kinship}ꯒꯤ ꯆꯌꯣꯜ ꯑꯁꯤꯒꯤ ꯋꯥꯈꯜ ꯆꯦꯠꯄꯒꯤ ꯁ꯭ꯀꯣꯔ (MMSE) ꯳꯰ꯒꯤ ꯃꯅꯨꯡꯗꯥ {mmse} ꯑꯣꯏꯔꯤ ({deltaStr})꯫ ꯄꯨꯋꯥꯔꯤ ꯁꯥꯟꯅꯄꯣꯠꯁꯤꯡ ꯁꯥꯟꯅꯕꯗꯥ ꯃꯍꯥꯛꯀꯤ ꯅꯤꯡꯁꯤꯡ ꯊꯧꯅꯥ ꯐꯅꯥ ꯎꯕꯥ ꯐꯪꯏ꯫",
+    "bn": "{kinship}র সামগ্রিক মানসিক স্কোর (MMSE প্রক্সি) ৩০ এর মধ্যে {mmse} রেকর্ড করা হয়েছে (পূর্ববর্তী সপ্তাহের চেয়ে {deltaStr})। ঐতিহ্যবাহী খেলায় অংশ নিয়ে তিনি স্মৃতিশক্তি বেশ ধরে রেখেছেন।",
+    "brx": "{kinship}नि सप्ताहानि गोसोखांथि स्कोर (MMSE) ३० नि मादाव {mmse} जाबाय ({deltaStr})। दोहोरोम गेलेनायाव बिथांनि गोसोखांथि मोजां जादों।",
+    "kha": "Ka score jingmut jong {kinship} ha kane ka taiew ka long {mmse} na ka 30 ({deltaStr}). Ha ki jingialehkai tynrai u/ka la lah ban pyni ia ka jingkynmaw kaba biang.",
+    "lus": "{kinship} hriatna tehna (MMSE) chu 30 zelah {mmse} a ni e ({deltaStr}). Hnam infiamna a khelhnaah hriatna a hmang tha hle.",
+    "hi": "{kinship} का समग्र संज्ञानात्मक स्कोर (MMSE प्रॉक्सी) इस सप्ताह ३० में से {mmse} रहा ({deltaStr})। सांस्कृतिक खेलों में उनकी सक्रियता और स्मरण क्षमता संतुलित रही।",
+    "en": "{kinship}'s cognitive MMSE proxy score averaged {mmse} out of 30 this week ({deltaStr} shift). Game interaction confirmed healthy engagement and steady visual-auditory recall.",
+}
+
+NLG_ADHERENCE_TEMPLATES = {
+    "as": "ঔষধ আৰু পানী খোৱাৰ নিয়মীয়াতা আছিল {adh}%। সন্ধিয়াৰ সময়ত বিচলিত হোৱাৰ মাত্ৰা {sundowning} বাৰ লক্ষ্য কৰা হৈছিল আৰু লোকগীতৰ সুৰেৰে শান্ত কৰা হৈছিল।",
+    "mni": "ꯍꯤꯗꯥꯛ ꯑꯃꯁꯨꯡ ꯏꯁꯤꯡ ꯊꯛꯄꯒꯤ ꯆꯥꯡ {adh}% ꯑꯣꯏꯔꯤ꯫ ꯅꯨꯃꯤꯗꯥꯡꯋꯥꯏꯔꯝꯒꯤ ꯏꯉꯥꯎ {sundowning} ꯔꯛ ꯊꯣꯛꯈꯤ ꯑꯃꯁꯨꯡ ꯏꯁꯩꯅꯥ ꯅꯨꯡꯉꯥꯏꯍꯟꯈꯤ꯫",
+    "bn": "ওষুধ ও পানীয় গ্রহণের নিয়মিততা ছিল {adh}%। সন্ধ্যার সময় অস্বস্তির ঘটনা {sundowning} বার ঘটেছে এবং লোকগানের সুরে প্রশমিত করা হয়েছে।",
+    "brx": "मुलि आरो दै लोंनाया {adh}% जादों। बेलासिनि गोजोन समआव {sundowning} खेब अनजिमा गोसो गोजोन मेथायजों सोमावसारनाय खम जादों।",
+    "kha": "Ka jingdih dawai bad um ka long {adh}%. Ha ka por janmiet la don {sundowning} sien ka jingpyngngad da ka sur jingrwai tynrai.",
+    "lus": "Damdawi leh tui in thlapna chu {adh}% a ni. Tlailam buaina vawi {sundowning} thleng chu nau awih hlain a tiziaawm e.",
+    "hi": "दवा और जलपान की नियमितता {adh}% रही। शाम के समय हल्की बेचैनी की {sundowning} घटनाएं दर्ज हुईं जिन्हें लोरी और शांत संगीत से नियंत्रित किया गया।",
+    "en": "Medication and hydration adherence achieved {adh}%. Twilight restlessness was logged {sundowning} time(s) and safely de-escalated via regional lullabies.",
+}
+
+NLG_CORRELATION_HINTS = {
+    "TUESDAY_HAAT_DIP": {
+        "as": "পৰামৰ্শ: মঙলবাৰে প্ৰতিক্ৰিয়াৰ সময় অলপ বেছি দেখা গৈছিল, যিটো সাপ্তাহিক হাট-বজাৰৰ দিনৰ শাৰীৰিক ভাগৰৰ বাবে হোৱা স্বাভাৱিক কথা।",
+        "mni": "ꯋꯥꯈꯜꯂꯣꯟ: ꯂꯩꯄꯥꯀꯄꯣꯛꯄꯗꯥ ꯃꯇꯝ ꯈꯔꯥ ꯆꯪꯈꯤ, ꯃꯁꯤ ꯀꯩꯊꯦꯜ ꯆꯠꯄꯒꯤ ꯊꯕꯛꯅꯥ ꯃꯔꯝ ꯑꯣꯏꯔꯒꯥ ꯍꯀꯆꯥꯡ ꯋꯥꯕꯒꯤꯅꯤ꯫",
+        "bn": "পরামর্শ: মঙ্গলবার প্রতিক্রিয়া জানাতে সামান্য বিলম্ব লক্ষ্য করা গেছে, যা গ্রামীণ হাটের দিনে হাঁটাচলার ক্লান্তির স্বাভাবিক ফল।",
+        "brx": "थासारि: मंगलबाराव इसे गोबाव जादोंमोन, बेयो हाथाय साननि थाबायनायनि थाखाय जादोंमोन।",
+        "kha": "Jingbatai: Ha ka sngi Ba-ar ka la don ka jingbuh por khyndiat namar ka jingbazar iew kaba la pynbut ia ka met.",
+        "lus": "Hriattur: Thawhlehnia a chet muan deuhna chu bazar ni a nih vanga taksa chauh vang a ni e.",
+        "hi": "जीवनशैली संकेत: मंगलवार को प्रतिक्रिया समय में थोड़ी देरी साप्ताहिक हाट-बाजार की शारीरिक थकान के कारण स्वाभाविक प्रतीत होती है।",
+        "en": "Lifestyle Correlation: Tuesday's reaction latency increase coincides with village market day; walking fatigue is typical and non-pathological.",
+    },
+    "SUNDAY_PRAYER_BOOST": {
+        "as": "পৰামৰ্শ: দেওবাৰে প্ৰাৰ্থনা সভা বা নামঘৰলৈ যোৱাৰ পিছত স্মৃতি শক্তি আৰু আনন্দ লক্ষণীয়ভাৱে বৃদ্ধি পোৱা দেখা গৈছে।",
+        "mni": "ꯋꯥꯈꯜꯂꯣꯟ: ꯅꯣꯡꯃꯥꯏꯖꯤꯡꯗꯥ ꯂꯥꯏꯅꯤꯡ-ꯂꯤꯆꯠ ꯑꯃꯁꯨꯡ ꯏꯁꯩ ꯁꯛꯄꯅꯥ ꯋꯥꯈꯜ ꯌꯥꯝꯅꯥ ꯐꯍꯟꯈꯤ꯫",
+        "bn": "পরামর্শ: রবিবার প্রার্থনা সভায় অংশ নেওয়ার পর স্মৃতিশক্তি ও মেজাজে উল্লেখযোগ্য প্রফুল্লতা লক্ষ্য করা গেছে।",
+        "brx": "थासारि: रबिबाराव इसोर सोरजिनायनि उनाव गोसोखांथि आरो गोसोनि गोजोननाय बारा जादों।",
+        "kha": "Jingbatai: Ha ka sngi U Blei ka jingrwai ha iingmane ka la ai jingkyrmen bad pynshait ia ka jingmut.",
+        "lus": "Hriattur: Pathiannia inkhawm leh hla sak hian a hriatrengna leh rilru a pui nasa hle.",
+        "hi": "जीवनशैली संकेत: रविवार को सत्संग/प्रार्थना के उपरांत स्मरण शक्ति और मानसिक प्रसन्नता में सकारात्मक वृद्धि देखी गई।",
+        "en": "Lifestyle Correlation: Sunday's performance boost correlates with community prayer/singing; social spiritual grounding aided cognitive focus.",
+    },
+    "WINTER_DUSK_AGITATION": {
+        "as": "পৰামৰ্শ: সোনকালে বেলি বহাৰ বাবে আবেলি ৪:১৫ মানতেই কোঠাত পোহৰ জ্বলাই দিলে সন্ধিয়াৰ অস্বস্তি সহজে এৰাব পাৰি।",
+        "mni": "ꯋꯥꯈꯜꯂꯣꯟ: ꯅꯨꯃꯤꯠ ꯊꯨꯅꯥ ꯇꯥꯕꯅꯥ ꯃꯔꯝ ꯑꯣꯏꯔꯒꯥ ꯑꯌꯨꯛ-ꯅꯨꯃꯤꯗꯥꯡ ꯃꯉꯥꯜ ꯊꯨꯅꯥ ꯊꯥꯅꯕꯤꯌꯨ꯫",
+        "bn": "পরামর্শ: শীতের দ্রুত সূর্যাস্তের কারণে বিকেল ৪:১৫ নাগাদ ঘরে উজ্জ্বল আলো জ্বালিয়ে দিলে সন্ধ্যার অস্বস্তি কমে যাবে।",
+        "brx": "थासारि: सान थाब हाबनायनि थाखाय बेलासे ४:१५ आव नोआव जोंनाय होबानो गोजोन थागोन।",
+        "kha": "Jingbatai: Namar ba step kem janmiet ha tlang, pynbna ia ki sharak ha iing shuwa ka 4:15 PM.",
+        "lus": "Hriattur: Fur lai a nih vangin tlai lam 4:15 velah in chhung tih en thin tur a ni.",
+        "hi": "जीवनशैली संकेत: सर्दियों में जल्दी ढलते सूरज के कारण शाम ४:१५ बजे कमरे की रोशनी चालू रखने से बेचैनी रोकी जा सकती है।",
+        "en": "Lifestyle Correlation: Early twilight dusk triggers restlessness; illuminating rooms by 4:15 PM prevents twilight disorientation.",
+    },
+    "MISSED_DOSE_TREMOR": {
+        "as": "পৰামৰ্শ: বৃহস্পতিবাৰে পুৱা ঔষধ পাহৰি যোৱাৰ বাবে হাতৰ কঁপনি সামান্য বাঢ়িছিল; ঔষধৰ বাকচটো পৰীক্ষা কৰক।",
+        "mni": "ꯋꯥꯈꯜꯂꯣꯟ: ꯍꯤꯗꯥꯛ ꯆꯥꯕꯥ ꯊꯨꯅꯥ ꯀꯥꯎꯈꯤꯕꯅꯥ ꯃꯔꯝ ꯑꯣꯏꯔꯒꯥ ꯈꯨꯠ ꯈꯔꯥ ꯈꯠꯈꯤ꯫",
+        "bn": "পরামর্শ: বৃহস্পতিবার ওষুধ গ্রহণে বিলম্ব হওয়ায় হাতে মৃদু কম্পন বেড়েছিল; ওষুধের বাক্সটি পরীক্ষা করুন।",
+        "brx": "थासारि: मुलि लोंनो बावनायनि थाखाय आखाय गोबाव सोमावदोंमोन, मुलिखौ नायदो।",
+        "kha": "Jingbatai: Ka jingkynmaw dawai kaba la bakla ka la wanrah jingkhynniuh kti; peit ia ka synduk dawai.",
+        "lus": "Hriattur: Damdawi ei theihnghilh avangin kut khur a awm thut a, damdawi bawm enfiah rawh.",
+        "hi": "जीवनशैली संकेत: गुरुवार की खुराक छूटने के कारण हाथ का कंपन हल्का बढ़ा था; दवा बॉक्स की जांच करें।",
+        "en": "Lifestyle Correlation: Thursday's tremor elevation followed an unconfirmed morning dose; please verify the pill organizer.",
+    },
+    "NONE": {
+        "as": "পৰামৰ্শ: দৈনন্দিন অভ্যাস সুস্থিৰ আছিল, কোনো অস্বাভাৱিক ঘটনা লক্ষ্য কৰা হোৱা নাই।",
+        "mni": "ꯋꯥꯈꯜꯂꯣꯟ: ꯅꯨꯃꯤꯠ ꯈꯨꯗꯤꯡꯒꯤ ꯊꯕꯛ ꯆꯨꯝꯅꯥ ꯆꯠꯊꯔꯤ꯫",
+        "bn": "পরামর্শ: প্রাত্যহিক কার্যকলাপ স্বাভাবিক ছিল, কোনো অস্বাভাবিকতা লক্ষ্য করা যায়নি।",
+        "brx": "थासारि: सानफ्रोमनि थासारिया मोजाङैनो थांबाय।",
+        "kha": "Jingbatai: Ka rukom im sngi ka la iaid beit kumba juh long.",
+        "lus": "Hriattur: Ni tin nunphung a pangngai reng e.",
+        "hi": "जीवनशैली संकेत: दैनिक दिनचर्या सामान्य और संतुलित रही।",
+        "en": "Lifestyle Correlation: Daily habits proceeded consistently with no abnormal variance detected.",
+    },
+}
+
+NLG_ACTION_ITEMS = {
+    "low_adherence": {
+        "as": "পৰিয়ালৰ পৰামৰ্শ: ঔষধৰ বাবে নাতিনীয়েকৰ পৰিয়ালৰ কণ্ঠৰ ৰিমাইণ্ডাৰ ব্যৱহাৰ কৰক।",
+        "mni": "ꯏꯃꯨꯡꯒꯤ ꯊꯕꯛ: ꯍꯤꯗꯥꯛ ꯆꯥꯅꯕꯥ ꯏꯃꯨꯡꯒꯤ ꯈꯣꯟꯊꯣꯛꯀꯤ ꯔꯤꯃꯥꯏꯟꯗꯔ ꯁꯤꯖꯤꯟꯅꯕꯤꯌꯨ꯫",
+        "bn": "পরিবারের করণীয়: ওষুধের সময় প্রিয়জনের গলার ভয়েস অ্যালার্ম সক্রিয় করুন।",
+        "brx": "नख'रनि मावनांगौ: मुलिनि थाखाय नख'रनि गाबनि रिमाइन्डर बाहाय।",
+        "kha": "Jingbthah: Pyndonkam ia ka sur rwai kur ban kynmaw dawai.",
+        "lus": "Chhungkaw tih tur: Damdawi hriattirnaah chhungte aw hmang rawh.",
+        "hi": "परिवार का कदम: दवा समय पर लेने के लिए पारिवारिक आवाज वाला अलार्म सेट करें।",
+        "en": "Family Action Item: Activate kinship voice prompts to assist medication routine.",
+    },
+    "normal_adherence": {
+        "as": "পৰিয়ালৰ পৰামৰ্শ: আজি সন্ধিয়া তেওঁৰ সৈতে ১৫ মিনিট পুৰণি স্মৃতিৰ বিষয়ে কথা পাতক।",
+        "mni": "ꯏꯃꯨꯡꯒꯤ ꯊꯕꯛ: ꯅꯨꯃꯤꯗꯥꯡꯋꯥꯏꯔꯝꯗꯥ ꯃꯤꯅꯤꯠ ꯱꯵ ꯄꯨꯋꯥꯔꯤ ꯋꯥꯔꯤ ꯁꯥꯅꯕꯤꯌꯨ꯫",
+        "bn": "পরিবারের করণীয়: আজ রাতে ওনার সাথে পুরোনো সুখস্মৃতি নিয়ে গল্প করুন।",
+        "brx": "नख'रनि मावनांगौ: दिनै बेलासे बिथांजों १५ मिनिट गोजाम गोसोखांथि रायज्लाय।",
+        "kha": "Jingbthah: Iakren bad u/ka 15 minit shaphang ki por ba la leit noh.",
+        "lus": "Chhungkaw tih tur: Zanin chu hmanlai thawnthu minute 15 inhrilh ula.",
+        "hi": "परिवार का कदम: आज शाम उनके साथ बैठकर १५ मिनट पुरानी सुखद यादें साझा करें।",
+        "en": "Family Action Item: Spend 15 minutes this evening reminiscing over family photo stories.",
+    },
+}
+
+
+@app.post("/api/v1/caregiver/weekly-summary", response_model=CaregiverSummaryResponse, tags=["Caregiver & NLG"])
+async def generate_caregiver_weekly_summary(req: CaregiverSummaryRequest):
+    """Generates a clinically-bounded, deterministic natural language summary in 8 NER languages."""
+    lang = req.language if req.language in SUPPORTED_VOICE_LANGUAGES else "as"
+    kinship = req.kinship_title or "আইতা"
+    delta = req.mmse_delta_7d
+    mmse = f"{req.current_mmse_proxy:.1f}"
+    delta_str = f"+{delta:.1f}" if delta >= 0 else f"{delta:.1f}"
+    adh = int(req.adherence_rate_percent)
+    sundowning = req.sundowning_incidents_count
+    pattern = req.notable_day_pattern if req.notable_day_pattern in NLG_CORRELATION_HINTS else "NONE"
+
+    # Status classification
+    if delta >= 1.0:
+        status_category = "POSITIVE"
+    elif delta >= -0.5:
+        status_category = "STABLE"
+    elif delta >= -1.5:
+        status_category = "MILD_VARIATION"
+    else:
+        status_category = "NEEDS_REVIEW"
+
+    headline = NLG_HEADLINES[status_category].get(lang, NLG_HEADLINES[status_category]["en"]).format(kinship=kinship)
+    cog_template = NLG_COGNITIVE_TEMPLATES.get(lang, NLG_COGNITIVE_TEMPLATES["en"])
+    cognitive_paragraph = cog_template.format(kinship=kinship, mmse=mmse, deltaStr=delta_str)
+    adh_template = NLG_ADHERENCE_TEMPLATES.get(lang, NLG_ADHERENCE_TEMPLATES["en"])
+    adherence_paragraph = adh_template.format(adh=adh, sundowning=sundowning)
+    hint_dict = NLG_CORRELATION_HINTS[pattern]
+    correlation_hint = hint_dict.get(lang, hint_dict["en"])
+    action_key = "low_adherence" if adh < 80 else "normal_adherence"
+    action_dict = NLG_ACTION_ITEMS[action_key]
+    action_item = action_dict.get(lang, action_dict["en"])
+
+    full_summary_text = f"{headline}\n\n{cognitive_paragraph}\n\n{adherence_paragraph}\n\n{correlation_hint}\n\n📌 {action_item}"
+
+    from datetime import datetime, timezone
+
+    return CaregiverSummaryResponse(
+        language=lang,
+        status_category=status_category,
+        headline=headline,
+        cognitive_paragraph=cognitive_paragraph,
+        adherence_paragraph=adherence_paragraph,
+        correlation_hint_paragraph=correlation_hint,
+        action_item=action_item,
+        full_summary_text=full_summary_text,
+        generated_at=datetime.now(timezone.utc).isoformat(),
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 
