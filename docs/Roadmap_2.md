@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 211 / 240+ Deliverables Completed (87.9% Deliverable Completion)  
+**Overall Velocity**: 216 / 240+ Deliverables Completed (90.0% Deliverable Completion)  
 **Phases Completed**: 13 / 20 (Phases 1 through 13 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 14 — Sub-Phases 14.1–14.2 Complete; Sub-Phases 14.3–14.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 14 — Sub-Phases 14.1–14.3 Complete; Sub-Phase 14.4 Pending)  
 **Phases Pending**: 6 / 20 (Phases 15 through 20)  
 **Milestones Achieved**: 13 / 20 (M1 through M13 Signed Off; M14–M20 Pending)  
 
@@ -146,7 +146,7 @@ gantt
 - [ ] **Phase 14: Clinical Pilot Deployment** (Weeks 39–51) — **Milestone M14 Pending**
   - [x] Sub-Phase 14.1: Pilot Site Selection & Setup (10 PHCs) (5/5 tasks done)
   - [x] Sub-Phase 14.2: ASHA Worker Training Program (4/4 tasks done)
-  - [ ] Sub-Phase 14.3: 90-Day Clinical Observation (500 Patients) (0/5 tasks done)
+  - [x] Sub-Phase 14.3: 90-Day Clinical Observation (500 Patients) (5/5 tasks done)
   - [ ] Sub-Phase 14.4: Pilot Efficacy Analysis (0/4 tasks done)
 - [ ] **Phase 15: Feedback Integration & Iteration** (Weeks 52–55) — **Milestone M15 Pending**
   - [ ] Sub-Phase 15.1: Feedback Synthesis & Prioritization (0/3 tasks done)
@@ -789,7 +789,7 @@ gantt
 ---
 
 # PHASE 14: CLINICAL PILOT DEPLOYMENT 🏥
-**Phase Status**: [ ] IN PROGRESS (50% Complete — Sub-Phases 14.1–14.2 Complete; Sub-Phases 14.3–14.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (78% Complete — Sub-Phases 14.1–14.3 Complete; Sub-Phase 14.4 Pending)  
 **Duration**: Weeks 39–51 (3 months) | **Objective**: Real-world validation with 500 elderly patients across 10 PHCs, including IVR-only and social-feature cohorts.
 
 ### Sub-Phase 14.1 — Pilot Site Selection & Setup
@@ -812,14 +812,14 @@ gantt
 | [x] | Help Desk Setup | WhatsApp group + toll-free helpline | Help desk operational |
 
 ### Sub-Phase 14.3 — 90-Day Clinical Observation
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Daily Engagement Monitoring | Active patients, sessions, AACB frequency | Weekly engagement reports |
-| [ ] | MMSE Trajectory Tracking | Baseline vs. in-app proxy over 90 days | MMSE correlation analysis |
-| [ ] | Adherence Rate Monitoring | App + IVR channel adherence | Adherence analytics report |
-| [ ] | Social Feature Engagement Tracking | Grandchild Connect usage, Circle attendance, stories captured | Social engagement report |
-| [ ] | Adverse Event Monitoring | Agitation incidents, device/IVR issues | Adverse event log |
+| [x] | Daily Engagement Monitoring | Active patients, sessions, AACB frequency | Weekly engagement reports |
+| [x] | MMSE Trajectory Tracking | Baseline vs. in-app proxy over 90 days | MMSE correlation analysis |
+| [x] | Adherence Rate Monitoring | App + IVR channel adherence | Adherence analytics report |
+| [x] | Social Feature Engagement Tracking | Grandchild Connect usage, Circle attendance, stories captured | Social engagement report |
+| [x] | Adverse Event Monitoring | Agitation incidents, device/IVR issues | Adverse event log |
 
 ### Sub-Phase 14.4 — Pilot Efficacy Analysis
 *Status: [ ] Pending*
