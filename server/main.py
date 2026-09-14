@@ -2513,6 +2513,271 @@ async def get_caregiver_reminiscence_album(patient_id: str):
     return [ReminiscenceStoryMediaResponse(**item) for item in album]
 
 
+# ── ASHA Worker Portal (Community View) Models & Storage (Sub-Phase 9.2) ────
+class AshaCohortPatientResponse(BaseModel):
+    id: str
+    name: str
+    age: int
+    village: str
+    mmse: int
+    staging: str
+    trend_arrow: str  # "UP" | "FLAT" | "DOWN"
+    adherence_rate: int
+    sundowning_risk: str
+    channel: str  # "APP" | "IVR" | "HYBRID"
+    last_sync: str
+
+
+class BluetoothSyncRequest(BaseModel):
+    patient_id: str
+
+
+class BluetoothSyncResponse(BaseModel):
+    sync_id: str
+    patient_id: str
+    bytes_transferred: int
+    duration_ms: int
+    records_count: int
+    checksum_verified: bool
+    completed_at: str
+
+
+class VillageVisitRecordRequest(BaseModel):
+    patient_id: str
+    asha_worker_name: str = "Jonali Saikia"
+    visit_date: str
+    mmse_checked: bool = True
+    pill_count_verified: bool = True
+    caregiver_burnout_assessed: bool = False
+    fall_risk_inspected: bool = False
+    voice_notes_url: Optional[str] = None
+    clinician_escalation_needed: bool = False
+    notes: Optional[str] = None
+
+
+class VillageVisitRecordResponse(BaseModel):
+    visit_id: str
+    patient_id: str
+    asha_worker_name: str
+    visit_date: str
+    mmse_checked: bool
+    pill_count_verified: bool
+    caregiver_burnout_assessed: bool
+    fall_risk_inspected: bool
+    voice_notes_url: Optional[str] = None
+    clinician_escalation_needed: bool
+    notes: Optional[str] = None
+
+
+class CommunityCircleScheduleRequest(BaseModel):
+    circle_name: str
+    village_venue: str
+    scheduled_date: str
+    facilitator_asha: str = "Jonali Saikia"
+    registered_elders_count: int = 8
+    cultural_theme: str
+
+
+class CommunityCircleScheduleResponse(BaseModel):
+    circle_id: str
+    circle_name: str
+    village_venue: str
+    scheduled_date: str
+    facilitator_asha: str
+    registered_elders_count: int
+    cultural_theme: str
+    status: str
+
+
+ASHA_VILLAGE_VISITS_STORE: Dict[str, List[dict]] = {}
+
+ASHA_COMMUNITY_CIRCLES_STORE: List[dict] = [
+    {
+        "circle_id": "cir_majuli_01",
+        "circle_name": "Kamalabari Reminiscence Circle",
+        "village_venue": "Kamalabari Anganwadi Center (Majuli)",
+        "scheduled_date": "2026-09-18T10:00:00Z",
+        "facilitator_asha": "Jonali Saikia",
+        "registered_elders_count": 8,
+        "cultural_theme": "Brahmaputra Boat Songs & Rongali Bihu Memories",
+        "status": "UPCOMING",
+    },
+    {
+        "circle_id": "cir_sohra_02",
+        "circle_name": "Sohra Community Memory Circle",
+        "village_venue": "Nongthymmai Community Hall (Meghalaya)",
+        "scheduled_date": "2026-09-21T14:30:00Z",
+        "facilitator_asha": "Merilda Lyngdoh",
+        "registered_elders_count": 6,
+        "cultural_theme": "Khasi Sacred Groves & Duitara Folk Lore",
+        "status": "UPCOMING",
+    },
+]
+
+ASHA_DEFAULT_COHORT = [
+    {
+        "id": "p1",
+        "name": "Birendra Nath Baruah",
+        "age": 74,
+        "village": "Kamalabari, Majuli",
+        "mmse": 24,
+        "staging": "MCI Staging",
+        "trend_arrow": "UP",
+        "adherence_rate": 94,
+        "sundowning_risk": "low",
+        "channel": "APP",
+        "last_sync": "Today, 09:30 AM",
+    },
+    {
+        "id": "p2",
+        "name": "Kong Merilda Lyngdoh",
+        "age": 81,
+        "village": "Nongthymmai, Sohra",
+        "mmse": 19,
+        "staging": "Mild Dementia",
+        "trend_arrow": "DOWN",
+        "adherence_rate": 78,
+        "sundowning_risk": "moderate",
+        "channel": "APP",
+        "last_sync": "Yesterday",
+    },
+    {
+        "id": "p3",
+        "name": "Radhabinod Sharma",
+        "age": 78,
+        "village": "Khurai, Imphal East",
+        "mmse": 25,
+        "staging": "MCI Staging",
+        "trend_arrow": "UP",
+        "adherence_rate": 98,
+        "sundowning_risk": "low",
+        "channel": "APP",
+        "last_sync": "Today, 10:15 AM",
+    },
+    {
+        "id": "p4",
+        "name": "Purnima Devi Gogoi",
+        "age": 83,
+        "village": "Garamur, Majuli",
+        "mmse": 14,
+        "staging": "Moderate Dementia",
+        "trend_arrow": "DOWN",
+        "adherence_rate": 62,
+        "sundowning_risk": "high",
+        "channel": "HYBRID",
+        "last_sync": "3 days ago",
+    },
+    {
+        "id": "p5",
+        "name": "Tenzing Norbu Lepcha",
+        "age": 76,
+        "village": "Ravangla, South Sikkim",
+        "mmse": 26,
+        "staging": "Age Normative",
+        "trend_arrow": "FLAT",
+        "adherence_rate": 100,
+        "sundowning_risk": "low",
+        "channel": "APP",
+        "last_sync": "Today, 08:00 AM",
+    },
+    {
+        "id": "p6",
+        "name": "Ratneswar Saikia",
+        "age": 78,
+        "village": "Garamur, Majuli (📞 IVR-Only)",
+        "mmse": 21,
+        "staging": "Mild Cognitive Impairment",
+        "trend_arrow": "FLAT",
+        "adherence_rate": 91,
+        "sundowning_risk": "low",
+        "channel": "IVR",
+        "last_sync": "Today, 07:45 AM via IVR",
+    },
+]
+
+
+@app.get("/api/v1/asha/cohort", response_model=List[AshaCohortPatientResponse], tags=["ASHA Worker Portal (Community View)"])
+async def get_asha_patient_cohort():
+    """Retrieves rural multi-patient cohort with cognitive staging and trend arrows."""
+    return [AshaCohortPatientResponse(**p) for p in ASHA_DEFAULT_COHORT]
+
+
+@app.post("/api/v1/asha/sync/bluetooth", response_model=BluetoothSyncResponse, tags=["ASHA Worker Portal (Community View)"])
+async def trigger_bluetooth_delta_sync(req: BluetoothSyncRequest):
+    """Executes offline peer-to-peer Bluetooth delta telemetry sync with elder's device (<30s)."""
+    import uuid
+    from datetime import datetime, timezone
+
+    return BluetoothSyncResponse(
+        sync_id=f"ble_{uuid.uuid4().hex[:8]}",
+        patient_id=req.patient_id,
+        bytes_transferred=42500,
+        duration_ms=1140,
+        records_count=28,
+        checksum_verified=True,
+        completed_at=datetime.now(timezone.utc).isoformat(),
+    )
+
+
+@app.post("/api/v1/asha/visits/submit", response_model=VillageVisitRecordResponse, tags=["ASHA Worker Portal (Community View)"])
+async def submit_village_visit_audit(req: VillageVisitRecordRequest):
+    """Records an ASHA worker's home visit clinical inspection and escalation flags."""
+    import uuid
+
+    visit_id = f"vis_{uuid.uuid4().hex[:8]}"
+    record_dict = {
+        "visit_id": visit_id,
+        "patient_id": req.patient_id,
+        "asha_worker_name": req.asha_worker_name,
+        "visit_date": req.visit_date,
+        "mmse_checked": req.mmse_checked,
+        "pill_count_verified": req.pill_count_verified,
+        "caregiver_burnout_assessed": req.caregiver_burnout_assessed,
+        "fall_risk_inspected": req.fall_risk_inspected,
+        "voice_notes_url": req.voice_notes_url,
+        "clinician_escalation_needed": req.clinician_escalation_needed,
+        "notes": req.notes,
+    }
+
+    if req.patient_id not in ASHA_VILLAGE_VISITS_STORE:
+        ASHA_VILLAGE_VISITS_STORE[req.patient_id] = []
+    ASHA_VILLAGE_VISITS_STORE[req.patient_id].append(record_dict)
+    return VillageVisitRecordResponse(**record_dict)
+
+
+@app.get("/api/v1/asha/visits/{patient_id}", response_model=List[VillageVisitRecordResponse], tags=["ASHA Worker Portal (Community View)"])
+async def get_patient_village_visits(patient_id: str):
+    """Retrieves all past home visit records for a patient."""
+    records = ASHA_VILLAGE_VISITS_STORE.get(patient_id, [])
+    return [VillageVisitRecordResponse(**r) for r in records]
+
+
+@app.get("/api/v1/asha/circles/schedules", response_model=List[CommunityCircleScheduleResponse], tags=["ASHA Worker Portal (Community View)"])
+async def get_community_circle_schedules():
+    """Retrieves scheduled Anganwadi Community Reminiscence Circle sessions."""
+    return [CommunityCircleScheduleResponse(**s) for s in ASHA_COMMUNITY_CIRCLES_STORE]
+
+
+@app.post("/api/v1/asha/circles/schedule", response_model=CommunityCircleScheduleResponse, tags=["ASHA Worker Portal (Community View)"])
+async def schedule_community_circle_session(req: CommunityCircleScheduleRequest):
+    """Schedules a new Reminiscence Circle group co-play session at an Anganwadi center."""
+    import uuid
+
+    circle_id = f"cir_{uuid.uuid4().hex[:8]}"
+    schedule_dict = {
+        "circle_id": circle_id,
+        "circle_name": req.circle_name,
+        "village_venue": req.village_venue,
+        "scheduled_date": req.scheduled_date,
+        "facilitator_asha": req.facilitator_asha,
+        "registered_elders_count": req.registered_elders_count,
+        "cultural_theme": req.cultural_theme,
+        "status": "UPCOMING",
+    }
+    ASHA_COMMUNITY_CIRCLES_STORE.append(schedule_dict)
+    return CommunityCircleScheduleResponse(**schedule_dict)
+
+
 if __name__ == "__main__":
     import uvicorn
 

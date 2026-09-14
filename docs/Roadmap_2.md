@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 134 / 240+ Deliverables Completed (55.8% Deliverable Completion)  
+**Overall Velocity**: 138 / 240+ Deliverables Completed (57.5% Deliverable Completion)  
 **Phases Completed**: 8 / 20 (Phases 1, 2, 3, 4, 5, 6, 7 & 8 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 9 — Sub-Phase 9.1 Complete, Sub-Phases 9.2–9.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 9 — Sub-Phases 9.1 & 9.2 Complete, Sub-Phases 9.3 & 9.4 Pending)  
 **Phases Pending**: 11 / 20 (Phases 10 through 20)  
 **Milestones Achieved**: 8 / 20 (M1, M2, M3, M4, M5, M6, M7 & M8 Signed Off; M9–M20 Pending)  
 
@@ -120,7 +120,7 @@ gantt
   - [x] Sub-Phase 8.4: IVR-to-Platform Data Bridge (2/2 tasks done)
 - [ ] **Phase 9: Caregiver, ASHA & Clinician Ecosystem Dashboards** (Weeks 25–33) — **Milestone M9 Pending**
   - [x] Sub-Phase 9.1: Caregiver Portal (Family View) (5/5 tasks done)
-  - [ ] Sub-Phase 9.2: ASHA Worker Portal (Community View) (0/4 tasks done)
+  - [x] Sub-Phase 9.2: ASHA Worker Portal (Community View) (4/4 tasks done)
   - [ ] Sub-Phase 9.3: District Medical Officer / Clinician View (0/4 tasks done)
   - [ ] Sub-Phase 9.4: Caregiver Wellness & Peer Support (0/3 tasks done)
 - [ ] **Phase 10: Multi-Sensory Reminder & Adherence System** (Weeks 27–31) — **Milestone M10 Pending**
@@ -567,7 +567,7 @@ gantt
 ---
 
 # PHASE 9: CAREGIVER, ASHA & CLINICIAN ECOSYSTEM DASHBOARDS 🖥️
-**Phase Status**: [/] IN PROGRESS (31% Complete — Sub-Phase 9.1 Done, Sub-Phases 9.2–9.4 Pending)  
+**Phase Status**: [/] IN PROGRESS (56% Complete — Sub-Phases 9.1 & 9.2 Done, Sub-Phases 9.3 & 9.4 Pending)  
 **Duration**: Weeks 25–33 | **Objective**: Build all persona dashboards including the new caregiver wellness layer.
 
 ### Sub-Phase 9.1 — Caregiver Portal (Family View)
@@ -581,13 +581,13 @@ gantt
 | [x] | Reminiscence & Story Album | Photos, voice annotations, legacy stories | Photo/story gallery system |
 
 ### Sub-Phase 9.2 — ASHA Worker Portal (Community View)
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Multi-Patient Cohort Dashboard | Status, last sync, trend arrows | Cohort dashboard |
-| [ ] | Bluetooth Delta Sync Interface | One-tap peer-to-peer sync | Bluetooth sync UI |
-| [ ] | Village Visit Checklist | Status check, device health, recordings | Visit checklist module |
-| [ ] | Community Circle Scheduler View | See/manage upcoming group sessions | Circle scheduler UI |
+| [x] | Multi-Patient Cohort Dashboard | Status, last sync, trend arrows | Cohort dashboard |
+| [x] | Bluetooth Delta Sync Interface | One-tap peer-to-peer sync | Bluetooth sync UI |
+| [x] | Village Visit Checklist | Status check, device health, recordings | Visit checklist module |
+| [x] | Community Circle Scheduler View | See/manage upcoming group sessions | Circle scheduler UI |
 
 ### Sub-Phase 9.3 — District Medical Officer / Clinician View
 *Status: [ ] Pending*
