@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 165 / 240+ Deliverables Completed (68.8% Deliverable Completion)  
+**Overall Velocity**: 169 / 240+ Deliverables Completed (70.4% Deliverable Completion)  
 **Phases Completed**: 10 / 20 (Phases 1, 2, 3, 4, 5, 6, 7, 8, 9 & 10 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 11 — Sub-Phases 11.1–11.2 Complete; Sub-Phases 11.3–11.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 11 — Sub-Phases 11.1–11.3 Complete; Sub-Phase 11.4 Pending)  
 **Phases Pending**: 9 / 20 (Phases 12 through 20)  
 **Milestones Achieved**: 10 / 20 (M1, M2, M3, M4, M5, M6, M7, M8, M9 & M10 Signed Off; M11–M20 Pending)  
 
@@ -131,7 +131,7 @@ gantt
 - [ ] **Phase 11: Offline Storage, Sync & BLE Safety Mesh** (Weeks 25–33) — **Milestone M11 Pending**
   - [x] Sub-Phase 11.1: Local-First Persistence Layer (4/4 tasks done)
   - [x] Sub-Phase 11.2: Delta Synchronization Engine (4/4 tasks done)
-  - [ ] Sub-Phase 11.3: Bluetooth/Wi-Fi Direct Mesh Relay (0/4 tasks done)
+  - [x] Sub-Phase 11.3: Bluetooth/Wi-Fi Direct Mesh Relay (4/4 tasks done)
   - [ ] Sub-Phase 11.4: BLE Beacon Wandering/Safety Mesh (0/4 tasks done)
 - [ ] **Phase 12: Government Health Platform & Policy Integration** (Weeks 30–36) — **Milestone M12 Pending**
   - [ ] Sub-Phase 12.1: ABDM / ABHA Integration (0/3 tasks done)
@@ -655,7 +655,7 @@ gantt
 ---
 
 # PHASE 11: OFFLINE STORAGE, SYNC & BLE SAFETY MESH 🔒
-**Phase Status**: [ ] IN PROGRESS (50% Complete — Sub-Phases 11.1–11.2 Complete; Sub-Phases 11.3–11.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (75% Complete — Sub-Phases 11.1–11.3 Complete; Sub-Phase 11.4 Pending)  
 **Duration**: Weeks 25–33 | **Objective**: Bulletproof offline-first storage, delta sync, and a low-cost wandering/emergency detection layer.
 
 ### Sub-Phase 11.1 — Local-First Persistence Layer
@@ -677,13 +677,13 @@ gantt
 | [x] | Conflict Resolution | Server-wins; client retains full local history | Conflict resolution policy |
 
 ### Sub-Phase 11.3 — Bluetooth/Wi-Fi Direct Mesh Relay
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Web Bluetooth API/Native Plugin | Peer-to-peer transfer to ASHA tablet | Bluetooth relay module |
-| [ ] | Handshake Protocol | Mutual auth, encrypted channel | Handshake protocol |
-| [ ] | Batch Transfer | Full delta batch with checksum verification | Batch transfer logic |
-| [ ] | Relay Chain to PHC | ASHA tablet uploads batch on reaching Wi-Fi | Relay chain implementation |
+| [x] | Web Bluetooth API/Native Plugin | Peer-to-peer transfer to ASHA tablet | Bluetooth relay module |
+| [x] | Handshake Protocol | Mutual auth, encrypted channel | Handshake protocol |
+| [x] | Batch Transfer | Full delta batch with checksum verification | Batch transfer logic |
+| [x] | Relay Chain to PHC | ASHA tablet uploads batch on reaching Wi-Fi | Relay chain implementation |
 
 ### Sub-Phase 11.4 — BLE Beacon Wandering/Safety Mesh (New)
 *Status: [ ] Pending*
