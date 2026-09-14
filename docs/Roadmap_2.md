@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 176 / 240+ Deliverables Completed (73.3% Deliverable Completion)  
+**Overall Velocity**: 181 / 240+ Deliverables Completed (75.4% Deliverable Completion)  
 **Phases Completed**: 11 / 20 (Phases 1 through 11 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 12 — Sub-Phase 12.1 Complete; Sub-Phases 12.2–12.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 12 — Sub-Phases 12.1–12.2 Complete; Sub-Phases 12.3–12.4 Pending)  
 **Phases Pending**: 8 / 20 (Phases 13 through 20)  
 **Milestones Achieved**: 11 / 20 (M1, M2, M3, M4, M5, M6, M7, M8, M9, M10 & M11 Signed Off; M12–M20 Pending)  
 
@@ -135,7 +135,7 @@ gantt
   - [x] Sub-Phase 11.4: BLE Beacon Wandering/Safety Mesh (4/4 tasks done)
 - [ ] **Phase 12: Government Health Platform & Policy Integration** (Weeks 30–36) — **Milestone M12 Pending**
   - [x] Sub-Phase 12.1: ABDM / ABHA Integration (3/3 tasks done)
-  - [ ] Sub-Phase 12.2: Backend API Development (0/5 tasks done)
+  - [x] Sub-Phase 12.2: Backend API Development (5/5 tasks done)
   - [ ] Sub-Phase 12.3: e-Sanjeevani Teleconsultation Bridge (0/2 tasks done)
   - [ ] Sub-Phase 12.4: Welfare Scheme Alignment (NPHCE / RVY) (0/3 tasks done)
 - [ ] **Phase 13: Quality Assurance & Accessibility Audit** (Weeks 34–38) — **Milestone M13 Pending**
@@ -701,7 +701,7 @@ gantt
 ---
 
 # PHASE 12: GOVERNMENT HEALTH PLATFORM & POLICY INTEGRATION 🏛️
-**Phase Status**: [ ] IN PROGRESS (23% Complete — Sub-Phase 12.1 Complete; Sub-Phases 12.2–12.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (61% Complete — Sub-Phases 12.1–12.2 Complete; Sub-Phases 12.3–12.4 Pending)  
 **Duration**: Weeks 30–36 | **Objective**: Wire the platform into existing government digital-health and welfare schemes rather than building parallel systems.
 
 ### Sub-Phase 12.1 — ABDM / ABHA Integration
@@ -713,14 +713,14 @@ gantt
 | [x] | Consent Management | ABDM consent artifact flow | Consent management UI |
 
 ### Sub-Phase 12.2 — Backend API Development
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | FastAPI Application | `/sync/delta`, `/patient/{id}/trajectory`, `/reminders/voice-upload`, `/mesh/relay-harvest`, `/bhashini/tts-stream`, `/ivr/checkin` | FastAPI application |
-| [ ] | TimescaleDB Schema | Hypertables for telemetry/adherence/trajectory | Database schema + migrations |
-| [ ] | Redis Caching Layer | Cache trajectories/dashboard computations | Redis cache implementation |
-| [ ] | Celery Task Workers | MMSE proxy, anomaly detection, adherence trend jobs | Celery worker tasks |
-| [ ] | Rate Limiting & Auth | JWT + RBAC (Patient, Caregiver, ASHA, Clinician) | Auth + RBAC middleware |
+| [x] | FastAPI Application | `/sync/delta`, `/patient/{id}/trajectory`, `/reminders/voice-upload`, `/mesh/relay-harvest`, `/bhashini/tts-stream`, `/ivr/checkin` | FastAPI application |
+| [x] | TimescaleDB Schema | Hypertables for telemetry/adherence/trajectory | Database schema + migrations |
+| [x] | Redis Caching Layer | Cache trajectories/dashboard computations | Redis cache implementation |
+| [x] | Celery Task Workers | MMSE proxy, anomaly detection, adherence trend jobs | Celery worker tasks |
+| [x] | Rate Limiting & Auth | JWT + RBAC (Patient, Caregiver, ASHA, Clinician) | Auth + RBAC middleware |
 
 ### Sub-Phase 12.3 — e-Sanjeevani Teleconsultation Bridge (New)
 *Status: [ ] Pending*
