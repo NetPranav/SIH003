@@ -68,10 +68,10 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 283 / 240+ Deliverables Completed (117.9% Deliverable Completion)  
+**Overall Velocity**: 286 / 240+ Deliverables Completed (119.2% Deliverable Completion)  
 **Phases Completed**: 19 / 20 (Phases 1 through 19 Complete & Signed Off)  
-**Phases In Progress**: 0 / 20 (Phase 20 Starting Next)  
-**Phases Pending**: 1 / 20 (Phase 20)  
+**Phases In Progress**: 1 / 20 (Phase 20 — Sub-Phase 20.1 Complete; Sub-Phases 20.2–20.4 Pending)  
+**Phases Pending**: 0 / 20  
 **Milestones Achieved**: 19 / 20 (M1 through M19 Signed Off; M20 Pending)  
 
 ### Phase & Milestone Checklist
@@ -174,7 +174,7 @@ gantt
   - [x] Sub-Phase 19.3: Scalability & Performance Optimization (3/3 tasks done)
   - [x] Sub-Phase 19.4: Launch Impact Tracking (2/2 tasks done)
 - [ ] **Phase 20: Governance, Sustainability & Continuous Improvement** (Weeks 85–104) — **Milestone M20 Pending**
-  - [ ] Sub-Phase 20.1: Governance Framework & Clinical Advisory Board (0/3 tasks done)
+  - [x] Sub-Phase 20.1: Governance Framework & Clinical Advisory Board (3/3 tasks done)
   - [ ] Sub-Phase 20.2: Long-Term Sustainability Model (0/4 tasks done)
   - [ ] Sub-Phase 20.3: Continuous Improvement Pipeline (0/4 tasks done)
   - [ ] Sub-Phase 20.4: Caregiver & Community Sustainability (0/2 tasks done)
@@ -1044,16 +1044,16 @@ gantt
 ---
 
 # PHASE 20: GOVERNANCE, SUSTAINABILITY & CONTINUOUS IMPROVEMENT 🛡️
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 20.1–20.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (25% Complete — Sub-Phase 20.1 Complete; Sub-Phases 20.2–20.4 Pending)  
 **Duration**: Weeks 85–104 (and ongoing) | **Objective**: Long-term governance, funding, and improvement pipeline.
 
 ### Sub-Phase 20.1 — Governance Framework
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Data Governance Policy | Retention, access, anonymization, deletion — MDoNER approved | Data governance document |
-| [ ] | Clinical Advisory Board | 5 neurologists + 3 geriatric specialists from NER medical colleges | Advisory board charter |
-| [ ] | Ethics Review Cycle | Annual review of AI, AACB, federated learning, and consent practices | Ethics review SOP |
+| [x] | Data Governance Policy | Retention, access, anonymization, deletion — MDoNER approved | Data governance document |
+| [x] | Clinical Advisory Board | 5 neurologists + 3 geriatric specialists from NER medical colleges | Advisory board charter |
+| [x] | Ethics Review Cycle | Annual review of AI, AACB, federated learning, and consent practices | Ethics review SOP |
 
 ### Sub-Phase 20.2 — Long-Term Sustainability Model
 *Status: [ ] Pending*

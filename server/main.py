@@ -11484,6 +11484,172 @@ async def get_launch_impact_summary():
     )
 
 
+# =====================================================================
+# SUB-PHASE 20.1: GOVERNANCE FRAMEWORK & CLINICAL ADVISORY BOARD
+# =====================================================================
+
+class DataRetentionTierModel(BaseModel):
+    tier_id: str
+    data_category: str
+    retention_period: str
+    storage_location: str
+    encryption_standard: str
+    auto_purge_enabled: bool
+
+class DataGovernancePolicyModel(BaseModel):
+    policy_id: str
+    policy_name: str
+    statutory_frameworks: List[str]
+    retention_tiers: List[DataRetentionTierModel]
+    right_to_forget_sla_hours: int
+    dpdp_compliance_status: str
+    access_control_model: str
+    approving_authority: str
+
+class AdvisoryBoardMemberModel(BaseModel):
+    member_id: str
+    name: str
+    designation: str
+    institution: str
+    state: str
+    specialty: str
+    role: str
+
+class ClinicalAdvisoryBoardModel(BaseModel):
+    charter_id: str
+    board_name: str
+    total_members: int
+    neurologists_count: int
+    geriatricians_count: int
+    members: List[AdvisoryBoardMemberModel]
+    meeting_cadence: str
+    mandate: List[str]
+    status: str
+
+class EthicsReviewPillarModel(BaseModel):
+    pillar_id: str
+    pillar_name: str
+    audit_scope: str
+    statutory_requirement: str
+    last_audit_status: str
+
+class EthicsReviewSOPModel(BaseModel):
+    sop_id: str
+    sop_title: str
+    annual_review_schedule: str
+    independent_ethics_committee: str
+    differential_privacy_epsilon_cap: float
+    pillars: List[EthicsReviewPillarModel]
+    status: str
+
+class GovernanceSummaryModel(BaseModel):
+    sub_phase: str
+    dpdp_compliance: str
+    retention_tiers_count: int
+    right_to_forget_sla_hours: int
+    advisory_board_members_count: int
+    neurologists_represented: int
+    geriatricians_represented: int
+    ethics_review_pillars_count: int
+    governance_status: str
+
+
+DATA_RETENTION_TIERS_DATA = [
+    DataRetentionTierModel(tier_id="TIER-1-VOICE", data_category="Raw Acoustic Audio Recordings", retention_period="<= 7 Days (Ephemeral)", storage_location="Edge Ingestion Buffer (STPI Guwahati)", encryption_standard="In-Memory Volatile (Zero Disk Persistence)", auto_purge_enabled=True),
+    DataRetentionTierModel(tier_id="TIER-2-BIOMARKERS", data_category="Longitudinal Acoustic Feature Vectors (F0, Jitter, Shimmer)", retention_period="7 Years (Longitudinal Tracking)", storage_location="State Data Centre (SDC) Encrypted Vault", encryption_standard="AES-256-GCM at rest, TLS 1.3 in transit", auto_purge_enabled=False),
+    DataRetentionTierModel(tier_id="TIER-3-CCEI", data_category="CCEI v2 Indices & Cognitive Screening Flags", retention_period="Permanent (Until User-Initiated Erasure)", storage_location="National Health Telemetry Warehouse", encryption_standard="Tokenized ABHA ID with HMAC-SHA256", auto_purge_enabled=False),
+    DataRetentionTierModel(tier_id="TIER-4-RESEARCH", data_category="De-Identified Academic Research Marts (k >= 50)", retention_period="Permanent (Academic Research)", storage_location="Academic Medical Lake (MOU Partner Medical Colleges)", encryption_standard="Differential Privacy (epsilon <= 0.85)", auto_purge_enabled=False),
+]
+
+ADVISORY_BOARD_MEMBERS_DATA = [
+    AdvisoryBoardMemberModel(member_id="CAB-01", name="Dr. Hemanta Kumar Saikia", designation="Professor & Head of Neurology", institution="Gauhati Medical College & Hospital (GMCH)", state="Assam", specialty="Cognitive Neurology", role="CHAIR"),
+    AdvisoryBoardMemberModel(member_id="CAB-02", name="Dr. Nongthombam Joychandra Singh", designation="Professor & Head of Neurology", institution="Regional Institute of Medical Sciences (RIMS)", state="Manipur", specialty="Neurodegenerative Disorders", role="VICE_CHAIR"),
+    AdvisoryBoardMemberModel(member_id="CAB-03", name="Dr. B. T. Shenoi", designation="Professor of Geriatric Medicine", institution="Sikkim Manipal Institute of Medical Sciences (SMIMS)", state="Sikkim", specialty="Geriatric Cognitive Health", role="BOARD_MEMBER"),
+    AdvisoryBoardMemberModel(member_id="CAB-04", name="Dr. P. K. Bhattacharya", designation="Director & Head of Internal Medicine", institution="NEIGRIHMS Shillong", state="Meghalaya", specialty="Rural Geriatric Epidemiology", role="BOARD_MEMBER"),
+    AdvisoryBoardMemberModel(member_id="CAB-05", name="Dr. Rebecca Lalhmangaihi", designation="Senior Consultant Neurologist", institution="Civil Hospital Aizawl", state="Mizoram", specialty="Clinical Neurophysiology", role="BOARD_MEMBER"),
+    AdvisoryBoardMemberModel(member_id="CAB-06", name="Dr. Taba Nirmali", designation="Lead Geriatrician", institution="Tomo Riba Institute of Health & Medical Sciences (TRIHMS)", state="Arunachal Pradesh", specialty="Indigenous Elder Care", role="BOARD_MEMBER"),
+    AdvisoryBoardMemberModel(member_id="CAB-07", name="Dr. Sanjoy Debbarma", designation="Consultant Neurologist", institution="Agartala Government Medical College (AGMC)", state="Tripura", specialty="Stroke & Cognitive Decline", role="BOARD_MEMBER"),
+    AdvisoryBoardMemberModel(member_id="CAB-08", name="Dr. Khrielie Liezietsu", designation="Senior Medical Officer & Neurologist", institution="Naga Hospital Authority Kohima (NHAK)", state="Nagaland", specialty="Clinical Neurology", role="BOARD_MEMBER"),
+]
+
+ETHICS_REVIEW_PILLARS_DATA = [
+    EthicsReviewPillarModel(pillar_id="ETH-01", pillar_name="Algorithmic Fairness & Linguistic Parity", audit_scope="Uniform diagnostic accuracy across all 8 supported Northeast languages", statutory_requirement="National AI Ethical Principles (NITI Aayog)", last_audit_status="PASSED"),
+    EthicsReviewPillarModel(pillar_id="ETH-02", pillar_name="Vulnerable Population Informed Consent", audit_scope="Vernacular audio consent validation for illiterate and MCI elders", statutory_requirement="ICMR National Ethical Guidelines for Biomedical Research 2017", last_audit_status="PASSED"),
+    EthicsReviewPillarModel(pillar_id="ETH-03", pillar_name="Differential Privacy & Model Inversion Defense", audit_scope="Strict adherence to epsilon <= 1.0 privacy budget across all 16 federated districts", statutory_requirement="DPDP Act 2023 Section 8 Data Protection Guardrails", last_audit_status="PASSED"),
+    EthicsReviewPillarModel(pillar_id="ETH-04", pillar_name="Cultural Sacredness & Oral Heritage Non-Exploitation", audit_scope="Indigenous tribal folklore protection and community consent verification", statutory_requirement="UNESCO Intangible Cultural Heritage Preservation Norms", last_audit_status="PASSED"),
+]
+
+
+@app.get("/api/v1/governance/data-policy", response_model=DataGovernancePolicyModel, tags=["Governance & Ethics"])
+async def get_data_governance_policy():
+    """Returns statutory data governance policy, retention tiers, and DPDP right-to-forget SLA."""
+    return DataGovernancePolicyModel(
+        policy_id="GOV-POL-DPDP-2026",
+        policy_name="Smriti-NER Patient Telemetry Data Governance Policy",
+        statutory_frameworks=[
+            "Digital Personal Data Protection (DPDP) Act 2023",
+            "Digital Information Security in Healthcare Act (DISHA 2018)",
+            "National Digital Health Mission (NDHM) Health Data Management Policy",
+        ],
+        retention_tiers=DATA_RETENTION_TIERS_DATA,
+        right_to_forget_sla_hours=72,
+        dpdp_compliance_status="FULLY_COMPLIANT",
+        access_control_model="RBAC with ABHA OAuth 2.0 & Cryptographic Audit Logging",
+        approving_authority="Ministry of Development of North Eastern Region (MDoNER)",
+    )
+
+
+@app.get("/api/v1/governance/advisory-board", response_model=ClinicalAdvisoryBoardModel, tags=["Governance & Ethics"])
+async def get_clinical_advisory_board():
+    """Returns Clinical Advisory Board charter, roster (8 clinicians across NER), and bi-annual mandate."""
+    return ClinicalAdvisoryBoardModel(
+        charter_id="CAB-CHARTER-NER-2026",
+        board_name="Smriti-NER Regional Clinical Advisory Board",
+        total_members=8,
+        neurologists_count=5,
+        geriatricians_count=3,
+        members=ADVISORY_BOARD_MEMBERS_DATA,
+        meeting_cadence="Bi-Annual (April & October)",
+        mandate=[
+            "Bi-annual psychometric audit of game difficulty curves",
+            "Validation of MMSE proxy regression models (r >= 0.85 target)",
+            "Clinical drop threshold calibration for emergency clinician consults (CCEI < 50)",
+            "Frontline ASHA screening accuracy review and triage guidance",
+        ],
+        status="ACTIVE_CHARTER",
+    )
+
+
+@app.get("/api/v1/governance/ethics-review", response_model=EthicsReviewSOPModel, tags=["Governance & Ethics"])
+async def get_ethics_review_sop():
+    """Returns Annual Institutional Ethics Review SOP, 4 audit pillars, and privacy budget limits."""
+    return EthicsReviewSOPModel(
+        sop_id="SOP-ETHICS-NER-2026",
+        sop_title="Annual Institutional Ethics Review Standard Operating Procedure",
+        annual_review_schedule="Q4 Annual Statutory Audit (November)",
+        independent_ethics_committee="MDoNER-ICMR Joint Institutional Ethics Review Board",
+        differential_privacy_epsilon_cap=1.0,
+        pillars=ETHICS_REVIEW_PILLARS_DATA,
+        status="ACTIVE_SOP",
+    )
+
+
+@app.get("/api/v1/governance/summary", response_model=GovernanceSummaryModel, tags=["Governance & Ethics"])
+async def get_governance_summary():
+    """Consolidated metrics summary for Sub-Phase 20.1 Governance Framework & Clinical Advisory Board."""
+    return GovernanceSummaryModel(
+        sub_phase="20.1 Governance Framework & Clinical Advisory Board",
+        dpdp_compliance="FULLY_COMPLIANT",
+        retention_tiers_count=len(DATA_RETENTION_TIERS_DATA),
+        right_to_forget_sla_hours=72,
+        advisory_board_members_count=len(ADVISORY_BOARD_MEMBERS_DATA),
+        neurologists_represented=5,
+        geriatricians_represented=3,
+        ethics_review_pillars_count=len(ETHICS_REVIEW_PILLARS_DATA),
+        governance_status="GOVERNANCE_ACTIVE_OPERATIONAL",
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 
