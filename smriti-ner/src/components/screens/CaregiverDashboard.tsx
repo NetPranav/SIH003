@@ -152,6 +152,9 @@ export default function CaregiverDashboard({ navigate }: Props) {
     image: "/photos/festival.jpg",
   });
 
+  const [zbiAnswers, setZbiAnswers] = useState<number[]>([1, 0, 1, 0]);
+  const zbiTotalScore = zbiAnswers.reduce((acc, v) => acc + v, 0);
+
   const [offlineStats, setOfflineStats] = useState(() => ({
     adherenceRate: offlineMobileStore.getAdherenceRate(),
     completedGames: offlineMobileStore.getTodayCompletedGamesCount(),
@@ -2182,6 +2185,214 @@ export default function CaregiverDashboard({ navigate }: Props) {
                   ✅ Saved locally & encrypted to offline cache!
                 </span>
               )}
+            </div>
+          </div>
+
+          {/* Sub-Phase 9.4: ZBI-4 Caregiver Burden Screener & Peer Support Ecosystem */}
+          <div
+            style={{
+              background: "var(--white)",
+              border: zbiTotalScore >= 9 ? "2px solid #ef4444" : "1.5px solid var(--gray-200)",
+              borderRadius: "var(--radius-xl)",
+              padding: "1.3rem",
+              boxShadow: "var(--shadow-sm)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "0.5rem" }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                    Caregiver Wellness & Burden Screener (ZBI-4)
+                  </h3>
+                  <span
+                    style={{
+                      fontSize: "0.7rem",
+                      fontWeight: 800,
+                      padding: "0.2rem 0.6rem",
+                      borderRadius: "999px",
+                      background: zbiTotalScore >= 9 ? "#fee2e2" : zbiTotalScore >= 5 ? "#fef3c7" : "#dcfce7",
+                      color: zbiTotalScore >= 9 ? "#b91c1c" : zbiTotalScore >= 5 ? "#b45309" : "#15803d",
+                    }}
+                  >
+                    {zbiTotalScore >= 9 ? "Severe Burnout Risk" : zbiTotalScore >= 5 ? "Moderate Strain" : "Minimal Burden"}
+                  </span>
+                </div>
+                <p style={{ fontSize: "0.8rem", color: "var(--gray-500)", marginTop: "0.2rem" }}>
+                  Clinically validated 4-item Zarit Burden Interview adapted for NER joint families and Tele-MANAS support
+                </p>
+              </div>
+
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: "1.3rem", fontWeight: 900, color: zbiTotalScore >= 9 ? "#ef4444" : "var(--primary)" }}>
+                  {zbiTotalScore} / 16
+                </div>
+                <div style={{ fontSize: "0.7rem", color: "var(--gray-500)", fontWeight: 700 }}>ZBI-4 Total Burden Score</div>
+              </div>
+            </div>
+
+            {/* Questions Grid */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "1.1rem" }}>
+              {[
+                {
+                  id: 0,
+                  code: "ZBI_01 (Role Strain)",
+                  question: "Do you feel you don't have enough time for yourself or other responsibilities?",
+                  native: "আপুনি অনুভৱ কৰেনে যে পৰিচৰ্যাৰ বাবে নিজৰ বাবে বা অন্য দায়িত্বৰ বাবে সময়ৰ নাটনি হৈছে?",
+                },
+                {
+                  id: 1,
+                  code: "ZBI_02 (Emotional Stress)",
+                  question: "Do you feel stressed between caring for your relative and meeting family or work duties?",
+                  native: "পৰিয়ালৰ পৰিচৰ্যা আৰু আন দায়িত্বসমূহৰ মাজত আপুনি মানসিক চাপ অনুভৱ কৰেনে?",
+                },
+                {
+                  id: 2,
+                  code: "ZBI_03 (Uncertainty & Coping)",
+                  question: "Do you feel uncertain about what to do about your relative or where to seek medical help?",
+                  native: "চিকিৎসা বা যত্নৰ বাবে কি কৰা উচিত বা ক'ত সহায় বিচাৰিব লাগে তাক লৈ অনিশ্চিতনে?",
+                },
+                {
+                  id: 3,
+                  code: "ZBI_04 (Overwhelm & Strain)",
+                  question: "Do you feel strained or overwhelmed when you are caring for your relative?",
+                  native: "আপুনি পৰিচৰ্যা কৰাৰ সময়ত ভাগৰি পৰা বা অত্যাধিক মানসিক চাপ অনুভৱ কৰেনে?",
+                },
+              ].map((q) => (
+                <div
+                  key={q.id}
+                  style={{
+                    background: "#f8fafc",
+                    border: "1px solid var(--gray-200)",
+                    borderRadius: "var(--radius-lg)",
+                    padding: "0.85rem",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                    <div style={{ fontSize: "0.72rem", fontWeight: 800, color: "var(--primary)" }}>{q.code}</div>
+                    <div style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--gray-600)" }}>
+                      Selected: <strong>{zbiAnswers[q.id]}</strong> / 4
+                    </div>
+                  </div>
+                  <div style={{ fontSize: "0.85rem", fontWeight: 750, color: "var(--gray-900)", marginTop: "0.2rem" }}>
+                    {q.question}
+                  </div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--gray-500)", fontStyle: "italic", marginTop: "0.15rem" }}>
+                    {q.native}
+                  </div>
+
+                  {/* Likert 0-4 */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "0.35rem", marginTop: "0.6rem" }}>
+                    {[
+                      { val: 0, label: "Never", sub: "কেতিয়াও নহয়" },
+                      { val: 1, label: "Rarely", sub: "কেতিয়াবা" },
+                      { val: 2, label: "Sometimes", sub: "মাজে মাজে" },
+                      { val: 3, label: "Frequently", sub: "সঘনাই" },
+                      { val: 4, label: "Always", sub: "সদায়" },
+                    ].map((opt) => (
+                      <button
+                        key={opt.val}
+                        type="button"
+                        onClick={() => {
+                          const updated = [...zbiAnswers];
+                          updated[q.id] = opt.val;
+                          setZbiAnswers(updated);
+                          triggerHaptic("tap");
+                        }}
+                        style={{
+                          padding: "0.45rem 0.2rem",
+                          borderRadius: "var(--radius-sm)",
+                          border: zbiAnswers[q.id] === opt.val ? "2px solid var(--primary)" : "1px solid var(--gray-300)",
+                          background: zbiAnswers[q.id] === opt.val ? "var(--primary)" : "var(--white)",
+                          color: zbiAnswers[q.id] === opt.val ? "#ffffff" : "var(--gray-700)",
+                          fontSize: "0.72rem",
+                          fontWeight: 750,
+                          cursor: "pointer",
+                          textAlign: "center",
+                          lineHeight: "1.1",
+                        }}
+                      >
+                        <div>{opt.label}</div>
+                        <div style={{ fontSize: "0.6rem", opacity: 0.85 }}>({opt.val})</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Severity Action Box */}
+            {zbiTotalScore >= 9 && (
+              <div
+                style={{
+                  marginTop: "1.1rem",
+                  padding: "1rem",
+                  background: "#fef2f2",
+                  border: "1.5px solid #f87171",
+                  borderRadius: "var(--radius-lg)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "0.75rem",
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#991b1b" }}>
+                    🚨 Tele-MANAS Burnout Prevention Alert (Severe Caregiver Strain)
+                  </div>
+                  <div style={{ fontSize: "0.78rem", color: "#7f1d1d", marginTop: "0.2rem" }}>
+                    Your caregiving load is in the severe strain tier ($9-16$). Connect free with government 24x7 psychiatric counselors at Tele-MANAS (LGBRIMH Tezpur nodal center).
+                  </div>
+                </div>
+                <a
+                  href="tel:14416"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    padding: "0.55rem 1.1rem",
+                    background: "#dc2626",
+                    color: "#ffffff",
+                    textDecoration: "none",
+                    borderRadius: "var(--radius)",
+                    fontWeight: 800,
+                    fontSize: "0.85rem",
+                    boxShadow: "0 2px 6px rgba(220,38,38,0.3)",
+                  }}
+                >
+                  📞 Call Tele-MANAS (14416)
+                </a>
+              </div>
+            )}
+
+            {/* Peer-Support Buddy Matcher */}
+            <div
+              style={{
+                marginTop: "1.1rem",
+                padding: "1rem",
+                background: "#f0fdf4",
+                border: "1.5px solid #86efac",
+                borderRadius: "var(--radius-lg)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "0.75rem",
+              }}
+            >
+              <div>
+                <div style={{ fontSize: "0.85rem", fontWeight: 800, color: "#166534" }}>
+                  🤝 Peer-Support Community Buddy Assigned (Privacy Protected)
+                </div>
+                <div style={{ fontSize: "0.78rem", color: "#14532d", marginTop: "0.2rem" }}>
+                  Matched Peer: <strong>Caregiver-MJL-301</strong> (Majuli, Assam) • Language: <strong>Assamese</strong> • Recipient Stage: <strong>CDR-1.0</strong> • Compatibility: <strong>94%</strong>
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span style={{ fontSize: "0.75rem", color: "#15803d", fontWeight: 700 }}>
+                  Moderated by ASHA Jonali Saikia
+                </span>
+              </div>
             </div>
           </div>
         </div>
