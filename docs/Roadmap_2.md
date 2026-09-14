@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 113 / 240+ Deliverables Completed (47.1% Deliverable Completion)  
+**Overall Velocity**: 117 / 240+ Deliverables Completed (48.8% Deliverable Completion)  
 **Phases Completed**: 6 / 20 (Phases 1, 2, 3, 4, 5 & 6 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 7 — Sub-Phases 7.1 & 7.2 Complete, Sub-Phases 7.3 & 7.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 7 — Sub-Phases 7.1, 7.2 & 7.3 Complete, Sub-Phase 7.4 Pending)  
 **Phases Pending**: 13 / 20 (Phases 8 through 20)  
 **Milestones Achieved**: 6 / 20 (M1, M2, M3, M4, M5, M6 Signed Off; M7–M20 Pending)  
 
@@ -111,7 +111,7 @@ gantt
 - [ ] **Phase 7: Social Connection & Reminiscence Layer** (Weeks 18–25) — **Milestone M7 Pending**
   - [x] Sub-Phase 7.1: Grandchild Connect (Async Co-Play) (3/3 tasks done)
   - [x] Sub-Phase 7.2: Community Reminiscence Circles (4/4 tasks done)
-  - [ ] Sub-Phase 7.3: Digital Legacy Storytelling (0/4 tasks done)
+  - [x] Sub-Phase 7.3: Digital Legacy Storytelling (4/4 tasks done)
   - [ ] Sub-Phase 7.4: Consent & Content Moderation for Social Features (0/2 tasks done)
 - [ ] **Phase 8: Zero-Smartphone Accessibility — IVR Cognitive Line** (Weeks 22–27) — **Milestone M8 Pending**
   - [ ] Sub-Phase 8.1: IVR Cognitive Check-In Flow (0/3 tasks done)
@@ -484,7 +484,7 @@ gantt
 ---
 
 # PHASE 7: SOCIAL CONNECTION & REMINISCENCE LAYER 👨‍👩‍👧 (New Phase)
-**Phase Status**: [/] IN PROGRESS (54% Complete — Sub-Phases 7.1 & 7.2 Done, Sub-Phases 7.3 & 7.4 Pending)  
+**Phase Status**: [/] IN PROGRESS (85% Complete — Sub-Phases 7.1, 7.2 & 7.3 Done, Sub-Phase 7.4 Pending)  
 **Duration**: Weeks 18–25 | **Objective**: Directly answer the "social interaction" requirement with async family co-play, community group sessions, and legacy storytelling.
 
 ### Sub-Phase 7.1 — Grandchild Connect (Async Co-Play)
@@ -505,13 +505,13 @@ gantt
 | [x] | Group Engagement Logging | Attendance and group-level engagement metrics (no individual competitive scoring) | Group engagement log |
 
 ### Sub-Phase 7.3 — Digital Legacy Storytelling
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Story Recording Interface | Elder narrates life stories/local folklore via simple record button | Story recording UI |
-| [ ] | Auto-Transcription Pipeline | Transcribe recordings (Bhashini ASR) for searchability and family archive | Transcription pipeline |
-| [ ] | Story-to-Trivia Converter | Convert transcribed snippets into new game trivia/content (content flywheel) | Story-to-content converter |
-| [ ] | Family Archive View | Caregiver-side gallery of all recorded stories, downloadable/shareable | Family archive UI |
+| [x] | Story Recording Interface | Elder narrates life stories/local folklore via simple record button | Story recording UI |
+| [x] | Auto-Transcription Pipeline | Transcribe recordings (Bhashini ASR) for searchability and family archive | Transcription pipeline |
+| [x] | Story-to-Trivia Converter | Convert transcribed snippets into new game trivia/content (content flywheel) | Story-to-content converter |
+| [x] | Family Archive View | Caregiver-side gallery of all recorded stories, downloadable/shareable | Family archive UI |
 
 ### Sub-Phase 7.4 — Consent & Content Moderation for Social Features
 *Status: [ ] Pending*

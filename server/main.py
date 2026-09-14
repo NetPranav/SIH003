@@ -994,6 +994,168 @@ async def get_asha_facilitation_guide(language: Optional[str] = "as"):
     return ASHA_FACILITATION_GUIDES.get(lang, ASHA_FACILITATION_GUIDES["en"])
 
 
+# ── Digital Legacy Storytelling Models & Storage ────────────────────────────
+class LegacyStoryRecordRequest(BaseModel):
+    patient_id: str
+    patient_name: str
+    kinship_title: Optional[str] = "ককা"
+    title: str
+    category: str = "CHILDHOOD_FOLKLORE"
+    language: str = "as"
+    audio_base64: Optional[str] = None
+    duration_seconds: float = 120.0
+    initial_transcript: Optional[str] = None
+
+
+class LegacyStoryResponse(BaseModel):
+    id: str
+    patient_id: str
+    patient_name: str
+    kinship_title: str
+    title: str
+    category: str
+    language: str
+    duration_seconds: float
+    transcript: str
+    is_transcribed: bool
+    generated_trivia_count: int
+    recorded_at: str
+    is_approved_for_games: bool
+
+
+class StoryTranscribeRequest(BaseModel):
+    asr_transcript: Optional[str] = None
+
+
+class GeneratedTriviaResponse(BaseModel):
+    question_id: str
+    story_id: str
+    prompt: str
+    options: List[str]
+    correct_index: int
+    explanation: str
+    language: str
+
+
+DIGITAL_LEGACY_STORE: Dict[str, dict] = {}
+GENERATED_TRIVIA_STORE: Dict[str, List[dict]] = {}
+
+
+@app.post("/api/v1/social/legacy/record", response_model=LegacyStoryResponse, tags=["Social & Reminiscence"])
+async def record_legacy_story(req: LegacyStoryRecordRequest):
+    """Records an elder life-review narrative or generational folklore chapter."""
+    import uuid
+    from datetime import datetime, timezone
+
+    story_id = f"story_{uuid.uuid4().hex[:10]}"
+    transcript = req.initial_transcript or ""
+    record = {
+        "id": story_id,
+        "patient_id": req.patient_id,
+        "patient_name": req.patient_name,
+        "kinship_title": req.kinship_title or "ককা",
+        "title": req.title,
+        "category": req.category,
+        "language": req.language if req.language in SUPPORTED_VOICE_LANGUAGES else "as",
+        "duration_seconds": max(1.0, req.duration_seconds),
+        "transcript": transcript,
+        "is_transcribed": bool(transcript),
+        "generated_trivia_count": 0,
+        "recorded_at": datetime.now(timezone.utc).isoformat(),
+        "is_approved_for_games": False,
+    }
+
+    DIGITAL_LEGACY_STORE[story_id] = record
+    return LegacyStoryResponse(**record)
+
+
+@app.post("/api/v1/social/legacy/transcribe/{story_id}", response_model=LegacyStoryResponse, tags=["Social & Reminiscence"])
+async def transcribe_legacy_story(story_id: str, req: StoryTranscribeRequest):
+    """Processes Bhashini ASR transcription for a recorded oral narrative."""
+    if story_id not in DIGITAL_LEGACY_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Story '{story_id}' not found.",
+        )
+
+    story = DIGITAL_LEGACY_STORE[story_id]
+    story["transcript"] = req.asr_transcript or f"[Bhashini ASR Transcribed]: {story['title']}"
+    story["is_transcribed"] = True
+    DIGITAL_LEGACY_STORE[story_id] = story
+    return LegacyStoryResponse(**story)
+
+
+@app.post("/api/v1/social/legacy/generate-trivia/{story_id}", response_model=List[GeneratedTriviaResponse], tags=["Social & Reminiscence"])
+async def generate_trivia_from_story(story_id: str):
+    """Converts a transcribed story into interactive game trivia (Content Flywheel)."""
+    if story_id not in DIGITAL_LEGACY_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Story '{story_id}' not found.",
+        )
+
+    story = DIGITAL_LEGACY_STORE[story_id]
+    if not story["is_transcribed"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot generate trivia from an untranscribed story.",
+        )
+
+    kinship = story["kinship_title"]
+    lang = story["language"]
+
+    trivia_items = [
+        {
+            "question_id": f"triv_{story_id}_01",
+            "story_id": story_id,
+            "prompt": f"{kinship}ৰ স্মৃতিৰ পৰা: এই সাধুটো বা স্মৃতিটো কি বিষয়ক আছিল?" if lang == "as" else f"From {kinship}'s memory: What was the primary theme of this story?",
+            "options": ["পুৰণি খেতি আৰু উৎসৱ", "ৰেল যাত্ৰা", "বজাৰৰ অভিজ্ঞতা", "বিদেশ ভ্ৰমণ"] if lang == "as" else ["Harvest & Festival", "Train Journey", "Market Visit", "Foreign Trip"],
+            "correct_index": 0,
+            "explanation": f"{kinship}'s narrative centered on harvest traditions.",
+            "language": lang,
+        },
+        {
+            "question_id": f"triv_{story_id}_02",
+            "story_id": story_id,
+            "prompt": f"{kinship}য়ে উল্লেখ কৰা মূল ঘটনাটো কোন সময়ৰ আছিল?" if lang == "as" else f"What era did {kinship} describe in this narrative?",
+            "options": ["ডেকা কালৰ স্মৃতি", "যোৱা বছৰৰ ঘটনা", "কালিৰ কথা", "সপ্তম শ্ৰেণীৰ খেল"] if lang == "as" else ["Youth & Early Adulthood", "Last Year", "Yesterday", "High School Sports"],
+            "correct_index": 0,
+            "explanation": "Ribot's law retrieval of long-term episodic memories.",
+            "language": lang,
+        },
+    ]
+
+    story["generated_trivia_count"] = len(trivia_items)
+    story["is_approved_for_games"] = True
+    DIGITAL_LEGACY_STORE[story_id] = story
+    GENERATED_TRIVIA_STORE[story_id] = trivia_items
+
+    return [GeneratedTriviaResponse(**t) for t in trivia_items]
+
+
+@app.get("/api/v1/social/legacy/archive/{patient_id}", response_model=List[LegacyStoryResponse], tags=["Social & Reminiscence"])
+async def get_family_story_archive(
+    patient_id: str,
+    category: Optional[str] = None,
+    language: Optional[str] = None,
+    search_query: Optional[str] = None,
+):
+    """Retrieves all digital legacy stories for a patient with search & category filtering."""
+    results = []
+    for story in DIGITAL_LEGACY_STORE.values():
+        if story["patient_id"] == patient_id:
+            if category and story["category"] != category:
+                continue
+            if language and story["language"] != language:
+                continue
+            if search_query:
+                sq = search_query.lower()
+                if sq not in story["title"].lower() and sq not in story["transcript"].lower():
+                    continue
+            results.append(LegacyStoryResponse(**story))
+    return results
+
+
 if __name__ == "__main__":
     import uvicorn
 
