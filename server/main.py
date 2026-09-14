@@ -10911,6 +10911,269 @@ async def get_public_release_summary():
     )
 
 
+# =====================================================================
+# SUB-PHASE 19.2: COMMUNITY AWARENESS CAMPAIGN
+# =====================================================================
+
+class CampaignScheduleItemModel(BaseModel):
+    district_id: str
+    district_name: str
+    state: str
+    wave: str
+    start_week: int
+    end_week: int
+    target_panchayats: int
+    target_elders: int
+    asha_pairs_deployed: int
+    lead_venue: str
+
+class RadioSpotScriptModel(BaseModel):
+    language_code: str
+    language_name: str
+    spot_title: str
+    duration_seconds: int
+    stations: List[str]
+    broadcast_windows: List[str]
+    script_text_vernacular: str
+    script_text_english: str
+    call_to_action: str
+
+class PartnershipMOUModel(BaseModel):
+    mou_id: str
+    partner_name: str
+    organization_type: str
+    states_covered: List[str]
+    network_scope: str
+    core_deliverables: List[str]
+    signatory_authority: str
+    term_duration_years: int
+    status: str
+
+class AwarenessCampaignSummaryModel(BaseModel):
+    sub_phase: str
+    target_districts_count: int
+    total_target_panchayats: int
+    total_target_elders: int
+    total_asha_pairs_deployed: int
+    radio_languages_count: int
+    active_mous_count: int
+    campaign_status: str
+
+
+CAMPAIGN_SCHEDULE_DATA = [
+    CampaignScheduleItemModel(district_id="dist_kamrup", district_name="Kamrup Metropolitan", state="Assam", wave="Wave 1: Plains & Urban Hubs", start_week=84, end_week=85, target_panchayats=28, target_elders=2200, asha_pairs_deployed=56, lead_venue="Beltola Community Bhavan"),
+    CampaignScheduleItemModel(district_id="dist_majuli", district_name="Majuli River Island", state="Assam", wave="Wave 1: Plains & Urban Hubs", start_week=84, end_week=85, target_panchayats=20, target_elders=1400, asha_pairs_deployed=40, lead_venue="Garamur Satra Namghar"),
+    CampaignScheduleItemModel(district_id="dist_cachar", district_name="Cachar (Barak Valley)", state="Assam", wave="Wave 1: Plains & Urban Hubs", start_week=84, end_week=85, target_panchayats=24, target_elders=1800, asha_pairs_deployed=48, lead_venue="Silchar Town Hall"),
+    CampaignScheduleItemModel(district_id="dist_west_tripura", district_name="West Tripura", state="Tripura", wave="Wave 1: Plains & Urban Hubs", start_week=84, end_week=85, target_panchayats=25, target_elders=1900, asha_pairs_deployed=50, lead_venue="Agartala Town Hall"),
+    CampaignScheduleItemModel(district_id="dist_papum_pare", district_name="Papum Pare", state="Arunachal Pradesh", wave="Wave 1: Plains & Urban Hubs", start_week=84, end_week=85, target_panchayats=18, target_elders=1100, asha_pairs_deployed=36, lead_venue="Naharlagun Community Centre"),
+    CampaignScheduleItemModel(district_id="dist_imphal_west", district_name="Imphal West", state="Manipur", wave="Wave 1: Plains & Urban Hubs", start_week=84, end_week=85, target_panchayats=26, target_elders=2000, asha_pairs_deployed=52, lead_venue="Kangla Western Gate Complex"),
+    CampaignScheduleItemModel(district_id="dist_east_khasi", district_name="East Khasi Hills", state="Meghalaya", wave="Wave 2: Hills & Tribal Valleys", start_week=86, end_week=87, target_panchayats=24, target_elders=1700, asha_pairs_deployed=48, lead_venue="Dorbar Shnong Mawlai Courtyard"),
+    CampaignScheduleItemModel(district_id="dist_west_garo", district_name="West Garo Hills", state="Meghalaya", wave="Wave 2: Hills & Tribal Valleys", start_week=86, end_week=87, target_panchayats=22, target_elders=1500, asha_pairs_deployed=44, lead_venue="Tura Cultural Centre"),
+    CampaignScheduleItemModel(district_id="dist_aizawl", district_name="Aizawl District", state="Mizoram", wave="Wave 2: Hills & Tribal Valleys", start_week=86, end_week=87, target_panchayats=25, target_elders=1850, asha_pairs_deployed=50, lead_venue="Vanapa Hall Complex"),
+    CampaignScheduleItemModel(district_id="dist_lunglei", district_name="Lunglei District", state="Mizoram", wave="Wave 2: Hills & Tribal Valleys", start_week=86, end_week=87, target_panchayats=18, target_elders=1200, asha_pairs_deployed=36, lead_venue="Lunglei Convention Hall"),
+    CampaignScheduleItemModel(district_id="dist_kohima", district_name="Kohima District", state="Nagaland", wave="Wave 2: Hills & Tribal Valleys", start_week=86, end_week=87, target_panchayats=22, target_elders=1600, asha_pairs_deployed=44, lead_venue="State Academy Hall Kohima"),
+    CampaignScheduleItemModel(district_id="dist_mokokchung", district_name="Mokokchung District", state="Nagaland", wave="Wave 2: Hills & Tribal Valleys", start_week=86, end_week=87, target_panchayats=20, target_elders=1350, asha_pairs_deployed=40, lead_venue="Mokokchung Town Hall"),
+    CampaignScheduleItemModel(district_id="dist_tawang", district_name="Tawang Alpine District", state="Arunachal Pradesh", wave="Wave 3: Alpine Border & High Altitude", start_week=88, end_week=90, target_panchayats=14, target_elders=900, asha_pairs_deployed=28, lead_venue="Tawang Kalawangpo Hall"),
+    CampaignScheduleItemModel(district_id="dist_churachandpur", district_name="Churachandpur", state="Manipur", wave="Wave 3: Alpine Border & High Altitude", start_week=88, end_week=90, target_panchayats=20, target_elders=1400, asha_pairs_deployed=40, lead_venue="Hiangtam Lamka Community Hall"),
+    CampaignScheduleItemModel(district_id="dist_south_sikkim", district_name="Namchi (South Sikkim)", state="Sikkim", wave="Wave 3: Alpine Border & High Altitude", start_week=88, end_week=90, target_panchayats=18, target_elders=1200, asha_pairs_deployed=36, lead_venue="Namchi Central Park Pavilion"),
+    CampaignScheduleItemModel(district_id="dist_north_sikkim", district_name="Mangan (North Sikkim)", state="Sikkim", wave="Wave 3: Alpine Border & High Altitude", start_week=88, end_week=90, target_panchayats=12, target_elders=800, asha_pairs_deployed=24, lead_venue="Mangan District Hall"),
+]
+
+RADIO_SCRIPTS_DATA = [
+    RadioSpotScriptModel(
+        language_code="as",
+        language_name="Assamese",
+        spot_title="স্মৃতিৰ সুবাস — আই-বোপাইৰ মগজুৰ যত্ন",
+        duration_seconds=45,
+        stations=["AIR Guwahati (1035 kHz)", "AIR Dibrugarh (567 kHz)", "Radio Luit FM (90.8 MHz)"],
+        broadcast_windows=["07:15 - 07:30 IST (Morning Tea Band)", "18:45 - 19:00 IST (Krishi O Gramya)"],
+        script_text_vernacular="আই-বোপাইৰ মৰমৰ স্মৃতি... বিহু গীত আৰু সাধুকথাৰে মগজুৰ সতেজতা ঘূৰাই আনক। ডিমেনচিয়া বা পাহৰি যোৱা ৰোগক অৱহেলা নকৰিব। বিনামূলীয়া সহায়ৰ বাবে ১৮০০-৮৯০-স্মৃতি নম্বৰত কল কৰক।",
+        script_text_english="Preserve cherished memories of elders through Bihu songs and folk tales. Do not neglect dementia. Call toll-free 1800-890-SMRITI.",
+        call_to_action="১৮০০-৮৯০-৭৬৭৪৮৪ নম্বৰত কল কৰক"
+    ),
+    RadioSpotScriptModel(
+        language_code="bn",
+        language_name="Bengali",
+        spot_title="স্মৃতি জাগানো — প্রবীণদের আনন্দ ও যত্ন",
+        duration_seconds=45,
+        stations=["AIR Silchar (828 kHz)", "AIR Agartala (1269 kHz)", "Chillar FM (91.2 MHz)"],
+        broadcast_windows=["07:00 - 07:15 IST (Pratah Band)", "19:15 - 19:30 IST (Gramin Asar)"],
+        script_text_vernacular="পুরনো দিনের গান, ফেলে আসা সোনালী স্মৃতি... বয়সের ভারে মন ভুলতে দেবেন না। লোকগীতি ও ধাঁধার খেলায় সতেজ রাখুন প্রবীণদের ব্রেন। যোগাযোগ করুন বিনামূল্যে ১৮০০-৮৯০-স্মৃতি নম্বরে।",
+        script_text_english="Keep elders’ minds sharp with traditional folk songs and riddles. Do not let old age fade away precious memories. Call toll-free 1800-890-SMRITI.",
+        call_to_action="কল করুন ১৮০০-৮৯০-৭৬৭৪৮৪ নম্বরে"
+    ),
+    RadioSpotScriptModel(
+        language_code="brx",
+        language_name="Bodo",
+        spot_title="मेलेमनि बिथोन — आइजो-आफाफोरनि रैखाथि",
+        duration_seconds=40,
+        stations=["AIR Kokrajhar (102.6 MHz)", "AIR Guwahati (1035 kHz)"],
+        broadcast_windows=["07:30 - 07:45 IST", "19:00 - 19:15 IST"],
+        script_text_vernacular="बर' हारिमु, मेथाइ आरो बाथ्राफोरनि गेजेरजों मेलेमखौ गोख्रों खालाम। आइजो-आफाफोरखौ गोसोमैल' जानायनिफ्राय रैखाथि हो। कल खालाम अननानै १८००-८९०-स्म्रितिनाव।",
+        script_text_english="Strengthen cognitive faculties using Bodo folklore, songs, and traditional wisdom. Call toll-free 1800-890-SMRITI.",
+        call_to_action="कल खालाम १८००-८९०-७६७४८४"
+    ),
+    RadioSpotScriptModel(
+        language_code="mni",
+        language_name="Meitei",
+        spot_title="পুৱারি নীংশিংবা — অহলশিংগী পুকচেল",
+        duration_seconds=45,
+        stations=["AIR Imphal (756 kHz)", "Sangai FM (91.2 MHz)"],
+        broadcast_windows=["06:45 - 07:00 IST (Nongalloi)", "18:30 - 18:45 IST (Khunung Esei)"],
+        script_text_vernacular="মৈতৈলোনগী লাইরিক অমসুং পুৱারিগী ৱারীশিংগা লোয়ননা অহলশিংগী ৱাখলবু ফগৎহনসি। পুকচেল সতেজ তৌনবা ১৮০০-৮৯০-স্মৃতীদা কোল তৌবীয়ু।",
+        script_text_english="Revitalize elder cognitive vitality through Manipuri oral history and ballads. Call toll-free 1800-890-SMRITI.",
+        call_to_action="কোল তৌবীয়ু ১৮০০-৮৯০-৭৬৭৪৮৪"
+    ),
+    RadioSpotScriptModel(
+        language_code="lus",
+        language_name="Mizo",
+        spot_title="Hriatna Tichaktu — Kan Pitar Putarte Tan",
+        duration_seconds=40,
+        stations=["AIR Aizawl (846 kHz)", "LPS FM Aizawl (101.1 MHz)"],
+        broadcast_windows=["07:00 - 07:15 IST (Zing Daifim)", "19:30 - 19:45 IST (Zan Khawhar Hnem)"],
+        script_text_vernacular="Kan pitar leh putarte hriatna vawng him rawh u. Hla hlui leh thawnthu ngaihthlak nan leh hriatna tichak turin 1800-890-SMRITI ah hian awlsamtein a biak theih e.",
+        script_text_english="Protect the memory of our elders through old songs and folklore. Easily reach out at toll-free 1800-890-SMRITI.",
+        call_to_action="Biak rawh le 1800-890-767484"
+    ),
+    RadioSpotScriptModel(
+        language_code="kha",
+        language_name="Khasi",
+        spot_title="Ka Jingkoit Jingkhiah ki Tymmen — Kynmaw ia ki Parom",
+        duration_seconds=45,
+        stations=["AIR Shillong (864 kHz)", "Red FM Shillong (93.5 MHz)"],
+        broadcast_windows=["07:15 - 07:30 IST", "18:15 - 18:30 IST"],
+        script_text_vernacular="Pynneh pynsah ia ki parom bad ki sur tynrai jong ki tymmen ki san ha Ri-lum Meghalaya. Iada ia ka jingklet noh da kaba phone sha 1800-890-SMRITI.",
+        script_text_english="Sustain traditional stories and songs of our elders across Meghalaya hills. Prevent memory decline by calling toll-free 1800-890-SMRITI.",
+        call_to_action="Phone ha 1800-890-767484"
+    ),
+    RadioSpotScriptModel(
+        language_code="grt",
+        language_name="Garo",
+        spot_title="Ma•gitcham Pagitchamrangni Gisik Tang•ani",
+        duration_seconds=40,
+        stations=["AIR Tura (102.2 MHz)", "AIR Shillong (864 kHz)"],
+        broadcast_windows=["07:30 - 07:45 IST", "19:00 - 19:15 IST"],
+        script_text_vernacular="A•chik ma•gitcham pagitchamrangni gisik an•sengatani gimin golpo aro ring•aniko man•na gita 1800-890-SMRITI-o phone ka•bo. Cha•gualani aro gualgnirangko champengbo.",
+        script_text_english="Call 1800-890-SMRITI for elder brain rejuvenation through Garo storytelling and folk songs. Prevent cognitive decline.",
+        call_to_action="Phone ka•bo 1800-890-767484"
+    ),
+    RadioSpotScriptModel(
+        language_code="en",
+        language_name="English & Nagamese",
+        spot_title="Cherishing Elder Memories Across Northeast India",
+        duration_seconds=45,
+        stations=["AIR Kohima (1188 kHz)", "AIR Itanagar (675 kHz)", "AIR Gangtok (1566 kHz)"],
+        broadcast_windows=["08:00 - 08:15 IST", "19:45 - 20:00 IST"],
+        script_text_vernacular="Elderly minds deserve care, respect, and joyful memories. Connect your grandparents to daily folklore and memory stimulation. Dial toll-free 1800-890-SMRITI.",
+        script_text_english="Elderly minds deserve care, respect, and joyful memories. Connect your grandparents to daily folklore and memory stimulation. Dial toll-free 1800-890-SMRITI.",
+        call_to_action="Call Toll-Free 1800-890-767484"
+    ),
+]
+
+PARTNERSHIP_MOUS_DATA = [
+    PartnershipMOUModel(
+        mou_id="MOU-SMRITI-HELPA-2026",
+        partner_name="HelpAge India (Northeast Regional Directorate)",
+        organization_type="NGO",
+        states_covered=["Assam", "Meghalaya", "Manipur", "Tripura"],
+        network_scope="150+ Elder Self-Help Groups (ESHGs), 8 Mobile Healthcare Units (MHUs), 12 Senior Daycare Centres",
+        core_deliverables=[
+            "Screening integration into HelpAge mobile health vans",
+            "Cognitive circle activities in HelpAge senior daycare centres",
+            "Elder peer-advocacy and digital literacy volunteer support"
+        ],
+        signatory_authority="Regional Director, HelpAge India NER",
+        term_duration_years=3,
+        status="ACTIVE"
+    ),
+    PartnershipMOUModel(
+        mou_id="MOU-SMRITI-ARDSI-2026",
+        partner_name="Alzheimer’s and Related Disorders Society of India (ARDSI - Guwahati & Imphal Chapters)",
+        organization_type="CLINICAL_SOCIETY",
+        states_covered=["Assam", "Manipur", "Nagaland", "Mizoram"],
+        network_scope="12 Memory Clinics, 80 Caregiver Support Circles, 35 Consulting Neurologists/Psychiatrists",
+        core_deliverables=[
+            "Secondary clinical triage for high-risk CCEI cognitive drop flags",
+            "Monthly caregiver psychoeducation and burn-out relief webinars",
+            "Clinical validation of AACB acoustic markers against standard ACE-III"
+        ],
+        signatory_authority="State Chapter Presidents, ARDSI",
+        term_duration_years=3,
+        status="ACTIVE"
+    ),
+    PartnershipMOUModel(
+        mou_id="MOU-SMRITI-NERLP-2026",
+        partner_name="Northeast Rural Livelihood Project (NERLP) Women’s SHG Federation",
+        organization_type="SHG_FEDERATION",
+        states_covered=["Assam", "Meghalaya", "Mizoram", "Nagaland", "Sikkim"],
+        network_scope="480 Village Women’s SHGs (5,200+ rural women community mobilizers)",
+        core_deliverables=[
+            "Door-to-door zero-device feature phone caller ID registration",
+            "Village Namghar and Morung community reminiscence circle leadership",
+            "Distribution and upkeep of illustrated cultural reminiscence flipcharts"
+        ],
+        signatory_authority="State Project Coordinators, NERLP Federation",
+        term_duration_years=2,
+        status="ACTIVE"
+    ),
+    PartnershipMOUModel(
+        mou_id="MOU-SMRITI-SSCS-2026",
+        partner_name="Sikkim Senior Citizens Society & Tribal Council Alliances",
+        organization_type="COMMUNITY_COUNCIL",
+        states_covered=["Sikkim", "Arunachal Pradesh"],
+        network_scope="45 Alpine Village Gompas, 60 Tribal Council Dorbar Circles",
+        core_deliverables=[
+            "High-altitude alpine outreach in remote snow-bound hamlets",
+            "Bhutia, Lepcha, and Monpa oral folklore and sacred chant curation",
+            "Village headman (Gaon Burha / Pipon) endorsement and mobilization"
+        ],
+        signatory_authority="General Secretary, Sikkim Senior Citizens Society",
+        term_duration_years=3,
+        status="ACTIVE"
+    ),
+]
+
+
+@app.get("/api/v1/campaign/schedule", response_model=List[CampaignScheduleItemModel], tags=["Community Awareness Campaign"])
+async def get_campaign_schedule(district_id: Optional[str] = None):
+    """Returns village-level awareness campaign schedule across 16 target districts."""
+    if district_id:
+        return [item for item in CAMPAIGN_SCHEDULE_DATA if item.district_id == district_id]
+    return CAMPAIGN_SCHEDULE_DATA
+
+
+@app.get("/api/v1/campaign/radio-scripts", response_model=List[RadioSpotScriptModel], tags=["Community Awareness Campaign"])
+async def get_radio_spot_scripts(language_code: Optional[str] = None):
+    """Returns vernacular radio broadcast spot scripts in all 8 regional languages."""
+    if language_code:
+        return [script for script in RADIO_SCRIPTS_DATA if script.language_code == language_code]
+    return RADIO_SCRIPTS_DATA
+
+
+@app.get("/api/v1/campaign/partnerships", response_model=List[PartnershipMOUModel], tags=["Community Awareness Campaign"])
+async def get_partnership_mous():
+    """Returns active institutional NGO & SHG partnership MOUs."""
+    return PARTNERSHIP_MOUS_DATA
+
+
+@app.get("/api/v1/campaign/summary", response_model=AwarenessCampaignSummaryModel, tags=["Community Awareness Campaign"])
+async def get_awareness_campaign_summary():
+    """Consolidated metrics summary for Sub-Phase 19.2 Community Awareness Campaign."""
+    total_panchayats = sum(item.target_panchayats for item in CAMPAIGN_SCHEDULE_DATA)
+    total_elders = sum(item.target_elders for item in CAMPAIGN_SCHEDULE_DATA)
+    total_ashas = sum(item.asha_pairs_deployed for item in CAMPAIGN_SCHEDULE_DATA)
+    return AwarenessCampaignSummaryModel(
+        sub_phase="19.2 Community Awareness Campaign",
+        target_districts_count=len(CAMPAIGN_SCHEDULE_DATA),
+        total_target_panchayats=total_panchayats,
+        total_target_elders=total_elders,
+        total_asha_pairs_deployed=total_ashas,
+        radio_languages_count=len(RADIO_SCRIPTS_DATA),
+        active_mous_count=len(PARTNERSHIP_MOUS_DATA),
+        campaign_status="CAMPAIGN_ROLLOUT_ACTIVE",
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 
