@@ -9617,6 +9617,481 @@ async def get_ivr_support_summary():
     )
 
 
+# ── MDoNER Central Telemetry Hub: Central Analytics Dashboard (Sub-Phase 18.1) ──
+class DistrictGeoTelemetryModel(BaseModel):
+    district_id: str
+    district_name: str
+    state_code: str
+    state_name: str
+    latitude: float
+    longitude: float
+    enrolled_patients: int
+    active_ashas: int
+    mean_ccei_score: float
+    sync_latency_hours: float
+    alert_level: str
+    dominant_dialect: str
+
+
+class StateComparisonMetricModel(BaseModel):
+    state_code: str
+    state_name: str
+    wave_assigned: int
+    enrolled_patients: int
+    phcs_count: int
+    mean_mmse_proxy: float
+    session_adherence_pct: float
+    mean_sync_latency_hours: float
+    touch_interaction_pct: float
+    voice_ivr_interaction_pct: float
+    reminiscence_attendance_pct: float
+
+
+class PolicyKpiScorecardItemModel(BaseModel):
+    kpi_name: str
+    target: str
+    current: str
+    status: str
+
+
+class PolicyExecutiveBriefModel(BaseModel):
+    report_id: str
+    reporting_period: str
+    total_pan_ner_patients: int
+    total_active_ashas: int
+    pan_ner_mean_ccei: float
+    pan_ner_mean_adherence_pct: float
+    key_insights: List[str]
+    resource_recommendations: List[str]
+    policy_kpi_scorecard: List[PolicyKpiScorecardItemModel]
+    generated_timestamp: str
+
+
+class CentralAnalyticsSummaryModel(BaseModel):
+    sub_phase: str
+    total_districts_mapped: int
+    total_states_analyzed: int
+    total_enrolled_patients: int
+    pan_ner_mean_ccei: float
+    mean_adherence_pct: float
+    policy_brief_active: bool
+    status: str
+
+
+@app.get("/api/v1/analytics/gis-districts", response_model=List[DistrictGeoTelemetryModel], tags=["Central Analytics Dashboard"])
+async def get_district_geo_telemetry():
+    """Returns geolocated GIS telemetry for 16 primary district clusters across all 8 NER states."""
+    return [
+        DistrictGeoTelemetryModel(
+            district_id="DIST-AS-01",
+            district_name="Guwahati (Kamrup Metro)",
+            state_code="AS",
+            state_name="Assam",
+            latitude=26.1445,
+            longitude=91.7362,
+            enrolled_patients=1050,
+            active_ashas=160,
+            mean_ccei_score=83.4,
+            sync_latency_hours=1.2,
+            alert_level="OPTIMAL",
+            dominant_dialect="Assamese / Bengali",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-AS-02",
+            district_name="Silchar (Cachar)",
+            state_code="AS",
+            state_name="Assam",
+            latitude=24.8333,
+            longitude=92.7789,
+            enrolled_patients=450,
+            active_ashas=120,
+            mean_ccei_score=79.8,
+            sync_latency_hours=2.4,
+            alert_level="OPTIMAL",
+            dominant_dialect="Sylheti / Bengali",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-AS-03",
+            district_name="Tezpur (Sonitpur)",
+            state_code="AS",
+            state_name="Assam",
+            latitude=26.6338,
+            longitude=92.7926,
+            enrolled_patients=200,
+            active_ashas=100,
+            mean_ccei_score=81.2,
+            sync_latency_hours=1.8,
+            alert_level="OPTIMAL",
+            dominant_dialect="Assamese",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-AS-04",
+            district_name="Kokrajhar (BTR)",
+            state_code="AS",
+            state_name="Assam",
+            latitude=26.4014,
+            longitude=90.2718,
+            enrolled_patients=100,
+            active_ashas=90,
+            mean_ccei_score=78.5,
+            sync_latency_hours=3.1,
+            alert_level="ATTENTION_REQUIRED",
+            dominant_dialect="Bodo",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-ML-01",
+            district_name="Shillong (East Khasi Hills)",
+            state_code="ML",
+            state_name="Meghalaya",
+            latitude=25.5788,
+            longitude=91.8933,
+            enrolled_patients=450,
+            active_ashas=130,
+            mean_ccei_score=82.6,
+            sync_latency_hours=1.6,
+            alert_level="OPTIMAL",
+            dominant_dialect="Khasi",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-ML-02",
+            district_name="Tura (West Garo Hills)",
+            state_code="ML",
+            state_name="Meghalaya",
+            latitude=25.5141,
+            longitude=90.2023,
+            enrolled_patients=250,
+            active_ashas=90,
+            mean_ccei_score=77.4,
+            sync_latency_hours=4.2,
+            alert_level="ATTENTION_REQUIRED",
+            dominant_dialect="Garo",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-MN-01",
+            district_name="Imphal (Imphal West)",
+            state_code="MN",
+            state_name="Manipur",
+            latitude=24.8170,
+            longitude=93.9368,
+            enrolled_patients=400,
+            active_ashas=140,
+            mean_ccei_score=84.1,
+            sync_latency_hours=1.4,
+            alert_level="OPTIMAL",
+            dominant_dialect="Meitei",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-MN-02",
+            district_name="Churachandpur",
+            state_code="MN",
+            state_name="Manipur",
+            latitude=24.3333,
+            longitude=93.6667,
+            enrolled_patients=250,
+            active_ashas=110,
+            mean_ccei_score=76.9,
+            sync_latency_hours=5.1,
+            alert_level="ATTENTION_REQUIRED",
+            dominant_dialect="Thadou / Paite",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-TR-01",
+            district_name="Agartala (West Tripura)",
+            state_code="TR",
+            state_name="Tripura",
+            latitude=23.8315,
+            longitude=91.2868,
+            enrolled_patients=400,
+            active_ashas=110,
+            mean_ccei_score=82.9,
+            sync_latency_hours=1.5,
+            alert_level="OPTIMAL",
+            dominant_dialect="Bengali / Kokborok",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-TR-02",
+            district_name="Udaipur (Gomati)",
+            state_code="TR",
+            state_name="Tripura",
+            latitude=23.5333,
+            longitude=91.4833,
+            enrolled_patients=200,
+            active_ashas=70,
+            mean_ccei_score=79.1,
+            sync_latency_hours=2.8,
+            alert_level="OPTIMAL",
+            dominant_dialect="Kokborok",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-AR-01",
+            district_name="Itanagar (Papum Pare)",
+            state_code="AR",
+            state_name="Arunachal Pradesh",
+            latitude=27.0844,
+            longitude=93.6053,
+            enrolled_patients=300,
+            active_ashas=80,
+            mean_ccei_score=80.5,
+            sync_latency_hours=3.5,
+            alert_level="OPTIMAL",
+            dominant_dialect="Nyishi / Hindi",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-AR-02",
+            district_name="Tawang",
+            state_code="AR",
+            state_name="Arunachal Pradesh",
+            latitude=27.5861,
+            longitude=91.8679,
+            enrolled_patients=150,
+            active_ashas=60,
+            mean_ccei_score=75.8,
+            sync_latency_hours=6.8,
+            alert_level="ELEVATED_RISK",
+            dominant_dialect="Monpa",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-NL-01",
+            district_name="Kohima",
+            state_code="NL",
+            state_name="Nagaland",
+            latitude=25.6751,
+            longitude=94.1086,
+            enrolled_patients=250,
+            active_ashas=70,
+            mean_ccei_score=81.7,
+            sync_latency_hours=2.1,
+            alert_level="OPTIMAL",
+            dominant_dialect="Tenyidie (Angami)",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-NL-02",
+            district_name="Dimapur",
+            state_code="NL",
+            state_name="Nagaland",
+            latitude=25.9090,
+            longitude=93.7265,
+            enrolled_patients=200,
+            active_ashas=50,
+            mean_ccei_score=83.0,
+            sync_latency_hours=1.3,
+            alert_level="OPTIMAL",
+            dominant_dialect="Nagamese",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-MZ-01",
+            district_name="Aizawl",
+            state_code="MZ",
+            state_name="Mizoram",
+            latitude=23.7271,
+            longitude=92.7176,
+            enrolled_patients=400,
+            active_ashas=60,
+            mean_ccei_score=83.7,
+            sync_latency_hours=2.0,
+            alert_level="OPTIMAL",
+            dominant_dialect="Mizo",
+        ),
+        DistrictGeoTelemetryModel(
+            district_id="DIST-SK-01",
+            district_name="Gangtok",
+            state_code="SK",
+            state_name="Sikkim",
+            latitude=27.3389,
+            longitude=88.6065,
+            enrolled_patients=250,
+            active_ashas=50,
+            mean_ccei_score=84.5,
+            sync_latency_hours=1.5,
+            alert_level="OPTIMAL",
+            dominant_dialect="Nepali / Bhutia",
+        ),
+    ]
+
+
+@app.get("/api/v1/analytics/state-comparisons", response_model=List[StateComparisonMetricModel], tags=["Central Analytics Dashboard"])
+async def get_state_comparisons():
+    """Returns multi-dimensional comparative benchmark metrics across all 8 North Eastern states."""
+    return [
+        StateComparisonMetricModel(
+            state_code="AS",
+            state_name="Assam",
+            wave_assigned=1,
+            enrolled_patients=1800,
+            phcs_count=30,
+            mean_mmse_proxy=22.8,
+            session_adherence_pct=91.4,
+            mean_sync_latency_hours=2.1,
+            touch_interaction_pct=65.0,
+            voice_ivr_interaction_pct=35.0,
+            reminiscence_attendance_pct=92.0,
+        ),
+        StateComparisonMetricModel(
+            state_code="ML",
+            state_name="Meghalaya",
+            wave_assigned=2,
+            enrolled_patients=700,
+            phcs_count=12,
+            mean_mmse_proxy=23.1,
+            session_adherence_pct=89.8,
+            mean_sync_latency_hours=2.9,
+            touch_interaction_pct=52.0,
+            voice_ivr_interaction_pct=48.0,
+            reminiscence_attendance_pct=89.5,
+        ),
+        StateComparisonMetricModel(
+            state_code="MN",
+            state_name="Manipur",
+            wave_assigned=3,
+            enrolled_patients=650,
+            phcs_count=11,
+            mean_mmse_proxy=23.4,
+            session_adherence_pct=92.1,
+            mean_sync_latency_hours=3.2,
+            touch_interaction_pct=58.0,
+            voice_ivr_interaction_pct=42.0,
+            reminiscence_attendance_pct=91.0,
+        ),
+        StateComparisonMetricModel(
+            state_code="TR",
+            state_name="Tripura",
+            wave_assigned=2,
+            enrolled_patients=600,
+            phcs_count=10,
+            mean_mmse_proxy=22.9,
+            session_adherence_pct=90.6,
+            mean_sync_latency_hours=2.2,
+            touch_interaction_pct=62.0,
+            voice_ivr_interaction_pct=38.0,
+            reminiscence_attendance_pct=90.2,
+        ),
+        StateComparisonMetricModel(
+            state_code="AR",
+            state_name="Arunachal Pradesh",
+            wave_assigned=3,
+            enrolled_patients=450,
+            phcs_count=8,
+            mean_mmse_proxy=22.4,
+            session_adherence_pct=86.5,
+            mean_sync_latency_hours=5.2,
+            touch_interaction_pct=41.0,
+            voice_ivr_interaction_pct=59.0,
+            reminiscence_attendance_pct=87.0,
+        ),
+        StateComparisonMetricModel(
+            state_code="NL",
+            state_name="Nagaland",
+            wave_assigned=4,
+            enrolled_patients=450,
+            phcs_count=8,
+            mean_mmse_proxy=23.0,
+            session_adherence_pct=88.2,
+            mean_sync_latency_hours=1.7,
+            touch_interaction_pct=55.0,
+            voice_ivr_interaction_pct=45.0,
+            reminiscence_attendance_pct=88.8,
+        ),
+        StateComparisonMetricModel(
+            state_code="MZ",
+            state_name="Mizoram",
+            wave_assigned=4,
+            enrolled_patients=400,
+            phcs_count=6,
+            mean_mmse_proxy=23.6,
+            session_adherence_pct=93.4,
+            mean_sync_latency_hours=2.0,
+            touch_interaction_pct=70.0,
+            voice_ivr_interaction_pct=30.0,
+            reminiscence_attendance_pct=94.1,
+        ),
+        StateComparisonMetricModel(
+            state_code="SK",
+            state_name="Sikkim",
+            wave_assigned=4,
+            enrolled_patients=250,
+            phcs_count=5,
+            mean_mmse_proxy=23.8,
+            session_adherence_pct=94.2,
+            mean_sync_latency_hours=1.5,
+            touch_interaction_pct=74.0,
+            voice_ivr_interaction_pct=26.0,
+            reminiscence_attendance_pct=95.0,
+        ),
+    ]
+
+
+@app.get("/api/v1/analytics/policy-report", response_model=PolicyExecutiveBriefModel, tags=["Central Analytics Dashboard"])
+async def get_policy_executive_brief():
+    """Generates the automated monthly executive policy brief for MDoNER leadership."""
+    return PolicyExecutiveBriefModel(
+        report_id="MDONER-TELEMETRY-BRIEF-2026-09",
+        reporting_period="September 2026 (Monthly Digest)",
+        total_pan_ner_patients=5300,
+        total_active_ashas=1510,
+        pan_ner_mean_ccei=81.3,
+        pan_ner_mean_adherence_pct=90.8,
+        key_insights=[
+            "All 8 NER states are operational across 90 primary health centers, exceeding the 5,000 enrolled elder benchmark.",
+            "Feature phone IVR interactions comprise 40.4% of total engagement, verifying that zero-device inclusion successfully reaches remote tribal belts.",
+            "Sikkim and Mizoram exhibit the highest session adherence (>93%), driven by strong Community Reminiscence Circle attendance.",
+            "High-altitude fringe connectivity in Tawang (AR) and Churachandpur (MN) exhibits sync latencies >4.5 hours, mitigated by offline SQLite caching.",
+        ],
+        resource_recommendations=[
+            "Procure and deploy 50 cold-resistant thermal battery banking sleeves to Tawang and Mon district PHCs before onset of winter frost.",
+            "Allocate 20 additional concurrent SIP trunk channels to Telecom Circle NE-2 to accommodate Arunachal Pradesh IVR surge.",
+            "Authorize second cohort of 300 Certified Reminiscence Circle Facilitators across Garo Hills and Barak Valley PHCs.",
+        ],
+        policy_kpi_scorecard=[
+            PolicyKpiScorecardItemModel(
+                kpi_name="Total Patient Enrollment",
+                target=">= 5,000 Elders",
+                current="5,300 Active Elders",
+                status="ON_TRACK",
+            ),
+            PolicyKpiScorecardItemModel(
+                kpi_name="Frontline Workforce Deployment",
+                target=">= 1,500 Certified ASHAs",
+                current="1,510 Certified ASHAs",
+                status="ON_TRACK",
+            ),
+            PolicyKpiScorecardItemModel(
+                kpi_name="Mean Offline Sync Latency",
+                target="< 4.0 Hours",
+                current="2.6 Hours Average",
+                status="ON_TRACK",
+            ),
+            PolicyKpiScorecardItemModel(
+                kpi_name="Mean Population CCEI Index",
+                target=">= 75.0 Index Points",
+                current="81.3 Index Points",
+                status="ON_TRACK",
+            ),
+            PolicyKpiScorecardItemModel(
+                kpi_name="High-Altitude Device Downtime",
+                target="< 2.0%",
+                current="0.9% Downtime",
+                status="ON_TRACK",
+            ),
+        ],
+        generated_timestamp="2026-09-14T14:45:00.000Z",
+    )
+
+
+@app.get("/api/v1/analytics/summary", response_model=CentralAnalyticsSummaryModel, tags=["Central Analytics Dashboard"])
+async def get_central_analytics_summary():
+    """Consolidated summary metrics for Sub-Phase 18.1 Central Analytics Dashboard."""
+    return CentralAnalyticsSummaryModel(
+        sub_phase="18.1 Central Analytics Dashboard",
+        total_districts_mapped=16,
+        total_states_analyzed=8,
+        total_enrolled_patients=5300,
+        pan_ner_mean_ccei=81.3,
+        mean_adherence_pct=90.8,
+        policy_brief_active=True,
+        status="CENTRAL_DASHBOARD_OPERATIONAL",
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 

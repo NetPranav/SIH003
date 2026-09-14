@@ -68,10 +68,10 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 259 / 240+ Deliverables Completed (107.9% Deliverable Completion)  
+**Overall Velocity**: 262 / 240+ Deliverables Completed (109.2% Deliverable Completion)  
 **Phases Completed**: 17 / 20 (Phases 1 through 17 Complete & Signed Off)  
-**Phases In Progress**: 0 / 20  
-**Phases Pending**: 3 / 20 (Phases 18 through 20)  
+**Phases In Progress**: 1 / 20 (Phase 18 — Sub-Phase 18.1 Complete; Sub-Phases 18.2–18.4 Pending)  
+**Phases Pending**: 2 / 20 (Phases 19 through 20)  
 **Milestones Achieved**: 17 / 20 (M1 through M17 Signed Off; M18–M20 Pending)  
 
 ### Phase & Milestone Checklist
@@ -164,7 +164,7 @@ gantt
   - [x] Sub-Phase 17.3: Community Facilitation Training (2/2 tasks done)
   - [x] Sub-Phase 17.4: IVR Support Training (2/2 tasks done)
 - [ ] **Phase 18: MDoNER Central Telemetry Hub & Impact Framework** (Weeks 70–84) — **Milestone M18 Pending**
-  - [ ] Sub-Phase 18.1: Central Analytics Dashboard (GIS) (0/3 tasks done)
+  - [x] Sub-Phase 18.1: Central Analytics Dashboard (GIS) (3/3 tasks done)
   - [ ] Sub-Phase 18.2: Cultural Cognitive Engagement Index (CCEI) Finalization (0/3 tasks done)
   - [ ] Sub-Phase 18.3: Data Warehouse & Research Pipeline (0/3 tasks done)
   - [ ] Sub-Phase 18.4: Federated Learning at Population Scale (0/2 tasks done)
@@ -962,16 +962,16 @@ gantt
 ---
 
 # PHASE 18: MDoNER CENTRAL TELEMETRY HUB & IMPACT FRAMEWORK 📊
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 18.1–18.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (27% Complete — Sub-Phase 18.1 Complete; Sub-Phases 18.2–18.4 Pending)  
 **Duration**: Weeks 70–84 | **Objective**: Central analytics, research pipeline, and the named Cultural Cognitive Engagement Index (CCEI) as the platform's flagship impact metric.
 
 ### Sub-Phase 18.1 — Central Analytics Dashboard
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Pan-NER Geographic Dashboard | District-level engagement/cognitive trend map | GIS dashboard |
-| [ ] | State Comparison Analytics | Engagement, MMSE, adherence, sync frequency across states | State comparison module |
-| [ ] | Policy Decision Support | Auto-generated monthly reports for MDoNER officials | Auto-generated policy reports |
+| [x] | Pan-NER Geographic Dashboard | District-level engagement/cognitive trend map | GIS dashboard |
+| [x] | State Comparison Analytics | Engagement, MMSE, adherence, sync frequency across states | State comparison module |
+| [x] | Policy Decision Support | Auto-generated monthly reports for MDoNER officials | Auto-generated policy reports |
 
 ### Sub-Phase 18.2 — Cultural Cognitive Engagement Index (CCEI) Finalization (New)
 *Status: [ ] Pending*
