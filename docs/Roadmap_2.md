@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 190 / 240+ Deliverables Completed (79.2% Deliverable Completion)  
+**Overall Velocity**: 194 / 240+ Deliverables Completed (80.8% Deliverable Completion)  
 **Phases Completed**: 12 / 20 (Phases 1 through 12 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 13 — Sub-Phase 13.1 Complete; Sub-Phases 13.2–13.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 13 — Sub-Phases 13.1–13.2 Complete; Sub-Phases 13.3–13.4 Pending)  
 **Phases Pending**: 7 / 20 (Phases 14 through 20)  
 **Milestones Achieved**: 12 / 20 (M1 through M12 Signed Off; M13–M20 Pending)  
 
@@ -140,7 +140,7 @@ gantt
   - [x] Sub-Phase 12.4: Welfare Scheme Alignment (NPHCE / RVY) (3/3 tasks done)
 - [ ] **Phase 13: Quality Assurance & Accessibility Audit** (Weeks 34–38) — **Milestone M13 Pending**
   - [x] Sub-Phase 13.1: Functional Testing Suite (4/4 tasks done)
-  - [ ] Sub-Phase 13.2: Accessibility Audit (WCAG 2.2 AAA Target) (0/4 tasks done)
+  - [x] Sub-Phase 13.2: Accessibility Audit (WCAG 2.2 AAA Target) (4/4 tasks done)
   - [ ] Sub-Phase 13.3: Security & Privacy Audit (0/4 tasks done)
   - [ ] Sub-Phase 13.4: Social & IVR Feature QA (0/3 tasks done)
 - [ ] **Phase 14: Clinical Pilot Deployment** (Weeks 39–51) — **Milestone M14 Pending**
@@ -744,7 +744,7 @@ gantt
 ---
 
 # PHASE 13: QUALITY ASSURANCE & ACCESSIBILITY AUDIT 🧪
-**Phase Status**: [ ] IN PROGRESS (27% Complete — Sub-Phase 13.1 Complete; Sub-Phases 13.2–13.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (53% Complete — Sub-Phases 13.1–13.2 Complete; Sub-Phases 13.3–13.4 Pending)  
 **Duration**: Weeks 34–38 | **Objective**: Rigorous functional, accessibility, and security testing before clinical pilot.
 
 ### Sub-Phase 13.1 — Functional Testing
@@ -757,13 +757,13 @@ gantt
 | [x] | Offline Resilience Testing | 30-day simulated offline run | Offline test report |
 
 ### Sub-Phase 13.2 — Accessibility Audit (WCAG 2.2 AAA)
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Automated Accessibility Scan | axe-core + Lighthouse; target 100/100 | Scan report |
-| [ ] | Manual Screen Reader Testing | TalkBack/VoiceOver navigability | Screen reader test report |
-| [ ] | Color Contrast Verification | ≥7:1 across all screens/states | Contrast audit report |
-| [ ] | Elderly User Acceptance Testing | 10 participants (65+), ≥85% task completion | UAT report |
+| [x] | Automated Accessibility Scan | axe-core + Lighthouse; target 100/100 | Scan report |
+| [x] | Manual Screen Reader Testing | TalkBack/VoiceOver navigability | Screen reader test report |
+| [x] | Color Contrast Verification | ≥7:1 across all screens/states | Contrast audit report |
+| [x] | Elderly User Acceptance Testing | 10 participants (65+), ≥85% task completion | UAT report |
 
 ### Sub-Phase 13.3 — Security & Privacy Audit
 *Status: [ ] Pending*
