@@ -1954,6 +1954,243 @@ async def get_caller_ivr_profile(phone_number: str):
     )
 
 
+# ── IVR-to-Platform Data Bridge Models & Storage (Sub-Phase 8.4) ────────────
+class IVRBridgeEventResponse(BaseModel):
+    event_id: str
+    patient_id: str
+    event_type: str  # "COGNITIVE_CHECKIN" | "REMINDER_ADHERENCE" | "ESCALATION_ALERT"
+    timestamp: str
+    channel: str = "IVR_PHONE"
+    language: str
+    checkin_details: Optional[dict] = None
+    adherence_details: Optional[dict] = None
+    escalation_details: Optional[dict] = None
+
+
+class UnifiedPatientTelemetryResponse(BaseModel):
+    patient_id: str
+    total_interactions: int
+    app_interactions: int
+    ivr_interactions: int
+    last_interaction_at: str
+    last_interaction_channel: str
+    adherence_rate_percent: int
+    consecutive_adherence_streak: int
+    latest_cognitive_score: int
+    cognitive_stability_trend: str  # "IMPROVING" | "STABLE" | "DECLINING" | "INSUFFICIENT_DATA"
+    active_escalation_alerts: int
+    recent_events: List[IVRBridgeEventResponse]
+
+
+class SyncCheckinBridgeRequest(BaseModel):
+    session_id: str
+
+
+class SyncAdherenceBridgeRequest(BaseModel):
+    schedule_id: str
+    confirmed: bool
+    attempts_count: int = 1
+
+
+IVR_BRIDGE_EVENTS_STORE: Dict[str, List[dict]] = {}
+
+
+@app.post("/api/v1/ivr/bridge/sync-checkin", response_model=IVRBridgeEventResponse, tags=["IVR Cognitive Line"])
+async def sync_ivr_checkin_event(req: SyncCheckinBridgeRequest):
+    """Syncs an IVR Check-In session into the patient's unified longitudinal telemetry record."""
+    import uuid
+    from datetime import datetime, timezone
+
+    if req.session_id not in IVR_SESSIONS_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"IVR Check-In session '{req.session_id}' not found.",
+        )
+    sess = IVR_SESSIONS_STORE[req.session_id]
+    patient_id = sess["patient_id"]
+
+    event_id = f"brg_chk_{uuid.uuid4().hex[:8]}"
+    timestamp = sess.get("completed_at") or datetime.now(timezone.utc).isoformat()
+    event_record = {
+        "event_id": event_id,
+        "patient_id": patient_id,
+        "event_type": "COGNITIVE_CHECKIN",
+        "timestamp": timestamp,
+        "channel": "IVR_PHONE",
+        "language": sess.get("language", "as"),
+        "checkin_details": {
+            "session_id": req.session_id,
+            "orientation_correct": sess.get("orientation_correct", False),
+            "orientation_input_method": sess.get("orientation_input_method", "NONE"),
+            "words_recalled": sess.get("words_recalled", []),
+            "recall_score": sess.get("recall_score", 0),
+            "composite_score": sess.get("composite_score", 0),
+            "status_label": sess.get("status_label", "NORMAL_STABLE"),
+        },
+        "adherence_details": None,
+        "escalation_details": None,
+    }
+
+    if patient_id not in IVR_BRIDGE_EVENTS_STORE:
+        IVR_BRIDGE_EVENTS_STORE[patient_id] = []
+    IVR_BRIDGE_EVENTS_STORE[patient_id].append(event_record)
+    return IVRBridgeEventResponse(**event_record)
+
+
+@app.post("/api/v1/ivr/bridge/sync-adherence", response_model=IVRBridgeEventResponse, tags=["IVR Cognitive Line"])
+async def sync_ivr_adherence_event(req: SyncAdherenceBridgeRequest):
+    """Syncs an outbound adherence call outcome into unified patient records."""
+    import uuid
+    from datetime import datetime, timezone
+
+    if req.schedule_id not in IVR_SCHEDULES_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"IVR Reminder schedule '{req.schedule_id}' not found.",
+        )
+    sched = IVR_SCHEDULES_STORE[req.schedule_id]
+    patient_id = sched["patient_id"]
+
+    event_id = f"brg_adh_{uuid.uuid4().hex[:8]}"
+    timestamp = sched.get("last_attempt_at") or datetime.now(timezone.utc).isoformat()
+    event_record = {
+        "event_id": event_id,
+        "patient_id": patient_id,
+        "event_type": "REMINDER_ADHERENCE",
+        "timestamp": timestamp,
+        "channel": "IVR_PHONE",
+        "language": sched.get("language", "as"),
+        "checkin_details": None,
+        "adherence_details": {
+            "schedule_id": req.schedule_id,
+            "reminder_type": sched.get("reminder_type", "MEDICATION"),
+            "confirmed": req.confirmed,
+            "attempts_count": req.attempts_count,
+        },
+        "escalation_details": None,
+    }
+
+    if patient_id not in IVR_BRIDGE_EVENTS_STORE:
+        IVR_BRIDGE_EVENTS_STORE[patient_id] = []
+    IVR_BRIDGE_EVENTS_STORE[patient_id].append(event_record)
+    return IVRBridgeEventResponse(**event_record)
+
+
+@app.post("/api/v1/ivr/bridge/sync-escalation/{escalation_id}", response_model=IVRBridgeEventResponse, tags=["IVR Cognitive Line"])
+async def sync_ivr_escalation_event(escalation_id: str):
+    """Syncs an escalation notice into the caregiver urgent alert feed."""
+    import uuid
+    from datetime import datetime, timezone
+
+    if escalation_id not in IVR_ESCALATIONS_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Escalation '{escalation_id}' not found.",
+        )
+    esc = IVR_ESCALATIONS_STORE[escalation_id]
+    patient_id = esc["patient_id"]
+
+    event_id = f"brg_esc_{uuid.uuid4().hex[:8]}"
+    timestamp = esc.get("escalated_at") or datetime.now(timezone.utc).isoformat()
+    event_record = {
+        "event_id": event_id,
+        "patient_id": patient_id,
+        "event_type": "ESCALATION_ALERT",
+        "timestamp": timestamp,
+        "channel": "IVR_PHONE",
+        "language": "as",
+        "checkin_details": None,
+        "adherence_details": None,
+        "escalation_details": {
+            "escalation_id": escalation_id,
+            "alert_message": esc.get("alert_message", ""),
+            "caregiver_phone": esc.get("caregiver_phone", ""),
+            "asha_worker_phone": esc.get("asha_worker_phone", ""),
+            "acknowledged": esc.get("acknowledged", False),
+        },
+    }
+
+    if patient_id not in IVR_BRIDGE_EVENTS_STORE:
+        IVR_BRIDGE_EVENTS_STORE[patient_id] = []
+    IVR_BRIDGE_EVENTS_STORE[patient_id].append(event_record)
+    return IVRBridgeEventResponse(**event_record)
+
+
+@app.get("/api/v1/ivr/bridge/unified-telemetry/{patient_id}", response_model=UnifiedPatientTelemetryResponse, tags=["IVR Cognitive Line"])
+async def get_patient_unified_telemetry(patient_id: str, app_interactions: int = 0):
+    """Calculates unified telemetry metrics including IVR adherence rates, streak, and cognitive stability trends."""
+    from datetime import datetime, timezone
+
+    events = IVR_BRIDGE_EVENTS_STORE.get(patient_id, [])
+    # Sort descending by timestamp
+    sorted_events = sorted(events, key=lambda x: x.get("timestamp", ""), reverse=True)
+
+    ivr_count = len(sorted_events)
+    total_count = ivr_count + app_interactions
+    last_interaction_at = sorted_events[0]["timestamp"] if sorted_events else datetime.now(timezone.utc).isoformat()
+
+    # Adherence metrics
+    adh_events = [e for e in sorted_events if e["event_type"] == "REMINDER_ADHERENCE"]
+    adherence_rate = 100
+    streak = 0
+    if adh_events:
+        confirmed_count = sum(1 for e in adh_events if e.get("adherence_details", {}).get("confirmed"))
+        adherence_rate = int(round((confirmed_count / len(adh_events)) * 100))
+        for e in adh_events:
+            if e.get("adherence_details", {}).get("confirmed"):
+                streak += 1
+            else:
+                break
+
+    # Cognitive score and stability trend
+    chk_events = [e for e in sorted_events if e["event_type"] == "COGNITIVE_CHECKIN"]
+    latest_score = 0
+    trend = "INSUFFICIENT_DATA"
+    if chk_events:
+        latest_score = chk_events[0].get("checkin_details", {}).get("composite_score", 0)
+        if len(chk_events) >= 2:
+            scores = [e.get("checkin_details", {}).get("composite_score", 0) for e in reversed(chk_events)]
+            half = len(scores) // 2
+            baseline = sum(scores[:half]) / max(half, 1)
+            recent = sum(scores[half:]) / max(len(scores) - half, 1)
+            diff = recent - baseline
+            if diff >= 5:
+                trend = "IMPROVING"
+            elif diff <= -5:
+                trend = "DECLINING"
+            else:
+                trend = "STABLE"
+
+    # Active escalations
+    active_alerts = sum(
+        1 for e in sorted_events
+        if e["event_type"] == "ESCALATION_ALERT" and not e.get("escalation_details", {}).get("acknowledged", False)
+    )
+
+    return UnifiedPatientTelemetryResponse(
+        patient_id=patient_id,
+        total_interactions=total_count,
+        app_interactions=app_interactions,
+        ivr_interactions=ivr_count,
+        last_interaction_at=last_interaction_at,
+        last_interaction_channel="IVR_PHONE",
+        adherence_rate_percent=adherence_rate,
+        consecutive_adherence_streak=streak,
+        latest_cognitive_score=latest_score,
+        cognitive_stability_trend=trend,
+        active_escalation_alerts=active_alerts,
+        recent_events=[IVRBridgeEventResponse(**e) for e in sorted_events[:10]],
+    )
+
+
+@app.get("/api/v1/ivr/bridge/feed/{patient_id}", response_model=List[IVRBridgeEventResponse], tags=["IVR Cognitive Line"])
+async def get_caregiver_ivr_feed(patient_id: str, limit: int = 10):
+    """Retrieves recent IVR events feed for display on the Caregiver Portal."""
+    events = IVR_BRIDGE_EVENTS_STORE.get(patient_id, [])
+    sorted_events = sorted(events, key=lambda x: x.get("timestamp", ""), reverse=True)
+    return [IVRBridgeEventResponse(**e) for e in sorted_events[:limit]]
+
+
 if __name__ == "__main__":
     import uvicorn
 

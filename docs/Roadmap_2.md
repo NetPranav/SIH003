@@ -68,11 +68,11 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 127 / 240+ Deliverables Completed (52.9% Deliverable Completion)  
-**Phases Completed**: 7 / 20 (Phases 1, 2, 3, 4, 5, 6 & 7 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 8 — Sub-Phases 8.1, 8.2 & 8.3 Complete, Sub-Phase 8.4 Pending)  
+**Overall Velocity**: 129 / 240+ Deliverables Completed (53.8% Deliverable Completion)  
+**Phases Completed**: 8 / 20 (Phases 1, 2, 3, 4, 5, 6, 7 & 8 Complete & Signed Off)  
+**Phases In Progress**: 0 / 20  
 **Phases Pending**: 12 / 20 (Phases 9 through 20)  
-**Milestones Achieved**: 7 / 20 (M1, M2, M3, M4, M5, M6, M7 Signed Off; M8–M20 Pending)  
+**Milestones Achieved**: 8 / 20 (M1, M2, M3, M4, M5, M6, M7 & M8 Signed Off; M9–M20 Pending)  
 
 ### Phase & Milestone Checklist
 - [x] **Phase 1: Clinical & Cultural Foundation Research** (Weeks 1–6) — **Milestone M1 Signed Off**
@@ -113,11 +113,11 @@ gantt
   - [x] Sub-Phase 7.2: Community Reminiscence Circles (4/4 tasks done)
   - [x] Sub-Phase 7.3: Digital Legacy Storytelling (4/4 tasks done)
   - [x] Sub-Phase 7.4: Consent & Content Moderation for Social Features (2/2 tasks done)
-- [ ] **Phase 8: Zero-Smartphone Accessibility — IVR Cognitive Line** (Weeks 22–27) — **Milestone M8 Pending**
+- [x] **Phase 8: Zero-Smartphone Accessibility — IVR Cognitive Line** (Weeks 22–27) — **Milestone M8 Signed Off**
   - [x] Sub-Phase 8.1: IVR Cognitive Check-In Flow (3/3 tasks done)
   - [x] Sub-Phase 8.2: IVR Reminder & Adherence Delivery (3/3 tasks done)
   - [x] Sub-Phase 8.3: Multilingual IVR Content (2/2 tasks done)
-  - [ ] Sub-Phase 8.4: IVR-to-Platform Data Bridge (0/2 tasks done)
+  - [x] Sub-Phase 8.4: IVR-to-Platform Data Bridge (2/2 tasks done)
 - [ ] **Phase 9: Caregiver, ASHA & Clinician Ecosystem Dashboards** (Weeks 25–33) — **Milestone M9 Pending**
   - [ ] Sub-Phase 9.1: Caregiver Portal (Family View) (0/5 tasks done)
   - [ ] Sub-Phase 9.2: ASHA Worker Portal (Community View) (0/4 tasks done)
@@ -527,7 +527,7 @@ gantt
 ---
 
 # PHASE 8: ZERO-SMARTPHONE ACCESSIBILITY — IVR COGNITIVE LINE 📞 (New Phase)
-**Phase Status**: [/] IN PROGRESS (75% Complete — Sub-Phases 8.1, 8.2 & 8.3 Done, Sub-Phase 8.4 Pending)  
+**Phase Status**: [x] COMPLETED & SIGNED OFF (100% Complete — Sub-Phases 8.1, 8.2, 8.3 & 8.4 Complete)  
 **Duration**: Weeks 22–27 | **Objective**: Reach elders with no smartphone/tablet access via a toll-free, voice-only cognitive check-in and reminder line.
 
 ### Sub-Phase 8.1 — IVR Cognitive Check-In Flow
@@ -554,14 +554,14 @@ gantt
 | [x] | Language Auto-Detection/Selection | Caller selects language via keypress on first call | Language selection flow |
 
 ### Sub-Phase 8.4 — IVR-to-Platform Data Bridge
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | IVR Event Sync | Push IVR check-in/adherence events into the same patient record as app telemetry | IVR data bridge service |
-| [ ] | Caregiver Dashboard Integration | Show IVR-sourced adherence/check-in alongside app-sourced data | Dashboard integration |
+| [x] | IVR Event Sync | Push IVR check-in/adherence events into the same patient record as app telemetry | IVR data bridge service |
+| [x] | Caregiver Dashboard Integration | Show IVR-sourced adherence/check-in alongside app-sourced data | Dashboard integration |
 
 > [!IMPORTANT]
-> - [ ] **Milestone M8**: IVR Line Operational — calls connect reliably across 3 telecom circles in NER; check-in scoring and reminder delivery verified end-to-end. *(Status: PENDING)*
+> - [x] **Milestone M8**: IVR Line Operational — calls connect reliably across 3 telecom circles in NER; check-in scoring and reminder delivery verified end-to-end. *(Status: SIGNED OFF)*
 
 ---
 ---
