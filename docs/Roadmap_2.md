@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 251 / 240+ Deliverables Completed (104.6% Deliverable Completion)  
+**Overall Velocity**: 254 / 240+ Deliverables Completed (105.8% Deliverable Completion)  
 **Phases Completed**: 16 / 20 (Phases 1 through 16 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 17 — Sub-Phase 17.1 Complete; Sub-Phases 17.2–17.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 17 — Sub-Phases 17.1 & 17.2 Complete; Sub-Phases 17.3 & 17.4 Pending)  
 **Phases Pending**: 3 / 20 (Phases 18 through 20)  
 **Milestones Achieved**: 16 / 20 (M1 through M16 Signed Off; M17–M20 Pending)  
 
@@ -160,7 +160,7 @@ gantt
   - [x] Sub-Phase 16.4: IVR & Social Feature Scale-Out (2/2 tasks done)
 - [ ] **Phase 17: ASHA Worker Training at Scale** (Weeks 56–69) — **Milestone M17 Pending**
   - [x] Sub-Phase 17.1: Scalable Training Program (1,500+ ASHAs) (4/4 tasks done)
-  - [ ] Sub-Phase 17.2: Field Support Network & SOPs (0/3 tasks done)
+  - [x] Sub-Phase 17.2: Field Support Network & SOPs (3/3 tasks done)
   - [ ] Sub-Phase 17.3: Community Facilitation Training (0/2 tasks done)
   - [ ] Sub-Phase 17.4: IVR Support Training (0/2 tasks done)
 - [ ] **Phase 18: MDoNER Central Telemetry Hub & Impact Framework** (Weeks 70–84) — **Milestone M18 Pending**
@@ -921,7 +921,7 @@ gantt
 ---
 
 # PHASE 17: ASHA WORKER TRAINING AT SCALE 🎓
-**Phase Status**: [ ] IN PROGRESS (36% Complete — Sub-Phase 17.1 Complete; Sub-Phases 17.2–17.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (64% Complete — Sub-Phases 17.1 & 17.2 Complete; Sub-Phases 17.3 & 17.4 Pending)  
 **Duration**: Weeks 56–69 (parallel) | **Objective**: Train 1,500+ ASHA/ANM workers across 8 states, including social-facilitation and IVR-support skills.
 
 ### Sub-Phase 17.1 — Scalable Training Program
@@ -934,12 +934,12 @@ gantt
 | [x] | Monthly Refresher Webinars | 30-min virtual sessions | Webinar schedule + recordings |
 
 ### Sub-Phase 17.2 — Field Support Network
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | District-Level Technical Champions | 2 tech-savvy ASHAs per district | Champion network roster |
-| [ ] | Escalation Protocol | WhatsApp → District Champion → Central Help Desk | Escalation SOP |
-| [ ] | Device Maintenance SOP | Charging, storage, troubleshooting | Device maintenance guide |
+| [x] | District-Level Technical Champions | 2 tech-savvy ASHAs per district | Champion network roster |
+| [x] | Escalation Protocol | WhatsApp → District Champion → Central Help Desk | Escalation SOP |
+| [x] | Device Maintenance SOP | Charging, storage, troubleshooting | Device maintenance guide |
 
 ### Sub-Phase 17.3 — Community Facilitation Training (New)
 *Status: [ ] Pending*

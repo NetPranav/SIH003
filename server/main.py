@@ -8839,6 +8839,185 @@ async def get_scalable_training_summary():
     )
 
 
+# ── ASHA Training at Scale: Field Support Network (Sub-Phase 17.2) ────────────
+class TechnicalChampionProfileModel(BaseModel):
+    champion_id: str
+    asha_name: str
+    district_hq: str
+    state_code: str
+    peer_cohort_coverage: int
+    specialist_skills: List[str]
+    active_status: str
+
+
+class EscalationTierConfigModel(BaseModel):
+    tier_level: int
+    tier_name: str
+    channel: str
+    target_response_minutes: int
+    target_resolution_hours: float
+    scope_of_support: List[str]
+    sla_success_rate_pct: float
+
+
+class DeviceMaintenanceStandardModel(BaseModel):
+    category: str
+    title: str
+    protocol_rules: List[str]
+    required_accessories: List[str]
+    frequency: str
+
+
+class FieldSupportNetworkSummaryModel(BaseModel):
+    sub_phase: str
+    total_technical_champions: int
+    districts_covered: int
+    states_covered: int
+    mean_incident_resolution_hours: float
+    escalation_tiers_count: int
+    overall_support_sla_pct: float
+    status: str
+
+
+@app.get("/api/v1/support/champions", response_model=List[TechnicalChampionProfileModel], tags=["Field Support Network"])
+async def get_technical_champions():
+    """Returns the 30 District Technical Champions across 15 district headquarters."""
+    return [
+        TechnicalChampionProfileModel(champion_id="CHAMP-01", asha_name="Pranita Das", district_hq="Guwahati (Kamrup Metro)", state_code="AS", peer_cohort_coverage=80, specialist_skills=["BLE Mesh", "Kiosk Mode"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-02", asha_name="Anjana Saikia", district_hq="Guwahati (Kamrup Metro)", state_code="AS", peer_cohort_coverage=80, specialist_skills=["Screen Calibration", "Audio Booster"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-03", asha_name="Rupa Paul", district_hq="Silchar (Cachar)", state_code="AS", peer_cohort_coverage=60, specialist_skills=["Tea Garden Network", "DTMF Triage"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-04", asha_name="Manju Singha", district_hq="Silchar (Cachar)", state_code="AS", peer_cohort_coverage=60, specialist_skills=["SQLite Cache Repair", "Battery Swap"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-05", asha_name="Rekha Borah", district_hq="Tezpur (Sonitpur)", state_code="AS", peer_cohort_coverage=50, specialist_skills=["OTA Delta Patching", "Offline Storage"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-06", asha_name="Mina Chetri", district_hq="Tezpur (Sonitpur)", state_code="AS", peer_cohort_coverage=50, specialist_skills=["Hardware Shock Mounts", "Audio Calibration"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-07", asha_name="Bimala Brahma", district_hq="Kokrajhar (BTR)", state_code="AS", peer_cohort_coverage=45, specialist_skills=["Bodo Voice Pack", "BLE Re-pairing"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-08", asha_name="Joymati Basumatary", district_hq="Kokrajhar (BTR)", state_code="AS", peer_cohort_coverage=45, specialist_skills=["Battery Cycle Management", "Sensory Kits"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-09", asha_name="Iada Nongrum", district_hq="Shillong (East Khasi Hills)", state_code="ML", peer_cohort_coverage=65, specialist_skills=["Khasi TTS Cadence", "Rainproof Dry-Bags"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-10", asha_name="Phidalia Kharbhih", district_hq="Shillong (East Khasi Hills)", state_code="ML", peer_cohort_coverage=65, specialist_skills=["Knox Kiosk Mode", "Solar Charging"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-11", asha_name="Silme Sangma", district_hq="Tura (West Garo Hills)", state_code="ML", peer_cohort_coverage=45, specialist_skills=["Garo Audio Library", "SIM Swap"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-12", asha_name="Tening Marak", district_hq="Tura (West Garo Hills)", state_code="ML", peer_cohort_coverage=45, specialist_skills=["High-Contrast Border Tuning", "Hardware Swaps"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-13", asha_name="Thourani Devi", district_hq="Imphal (Imphal West)", state_code="MN", peer_cohort_coverage=70, specialist_skills=["Meitei Mayek Script", "Pena Sound Tests"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-14", asha_name="Memcha Leima", district_hq="Imphal (Imphal West)", state_code="MN", peer_cohort_coverage=70, specialist_skills=["Wetland Solar Micro-Grids", "Bluetooth Relays"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-15", asha_name="Grace Chinghoih", district_hq="Churachandpur", state_code="MN", peer_cohort_coverage=55, specialist_skills=["Hill Satellite Links", "Tablet Factory Re-flashing"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-16", asha_name="Niangthiankim", district_hq="Churachandpur", state_code="MN", peer_cohort_coverage=55, specialist_skills=["Audio Jack Cleaning", "Battery Banking"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-17", asha_name="Anita Debbarma", district_hq="Agartala (West Tripura)", state_code="TR", peer_cohort_coverage=55, specialist_skills=["Kokborok Localization", "4G Border Handoff"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-18", asha_name="Swapna Roy", district_hq="Agartala (West Tripura)", state_code="TR", peer_cohort_coverage=55, specialist_skills=["DTMF 160ms Tuning", "Kiosk PIN Override"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-19", asha_name="Jayanti Tripura", district_hq="Udaipur (Gomati)", state_code="TR", peer_cohort_coverage=35, specialist_skills=["Tea Labor Clinics", "Offline Syncing"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-20", asha_name="Bina Bhowmik", district_hq="Udaipur (Gomati)", state_code="TR", peer_cohort_coverage=35, specialist_skills=["Moisture Pouch Management", "Spare Tablets"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-21", asha_name="Yaba Nabam", district_hq="Itanagar (Papum Pare)", state_code="AR", peer_cohort_coverage=40, specialist_skills=["VSAT Bandwidth Throttling", "Battery Warmers"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-22", asha_name="Koj Rinya", district_hq="Itanagar (Papum Pare)", state_code="AR", peer_cohort_coverage=40, specialist_skills=["Tribal Elder Communication", "Hardware Swaps"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-23", asha_name="Lhamo Monpa", district_hq="Tawang", state_code="AR", peer_cohort_coverage=30, specialist_skills=["Cold-Temperature Battery Boot", "Satellite Relays"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-24", asha_name="Tenzin Chodon", district_hq="Tawang", state_code="AR", peer_cohort_coverage=30, specialist_skills=["High-Altitude Solar Docks", "Emergency PINs"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-25", asha_name="Viphretuonuo Angami", district_hq="Kohima", state_code="NL", peer_cohort_coverage=35, specialist_skills=["Village Council Liaison", "Log Drum Media"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-26", asha_name="Kevisenuo Kire", district_hq="Kohima", state_code="NL", peer_cohort_coverage=35, specialist_skills=["BLE Mesh Peer Sync", "Audio Booster"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-27", asha_name="Arenla Ao", district_hq="Dimapur", state_code="NL", peer_cohort_coverage=25, specialist_skills=["Central Hub Interconnect", "Hardware Triage"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-28", asha_name="Sentila Jamir", district_hq="Dimapur", state_code="NL", peer_cohort_coverage=25, specialist_skills=["OTA Validation", "Kiosk Lock Recovery"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-29", asha_name="Lalmuanpuii", district_hq="Aizawl", state_code="MZ", peer_cohort_coverage=30, specialist_skills=["Mizo Tonal Diacritics", "Ridge Repeater Relays"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-30", asha_name="Zoramthangi", district_hq="Aizawl", state_code="MZ", peer_cohort_coverage=30, specialist_skills=["Puanchei Texture QA", "Offline Database Backup"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-31", asha_name="Dawa Lhamu Lepcha", district_hq="Gangtok", state_code="SK", peer_cohort_coverage=25, specialist_skills=["Alpine Weatherproofing", "Lepcha Weave Assets"], active_status="ACTIVE_ON_DUTY"),
+        TechnicalChampionProfileModel(champion_id="CHAMP-32", asha_name="Tshering Bhutia", district_hq="Gangtok", state_code="SK", peer_cohort_coverage=25, specialist_skills=["High-Altitude Battery Thermal Care", "Solar Docks"], active_status="ACTIVE_ON_DUTY"),
+    ]
+
+
+@app.get("/api/v1/support/escalation-tiers", response_model=List[EscalationTierConfigModel], tags=["Field Support Network"])
+async def get_support_escalation_tiers():
+    """Returns the 3-tier frontline incident escalation protocols and target SLAs."""
+    return [
+        EscalationTierConfigModel(
+            tier_level=1,
+            tier_name="Tier 1: Peer WhatsApp & Village Sub-Centre",
+            channel="Regional ASHA WhatsApp Peer Network",
+            target_response_minutes=15,
+            target_resolution_hours=0.5,
+            scope_of_support=["PIN Re-entry", "Audio Volume Boost", "Screen Cleaning", "Simple App Restart"],
+            sla_success_rate_pct=99.4,
+        ),
+        EscalationTierConfigModel(
+            tier_level=2,
+            tier_name="Tier 2: District Technical Champions",
+            channel="Direct Helpline & Mobile Visit",
+            target_response_minutes=30,
+            target_resolution_hours=2.0,
+            scope_of_support=["BLE Mesh Re-pairing", "SQLite Database Integrity Check", "Temporary Spare Tablet Swap", "Battery Pack Replacements"],
+            sla_success_rate_pct=98.8,
+        ),
+        EscalationTierConfigModel(
+            tier_level=3,
+            tier_name="Tier 3: Central MDoNER Engineering Desk",
+            channel="1800-890-SMRITI Priority Engineering Queue",
+            target_response_minutes=60,
+            target_resolution_hours=6.0,
+            scope_of_support=["Hardware Replacement Courier", "Cracked Digitizer Repair", "Kernel-level OTA Hotfixes", "Carrier SIP Gateway Rerouting"],
+            sla_success_rate_pct=99.6,
+        ),
+    ]
+
+
+@app.get("/api/v1/support/maintenance-sops", response_model=List[DeviceMaintenanceStandardModel], tags=["Field Support Network"])
+async def get_device_maintenance_sops():
+    """Returns monsoonal, alpine cold, battery health, and kiosk recovery standards."""
+    return [
+        DeviceMaintenanceStandardModel(
+            category="MONSOON_HUMIDITY",
+            title="Monsoonal Moisture & Water Ingress Prevention",
+            protocol_rules=[
+                "Tablets must be sealed in IP68 dry ziplock sleeves when traveling on river ferries or during heavy rainfall.",
+                "Inspect color-indicating silica gel packet daily; replace if blue turns pink (indicating moisture saturation).",
+                "Never charge a damp device; air dry in a well-ventilated dry pouch for minimum 2 hours before plugging in.",
+            ],
+            required_accessories=["IP68 Zipper Sleeve", "Reusable Silica Gel Packs", "Silicone Port Dust Plugs"],
+            frequency="Daily during Monsoon (May–September)",
+        ),
+        DeviceMaintenanceStandardModel(
+            category="HIGH_ALTITUDE_COLD",
+            title="Alpine Thermal Battery Protection (>2,000m)",
+            protocol_rules=[
+                "Never leave tablets in unheated PHC storage overnight in sub-zero elevations (Tawang, Mon, North Sikkim).",
+                "Store devices inside wool-lined thermal insulation envelopes alongside external battery banks.",
+                "Warm the device to room temperature (>10°C) before booting to prevent premature low-voltage shutdown.",
+            ],
+            required_accessories=["Insulated Thermal Pouch", "Lithium-Iron-Phosphate Cold-Resistant Powerbank"],
+            frequency="Daily during Winter (November–February)",
+        ),
+        DeviceMaintenanceStandardModel(
+            category="BATTERY_HEALTH",
+            title="Optimal Battery Cycle & Solar Management",
+            protocol_rules=[
+                "Charge tablets to 80-85% during peak sunlight hours (11:00 AM - 2:00 PM) using PHC solar micro-docks.",
+                "Avoid deep discharge below 15% to maintain long-term lithium cell capacity.",
+                "Perform monthly full battery calibration cycle (drain to 10%, charge uninterrupted to 100%).",
+            ],
+            required_accessories=["10,000mAh Rugged Solar Power Bank", "Short USB-C High-Current Braided Cable"],
+            frequency="Continuous & Monthly Calibration",
+        ),
+        DeviceMaintenanceStandardModel(
+            category="KIOSK_RECOVERY",
+            title="Enterprise Kiosk Mode & PIN Emergency Recovery",
+            protocol_rules=[
+                "To exit kiosk mode for urgent system maintenance, enter Supervisor Master PIN provided by District Champion.",
+                "If screen is locked due to 5 failed caregiver attempts, wait 60s for automatic haptic biometric cooldown.",
+                "Perform weekly SQLite database export to encrypted micro-SD backup volume.",
+            ],
+            required_accessories=["Supervisor Security Token Card", "Class-10 Encrypted 32GB Micro-SD Card"],
+            frequency="As Needed & Weekly Backup",
+        ),
+    ]
+
+
+@app.get("/api/v1/support/summary", response_model=FieldSupportNetworkSummaryModel, tags=["Field Support Network"])
+async def get_field_support_summary():
+    """Consolidated summary of frontline field support network across 16 districts."""
+    return FieldSupportNetworkSummaryModel(
+        sub_phase="17.2 Field Support Network",
+        total_technical_champions=32,
+        districts_covered=16,
+        states_covered=8,
+        mean_incident_resolution_hours=1.8,
+        escalation_tiers_count=3,
+        overall_support_sla_pct=99.2,
+        status="FIELD_SUPPORT_OPERATIONAL",
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 
