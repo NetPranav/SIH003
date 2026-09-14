@@ -20,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: './smriti-ner/package-lock.json'
 
@@ -59,6 +59,8 @@ jobs:
         run: ruff check server/ || true
 
       - name: Run Server Unit Tests
+        env:
+          PYTHONPATH: .
         run: pytest server/
 
   ai-engine-check:
@@ -85,6 +87,8 @@ jobs:
           ruff check ai-engine/ || true
 
       - name: Run DCDA / BKT Unit Tests
+        env:
+          PYTHONPATH: .
         run: pytest ai-engine/
 
   ivr-service-check:
@@ -111,6 +115,8 @@ jobs:
           ruff check ivr-service/ || true
 
       - name: Run Telephony Tests
+        env:
+          PYTHONPATH: .
         run: pytest ivr-service/
 
   security-compliance-audit:
