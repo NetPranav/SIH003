@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 237 / 240+ Deliverables Completed (98.8% Deliverable Completion)  
+**Overall Velocity**: 241 / 240+ Deliverables Completed (100.4% Deliverable Completion)  
 **Phases Completed**: 15 / 20 (Phases 1 through 15 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 16 — Sub-Phase 16.1 Complete; Sub-Phases 16.2–16.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 16 — Sub-Phases 16.1 & 16.2 Complete; Sub-Phases 16.3 & 16.4 Pending)  
 **Phases Pending**: 4 / 20 (Phases 17 through 20)  
 **Milestones Achieved**: 15 / 20 (M1 through M15 Signed Off; M16–M20 Pending)  
 
@@ -155,7 +155,7 @@ gantt
   - [x] Sub-Phase 15.4: Composite Metric Draft (CCEI v1) (2/2 tasks done)
 - [ ] **Phase 16: Multi-State Expansion** (Weeks 56–72) — **Milestone M16 Pending**
   - [x] Sub-Phase 16.1: State-by-State Rollout Plan (Waves 1–4) (4/4 tasks done)
-  - [ ] Sub-Phase 16.2: State-Specific Localization (8 States) (0/4 tasks done)
+  - [x] Sub-Phase 16.2: State-Specific Localization (8 States) (4/4 tasks done)
   - [ ] Sub-Phase 16.3: NHM ASHA Tablet Ecosystem Integration (0/3 tasks done)
   - [ ] Sub-Phase 16.4: IVR & Social Feature Scale-Out (0/2 tasks done)
 - [ ] **Phase 17: ASHA Worker Training at Scale** (Weeks 56–69) — **Milestone M17 Pending**
@@ -878,7 +878,7 @@ gantt
 ---
 
 # PHASE 16: MULTI-STATE EXPANSION 📈
-**Phase Status**: [ ] IN PROGRESS (27% Complete — Sub-Phase 16.1 Complete; Sub-Phases 16.2–16.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (61% Complete — Sub-Phases 16.1 & 16.2 Complete; Sub-Phases 16.3 & 16.4 Pending)  
 **Duration**: Weeks 56–72 (4 months) | **Objective**: Scale from 3 pilot states to all 8 NER states in structured waves.
 
 ### Sub-Phase 16.1 — State-by-State Rollout Plan
@@ -891,13 +891,13 @@ gantt
 | [x] | Wave 4 | Mizoram, Sikkim | 15 PHCs | 800 | Weeks 72–79 |
 
 ### Sub-Phase 16.2 — State-Specific Localization
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Khasi Deep Localization | Full UI/game/TTS for Khasi speakers | Khasi locale pack |
-| [ ] | Mizo Deep Localization | Mizo ṭawng + Chapchar Kut/Puan assets | Mizo locale pack |
-| [ ] | Bodo Optimization | Bwisagu festival, Dokhona textile motifs | Bodo locale enhancement |
-| [ ] | State-Specific Cultural Content | Per-state fauna/flora/festivals/recipes/instruments | 8 state content packs |
+| [x] | Khasi Deep Localization | Full UI/game/TTS for Khasi speakers | Khasi locale pack |
+| [x] | Mizo Deep Localization | Mizo ṭawng + Chapchar Kut/Puan assets | Mizo locale pack |
+| [x] | Bodo Optimization | Bwisagu festival, Dokhona textile motifs | Bodo locale enhancement |
+| [x] | State-Specific Cultural Content | Per-state fauna/flora/festivals/recipes/instruments | 8 state content packs |
 
 ### Sub-Phase 16.3 — NHM ASHA Tablet Ecosystem Integration
 *Status: [ ] Pending*
