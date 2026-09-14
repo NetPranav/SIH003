@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 125 / 240+ Deliverables Completed (52.1% Deliverable Completion)  
+**Overall Velocity**: 127 / 240+ Deliverables Completed (52.9% Deliverable Completion)  
 **Phases Completed**: 7 / 20 (Phases 1, 2, 3, 4, 5, 6 & 7 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 8 — Sub-Phases 8.1 & 8.2 Complete, Sub-Phases 8.3 & 8.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 8 — Sub-Phases 8.1, 8.2 & 8.3 Complete, Sub-Phase 8.4 Pending)  
 **Phases Pending**: 12 / 20 (Phases 9 through 20)  
 **Milestones Achieved**: 7 / 20 (M1, M2, M3, M4, M5, M6, M7 Signed Off; M8–M20 Pending)  
 
@@ -116,7 +116,7 @@ gantt
 - [ ] **Phase 8: Zero-Smartphone Accessibility — IVR Cognitive Line** (Weeks 22–27) — **Milestone M8 Pending**
   - [x] Sub-Phase 8.1: IVR Cognitive Check-In Flow (3/3 tasks done)
   - [x] Sub-Phase 8.2: IVR Reminder & Adherence Delivery (3/3 tasks done)
-  - [ ] Sub-Phase 8.3: Multilingual IVR Content (0/2 tasks done)
+  - [x] Sub-Phase 8.3: Multilingual IVR Content (2/2 tasks done)
   - [ ] Sub-Phase 8.4: IVR-to-Platform Data Bridge (0/2 tasks done)
 - [ ] **Phase 9: Caregiver, ASHA & Clinician Ecosystem Dashboards** (Weeks 25–33) — **Milestone M9 Pending**
   - [ ] Sub-Phase 9.1: Caregiver Portal (Family View) (0/5 tasks done)
@@ -527,7 +527,7 @@ gantt
 ---
 
 # PHASE 8: ZERO-SMARTPHONE ACCESSIBILITY — IVR COGNITIVE LINE 📞 (New Phase)
-**Phase Status**: [/] IN PROGRESS (50% Complete — Sub-Phases 8.1 & 8.2 Done, Sub-Phases 8.3 & 8.4 Pending)  
+**Phase Status**: [/] IN PROGRESS (75% Complete — Sub-Phases 8.1, 8.2 & 8.3 Done, Sub-Phase 8.4 Pending)  
 **Duration**: Weeks 22–27 | **Objective**: Reach elders with no smartphone/tablet access via a toll-free, voice-only cognitive check-in and reminder line.
 
 ### Sub-Phase 8.1 — IVR Cognitive Check-In Flow
@@ -547,11 +547,11 @@ gantt
 | [x] | Missed-Call Escalation | No answer after N attempts → notify caregiver/ASHA | Escalation logic |
 
 ### Sub-Phase 8.3 — Multilingual IVR Content
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | 8-Language IVR Scripts | Recorded/TTS prompts in all target languages | IVR audio content library |
-| [ ] | Language Auto-Detection/Selection | Caller selects language via keypress on first call | Language selection flow |
+| [x] | 8-Language IVR Scripts | Recorded/TTS prompts in all target languages | IVR audio content library |
+| [x] | Language Auto-Detection/Selection | Caller selects language via keypress on first call | Language selection flow |
 
 ### Sub-Phase 8.4 — IVR-to-Platform Data Bridge
 *Status: [ ] Pending*

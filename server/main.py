@@ -1701,8 +1701,262 @@ async def acknowledge_ivr_escalation(escalation_id: str, acknowledged_by: str = 
     return EscalationNoticeResponse(**esc)
 
 
+# ── IVR Multilingual Content & Dialect Memory Models & Storage (Sub-Phase 8.3) ───
+class IVRMenuOptionResponse(BaseModel):
+    digit: str
+    code: str
+    name: str
+    native_name: str
+    telecom_circle: str
+
+
+class IVRLanguageScriptBundleResponse(BaseModel):
+    language: str
+    name: str
+    native_name: str
+    welcome: str
+    circadian_reassurance: str
+    orientation_question: str
+    recall_presentation: str
+    recall_retrieval: str
+    adherence_check: str
+    asha_emergency: str
+    goodbye_closure: str
+
+
+class IVRLanguageSelectionRequest(BaseModel):
+    phone_number: str
+    digit: Optional[str] = None
+    language_code: Optional[str] = None
+    telecom_circle: Optional[str] = None
+
+
+class IVRLanguageSelectionResponse(BaseModel):
+    phone_number: str
+    language: str
+    name: str
+    native_name: str
+    resolution_source: str  # "SAVED_PROFILE" | "DTMF_DIGIT" | "EXPLICIT_CODE" | "TELECOM_CIRCLE" | "DEFAULT"
+    script_bundle: IVRLanguageScriptBundleResponse
+
+
+IVR_CALLER_PROFILES_STORE: Dict[str, str] = {}
+
+IVR_MENU_OPTIONS = [
+    {"digit": "1", "code": "as", "name": "Assamese", "native_name": "অসমীয়া", "telecom_circle": "Assam"},
+    {"digit": "2", "code": "bn", "name": "Bengali", "native_name": "বাংলা", "telecom_circle": "Tripura / Barak Valley"},
+    {"digit": "3", "code": "mni", "name": "Meitei", "native_name": "ꯃꯤꯇꯩꯂꯣꯟ", "telecom_circle": "Manipur"},
+    {"digit": "4", "code": "brx", "name": "Bodo", "native_name": "बड़ो", "telecom_circle": "Bodoland (BTC)"},
+    {"digit": "5", "code": "kha", "name": "Khasi", "native_name": "Ka Ktien Khasi", "telecom_circle": "Meghalaya"},
+    {"digit": "6", "code": "lus", "name": "Mizo", "native_name": "Mizo ṭawng", "telecom_circle": "Mizoram"},
+    {"digit": "7", "code": "hi", "name": "Hindi", "native_name": "हिन्दी", "telecom_circle": "Pan-NER"},
+    {"digit": "8", "code": "en", "name": "English", "native_name": "English", "telecom_circle": "Pan-NER"},
+]
+
+IVR_SCRIPT_BUNDLES: Dict[str, dict] = {
+    "as": {
+        "language": "as",
+        "name": "Assamese",
+        "native_name": "অসমীয়া",
+        "welcome": "নমস্কাৰ পিতা! স্মৃতি সেৱালৈ স্বাগতম। আপোনাৰ মনটো আজি কেনে আছে?",
+        "circadian_reassurance": "চিন্তা নকৰিব পিতা, আপুনি আপোনাৰ নিজৰ ঘৰতেই সুৰক্ষিত হৈ আছে। বেলি ওলাইছে, শান্ত হওক।",
+        "orientation_question": "এতিয়া পুৱাৰ ভাগ হৈছেনে গধূলিৰ ভাগ? পুৱা হ'লে ১ টিপক, গধূলি হ'লে ২ টিপক, অথবা মুখেই কওক।",
+        "recall_presentation": "মই কোৱা এই তিনিটা চিনাকি শব্দ মন দি শুনক আৰু মনত ৰাখক: গামোচা, জাঁপী, কাজিৰঙা।",
+        "recall_retrieval": "এতিয়া মোক সেই তিনিটা চিনাকি শব্দ আকৌ মনত পেলাই কওকচোন।",
+        "adherence_check": "আজি ৰাতিপুৱাৰ ঔষধ আৰু এগিলাচ কুহুমীয়া পানী খালে নে? খালে ১ টিপক, বা 'খালোঁ' কওক।",
+        "asha_emergency": "আমাৰ আশা বাইদেউৰ সৈতে এতিয়াই পোনপটীয়াকৈ কথা পাতিবলৈ ৯ টিপক বা মুখৰে 'বাইদেউ' মাতক।",
+        "goodbye_closure": "বৰ ভাল লাগিল পিতা! মনটো প্ৰফুল্ল ৰাখক। স্মৃতি সেৱা সদায় আপোনাৰ কাষতেই আছে।",
+    },
+    "bn": {
+        "language": "bn",
+        "name": "Bengali",
+        "native_name": "বাংলা",
+        "welcome": "নমস্কার! স্মৃতি সেবায় আপনাকে স্বাগত। আজ আপনার শরীর ও মন কেমন আছে?",
+        "circadian_reassurance": "চিন্তা করবেন না, আপনি আপনার নিজের বাড়িতেই নিরাপদে আছেন।",
+        "orientation_question": "এখন কি সকালের সময় নাকি সন্ধ্যার সময়? সকাল হলে ১ টিপুন, সন্ধ্যা হলে ২ টিপুন।",
+        "recall_presentation": "মন দিয়ে শুনুন এই তিনটি পরিচিত শব্দ: গামছা, ঢাক, সুন্দরবন।",
+        "recall_retrieval": "এখন সেই তিনটি শব্দ আমাকে আবার মনে করে বলুন।",
+        "adherence_check": "আজকের সকালের ওষুধ আর জল কি খাওয়া হয়েছে? খেলে ১ টিপুন।",
+        "asha_emergency": "আশাকর্মী বোনের সাথে সরাসরি কথা বলতে ৯ টিপুন।",
+        "goodbye_closure": "ভালো থাকবেন! স্মৃতি সেবা সবসময় আপনার পাশে আছে।",
+    },
+    "mni": {
+        "language": "mni",
+        "name": "Meitei",
+        "native_name": "ꯃꯤꯇꯩꯂꯣꯟ",
+        "welcome": "ꯇꯔꯥꯝꯅꯥ ꯑꯣꯛꯆꯔꯤ ꯏꯄꯥ! ꯁ꯭ꯃ꯭ꯔꯤꯇꯤ ꯁꯦꯕꯥꯗꯥ ꯇꯔꯥꯝꯅꯥ ꯑꯣꯛꯄꯤꯌꯨ꯫",
+        "circadian_reassurance": "ꯏꯄꯥ ꯋꯥꯈꯜ ꯋꯥꯒꯅꯨ, ꯅꯍꯥꯛ ꯃꯌꯨꯃꯗꯥ ꯅꯨꯡꯉꯥꯏꯅꯥ ꯂꯩꯔꯤ꯫",
+        "orientation_question": "ꯍꯧꯖꯤꯛ ꯑꯌꯨꯛꯅꯤ ꯅꯠꯔꯒꯥ ꯅꯨꯃꯤꯗꯥꯡꯅꯤ? ꯑꯌꯨꯛ ꯑꯣꯏꯔꯒꯗꯤ ꯱ ꯅꯝꯕꯤꯌꯨ꯫",
+        "recall_presentation": "ꯋꯥꯍꯩ ꯑꯍꯨꯝ ꯑꯁꯤ ꯇꯥꯕꯤꯌꯨ: ꯂꯩꯔꯨꯝ, ꯄꯨꯡ, ꯂꯣꯛꯇꯥꯛ꯫",
+        "recall_retrieval": "ꯍꯧꯖꯤꯛ ꯋꯥꯍꯩ ꯑꯍꯨꯝ ꯑꯗꯨ ꯑꯃꯨꯛ ꯍꯥꯏꯕꯤꯌꯨ꯫",
+        "adherence_check": "ꯍꯤꯗꯥꯛ ꯆꯥꯕꯤꯔꯕꯔꯥ? ꯆꯥꯔꯕꯗꯤ ꯱ ꯅꯝꯕꯤꯌꯨ꯫",
+        "asha_emergency": "ꯑꯥꯁꯥ ꯊꯕꯛꯄꯨꯔꯣꯏꯒꯥ ꯋꯥꯔꯤ ꯁꯥꯅꯅꯕꯥ ꯹ ꯅꯝꯕꯤꯌꯨ꯫",
+        "goodbye_closure": "ꯍꯀꯆꯥꯡ ꯐꯅꯥ ꯂꯩꯕꯤꯌꯨ!",
+    },
+    "brx": {
+        "language": "brx",
+        "name": "Bodo",
+        "native_name": "बड़ो",
+        "welcome": "खुलुमबाय आबु! स्मृती सेवायाव बरायबाय।",
+        "circadian_reassurance": "गिख'नाङा आबु, नों गावनि नोआवनो दं।",
+        "orientation_question": "दा फुं जानाय ना बेलासे? फुं जाब्ला १ खौ थुदो।",
+        "recall_presentation": "बे मोनथाम सोदोबखौ गोसो हो: दखना, सिफुं, मानस।",
+        "recall_retrieval": "दा बै मोनथाम सोदोबखौ फिन बुं।",
+        "adherence_check": "मुलि लोंबाय ना? लोंब्ला १ खौ थुदो।",
+        "asha_emergency": "आशा हेफाजाबगिरिजों रायज्लायनो ९ खौ थुदो।",
+        "goodbye_closure": "गोजोनै थादो!",
+    },
+    "kha": {
+        "language": "kha",
+        "name": "Khasi",
+        "native_name": "Ka Ktien Khasi",
+        "welcome": "Khublei Meiieid! Pdiang sngewbha sha ka Smriti Service.",
+        "circadian_reassurance": "Wat sngewkhia, phi don ha la iing kaba shngain.",
+        "orientation_question": "Ka long ka por step ne janmiet? Lada ka step, pynkhein ia u 1.",
+        "recall_presentation": "Sngap bha ia kine ki lai tylli ki kyntien: Jainsem, Duitara, Umiam.",
+        "recall_retrieval": "Kynmaw pat bad iathuh ia kine ki kyntien.",
+        "adherence_check": "Phi la dih ia ki dawai step? Lada hooid pynkhein ia u 1.",
+        "asha_emergency": "Ban iakren bad ka ASHA, pynkhein ia u 9.",
+        "goodbye_closure": "Khublei shibun!",
+    },
+    "lus": {
+        "language": "lus",
+        "name": "Mizo",
+        "native_name": "Mizo ṭawng",
+        "welcome": "Chibai Pu pu! Smriti rawngbawlnaah kan lo lawm a che.",
+        "circadian_reassurance": "Hlauhthawn tur a awm lo, i inah i awm e.",
+        "orientation_question": "Zing lam nge tlai lam a nih? Zing a nih chuan 1 hmet rawh.",
+        "recall_presentation": "Heng thu pathumte hi lo ngaithla rawh: Puanchei, Khuang, Reiek.",
+        "recall_retrieval": "Chung thu pathumte chu han sawi leh teh le.",
+        "adherence_check": "Zing damdawi i ei tawh em? Ei tawh chuan 1 hmet rawh.",
+        "asha_emergency": "ASHA biak duh chuan 9 hmet rawh.",
+        "goodbye_closure": "Dam takin le!",
+    },
+    "hi": {
+        "language": "hi",
+        "name": "Hindi",
+        "native_name": "हिन्दी",
+        "welcome": "नमस्ते दादाजी! स्मृति सेवा में आपका स्वागत है। आज आपका स्वास्थ्य कैसा है?",
+        "circadian_reassurance": "चिंता न करें, आप अपने घर पर पूरी तरह सुरक्षित हैं।",
+        "orientation_question": "अभी सुबह का समय है या शाम का? सुबह के लिए १ दबाएं, शाम के लिए २ दबाएं।",
+        "recall_presentation": "इन तीन परिचित शब्दों को ध्यान से सुनें: शॉल, ढोलक, गंगा।",
+        "recall_retrieval": "अब वे तीन शब्द मुझे पुनः बताइए।",
+        "adherence_check": "क्या आपने सुबह की दवा और पानी ले लिया? ले लिया हो तो १ दबाएं।",
+        "asha_emergency": "आशा दीदी से बात करने के लिए ९ दबाएं।",
+        "goodbye_closure": "शुभ दिन! अपना ध्यान रखें।",
+    },
+    "en": {
+        "language": "en",
+        "name": "English",
+        "native_name": "English",
+        "welcome": "Hello! Welcome to Smriti Cognitive Wellness IVR line.",
+        "circadian_reassurance": "Do not worry, you are resting safely in your own home.",
+        "orientation_question": "Is it currently morning time or evening time? Press 1 for Morning, Press 2 for Evening.",
+        "recall_presentation": "Please listen carefully to these 3 familiar words: Shawl, Flute, Mountain.",
+        "recall_retrieval": "Now please repeat those three words back to me.",
+        "adherence_check": "Have you taken your morning medication and water? Press 1 to confirm.",
+        "asha_emergency": "To speak directly with your local ASHA health worker, press 9.",
+        "goodbye_closure": "Have a wonderful, peaceful day! Smriti is always here for you.",
+    },
+}
+
+
+@app.get("/api/v1/ivr/content/languages", response_model=List[IVRMenuOptionResponse], tags=["IVR Cognitive Line"])
+async def get_ivr_language_menu():
+    """Returns the 8-language 1-press DTMF menu options for zero-smartphone accessibility."""
+    return [IVRMenuOptionResponse(**opt) for opt in IVR_MENU_OPTIONS]
+
+
+@app.post("/api/v1/ivr/content/select-language", response_model=IVRLanguageSelectionResponse, tags=["IVR Cognitive Line"])
+async def select_ivr_language(req: IVRLanguageSelectionRequest):
+    """Resolves and persists caller language via saved profile, DTMF keypress, explicit code, or telecom circle."""
+    phone = req.phone_number
+    resolved_lang = "as"
+    source = "DEFAULT"
+
+    # 1. Saved caller profile
+    if phone in IVR_CALLER_PROFILES_STORE and not req.digit and not req.language_code:
+        resolved_lang = IVR_CALLER_PROFILES_STORE[phone]
+        source = "SAVED_PROFILE"
+    # 2. Explicit language code
+    elif req.language_code and req.language_code in IVR_SCRIPT_BUNDLES:
+        resolved_lang = req.language_code
+        source = "EXPLICIT_CODE"
+        IVR_CALLER_PROFILES_STORE[phone] = resolved_lang
+    # 3. DTMF digit selection
+    elif req.digit:
+        matched = next((opt for opt in IVR_MENU_OPTIONS if opt["digit"] == req.digit), None)
+        if matched:
+            resolved_lang = matched["code"]
+            source = "DTMF_DIGIT"
+            IVR_CALLER_PROFILES_STORE[phone] = resolved_lang
+    # 4. Telecom circle fallback
+    elif req.telecom_circle:
+        c = req.telecom_circle.lower()
+        if "tripura" in c or "barak" in c:
+            resolved_lang = "bn"
+        elif "manipur" in c:
+            resolved_lang = "mni"
+        elif "meghalaya" in c:
+            resolved_lang = "kha"
+        elif "mizoram" in c:
+            resolved_lang = "lus"
+        elif "bodo" in c or "btc" in c:
+            resolved_lang = "brx"
+        elif "assam" in c:
+            resolved_lang = "as"
+        source = "TELECOM_CIRCLE"
+        IVR_CALLER_PROFILES_STORE[phone] = resolved_lang
+    else:
+        resolved_lang = "as"
+        source = "DEFAULT"
+        IVR_CALLER_PROFILES_STORE[phone] = resolved_lang
+
+    bundle = IVR_SCRIPT_BUNDLES.get(resolved_lang, IVR_SCRIPT_BUNDLES["en"])
+    return IVRLanguageSelectionResponse(
+        phone_number=phone,
+        language=resolved_lang,
+        name=bundle["name"],
+        native_name=bundle["native_name"],
+        resolution_source=source,
+        script_bundle=IVRLanguageScriptBundleResponse(**bundle),
+    )
+
+
+@app.get("/api/v1/ivr/content/scripts/{language}", response_model=IVRLanguageScriptBundleResponse, tags=["IVR Cognitive Line"])
+async def get_ivr_script_bundle(language: str):
+    """Returns the full 7-prompt audio script bundle for a specified regional language."""
+    if language not in IVR_SCRIPT_BUNDLES:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Language '{language}' not found in IVR library. Available: {list(IVR_SCRIPT_BUNDLES.keys())}",
+        )
+    return IVRLanguageScriptBundleResponse(**IVR_SCRIPT_BUNDLES[language])
+
+
+@app.get("/api/v1/ivr/content/caller-profile/{phone_number}", response_model=IVRLanguageSelectionResponse, tags=["IVR Cognitive Line"])
+async def get_caller_ivr_profile(phone_number: str):
+    """Retrieves persisted caller language profile and script bundle."""
+    if phone_number not in IVR_CALLER_PROFILES_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Caller profile for '{phone_number}' not found.",
+        )
+    lang = IVR_CALLER_PROFILES_STORE[phone_number]
+    bundle = IVR_SCRIPT_BUNDLES.get(lang, IVR_SCRIPT_BUNDLES["en"])
+    return IVRLanguageSelectionResponse(
+        phone_number=phone_number,
+        language=lang,
+        name=bundle["name"],
+        native_name=bundle["native_name"],
+        resolution_source="SAVED_PROFILE",
+        script_bundle=IVRLanguageScriptBundleResponse(**bundle),
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
 
