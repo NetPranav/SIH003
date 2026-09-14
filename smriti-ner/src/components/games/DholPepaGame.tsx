@@ -6,7 +6,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import type { ScreenId } from "@/lib/types";
-import { INSTRUMENTS } from "@/lib/constants";
+import { getLocalizedInstruments } from "@/lib/constants";
+import { GAMES_SCREEN_LOCALES } from "@/lib/screenLocalizations";
 import { playInstrumentSound, playSuccessJingle, playGentleChime, playNeutralTap } from "@/lib/audio";
 import { decomposeLatency, updateBKT, type BKTState } from "@/lib/dcdaEngine";
 import { sessionManager } from "@/lib/gameSessionManager";
@@ -18,15 +19,19 @@ import AACBBanner from "@/components/ui/AACBBanner";
 interface Props {
   navigate: (target: ScreenId) => void;
   showSuccess: (time: string, accuracy: string, onNext?: () => void) => void;
+  language?: string;
 }
 
-export default function DholPepaGame({ navigate, showSuccess }: Props) {
+export default function DholPepaGame({ navigate, showSuccess, language = "en" }: Props) {
+  const loc = GAMES_SCREEN_LOCALES[language] || GAMES_SCREEN_LOCALES.en;
+
   // Current difficulty tier (1 through 5)
   const [tier, setTier] = useState<DifficultyTier>(2);
   const tierConfig = getTierConfig(tier);
 
   // Active instruments count adapts to difficulty tier (2 to 6 instruments)
-  const activeInstruments = INSTRUMENTS.slice(0, Math.min(INSTRUMENTS.length, Math.max(2, tierConfig.choiceCount)));
+  const allInstruments = getLocalizedInstruments(language);
+  const activeInstruments = allInstruments.slice(0, Math.min(allInstruments.length, Math.max(2, tierConfig.choiceCount)));
 
   const [sequence, setSequence] = useState<number[]>([0, 1]);
   const [playerStep, setPlayerStep] = useState<number>(0);
@@ -81,14 +86,14 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
       const instIndex = seq[i];
       setActiveHighlight(instIndex);
       const inst = activeInstruments[instIndex] || activeInstruments[0];
-      playInstrumentSound(inst.freq, inst.waveType, 320);
+      playInstrumentSound(inst.id, inst.waveType, 350);
       await new Promise((r) => setTimeout(r, 480));
       setActiveHighlight(null);
       await new Promise((r) => setTimeout(r, 220));
     }
 
     setIsPlayingSeq(false);
-    setStatusMsg("Now your turn: tap the matching instruments in rhythm!");
+    setStatusMsg(language === "hi" ? "अब आपकी बारी: उसी ताल में वाद्यों को छुएं!" : language === "as" ? "এতিয়া আপোনাৰ পাল: তাল অনুসৰি বাদ্যবোৰ স্পৰ্শ কৰক!" : language === "bn" ? "এবার আপনার পালা: একই ছন্দে বাদ্যযন্ত্রে ট্যাপ করুন!" : "Now your turn: tap the matching instruments in rhythm!");
     setPlayerStep(0);
     tapStartRef.current = Date.now();
   };
@@ -103,7 +108,7 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
 
     // Play tapped sound
     const inst = activeInstruments[idx];
-    playInstrumentSound(inst.freq, inst.waveType, 260);
+    playInstrumentSound(inst.id, inst.waveType, 320);
 
     // Visual feedback
     setActiveHighlight(idx);
@@ -248,10 +253,10 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
 
         <div style={{ textAlign: "center" }}>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--gray-900)" }}>
-            ঢোল-পেঁপা সুৰ-মিলন
+            {loc.dhol.native}
           </h2>
           <span style={{ fontSize: "0.82rem", color: "#d97706", fontWeight: 700 }}>
-            Dhol-Pepa Folk Rhythm • Round {round} of 3
+            {loc.dhol.name} • Round {round} of 3
           </span>
         </div>
 
@@ -273,10 +278,11 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
       {/* ── AACB Compassionate Family Guidance Banner ── */}
       <AACBBanner
         active={aacbState.triggered}
+        language={language}
         message={aacbState.nativeVoiceCue || aacbState.guidanceMessage}
         kinshipTitle={aacbState.kinshipTitle}
         onReplayVoice={() =>
-          aacbEngine.speakVoiceCue(aacbState.nativeVoiceCue || aacbState.guidanceMessage || "", "as")
+          aacbEngine.speakVoiceCue(aacbState.nativeVoiceCue || aacbState.guidanceMessage || "", language)
         }
       />
 

@@ -85,33 +85,49 @@ export default function App() {
       {screen === "home" && (
         <HomeScreen
           navigate={navigate}
-          language={language || "as"}
+          language={language || "en"}
           onSelectLanguage={handleSelectLanguage}
         />
       )}
       {screen === "games" && (
-        <GamesScreen navigate={navigate} language={language || "as"} />
+        <GamesScreen navigate={navigate} language={language || "en"} />
       )}
       {screen === "dhol-pepa" && (
-        <DholPepaGame navigate={navigate} showSuccess={showSuccess} />
+        <DholPepaGame
+          navigate={navigate}
+          showSuccess={showSuccess}
+          language={language || "en"}
+        />
       )}
       {screen === "kaziranga" && (
-        <KazirangaGame navigate={navigate} showSuccess={showSuccess} />
+        <KazirangaGame
+          navigate={navigate}
+          showSuccess={showSuccess}
+          language={language || "en"}
+        />
       )}
       {screen === "weavers-loom" && (
-        <WeaversLoomGame navigate={navigate} showSuccess={showSuccess} />
+        <WeaversLoomGame
+          navigate={navigate}
+          showSuccess={showSuccess}
+          language={language || "en"}
+        />
       )}
       {screen === "daily-haat" && (
-        <DailyHaatGame navigate={navigate} showSuccess={showSuccess} />
+        <DailyHaatGame
+          navigate={navigate}
+          showSuccess={showSuccess}
+          language={language || "en"}
+        />
       )}
       {screen === "reminders" && (
-        <RemindersScreen navigate={navigate} language={language || "as"} />
+        <RemindersScreen navigate={navigate} language={language || "en"} />
       )}
       {screen === "album" && (
-        <AlbumScreen navigate={navigate} language={language || "as"} />
+        <AlbumScreen navigate={navigate} language={language || "en"} />
       )}
       {screen === "connect" && (
-        <ConnectScreen navigate={navigate} language={language || "as"} />
+        <ConnectScreen navigate={navigate} language={language || "en"} />
       )}
       {screen === "caregiver-pin" && (
         <CaregiverPinScreen onSuccess={handlePinSuccess} onBack={() => setScreen("home")} />
@@ -123,7 +139,7 @@ export default function App() {
         <BottomNav
           active={screen}
           navigate={navigate}
-          language={language || "as"}
+          language={language || "en"}
         />
       )}
 
@@ -131,7 +147,7 @@ export default function App() {
         isOpen={successModal.open}
         accuracy={parseInt(successModal.accuracy) || 100}
         timeSpentSeconds={parseInt(successModal.time) || 15}
-        language={language || "as"}
+        language={language || "en"}
         onContinue={() => {
           setSuccessModal({ open: false, time: "", accuracy: "" });
           successModal.onNext?.();

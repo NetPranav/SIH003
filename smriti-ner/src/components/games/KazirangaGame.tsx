@@ -6,7 +6,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import type { ScreenId } from "@/lib/types";
-import { ANIMALS } from "@/lib/constants";
+import { getLocalizedAnimals } from "@/lib/constants";
+import { GAMES_SCREEN_LOCALES } from "@/lib/screenLocalizations";
 import { playSuccessJingle, playGentleChime, playNeutralTap } from "@/lib/audio";
 import { decomposeLatency } from "@/lib/dcdaEngine";
 import { sessionManager } from "@/lib/gameSessionManager";
@@ -17,9 +18,12 @@ import AACBBanner from "@/components/ui/AACBBanner";
 interface Props {
   navigate: (target: ScreenId) => void;
   showSuccess: (time: string, accuracy: string, onNext?: () => void) => void;
+  language?: string;
 }
 
-export default function KazirangaGame({ navigate, showSuccess }: Props) {
+export default function KazirangaGame({ navigate, showSuccess, language = "en" }: Props) {
+  const loc = GAMES_SCREEN_LOCALES[language] || GAMES_SCREEN_LOCALES.en;
+
   const [tier, setTier] = useState<DifficultyTier>(2);
   const tierConfig = getTierConfig(tier);
 
@@ -31,11 +35,12 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
   const startTimeRef = useRef<number>(Date.now());
   const questionStartRef = useRef<number>(Date.now());
 
-  // Target animal rotates through 5 indigenous species
-  const targetAnimal = ANIMALS[currentIndex % ANIMALS.length];
+  // Target animal rotates through 5 indigenous species with active language localization
+  const allAnimals = getLocalizedAnimals(language);
+  const targetAnimal = allAnimals[currentIndex % allAnimals.length];
   // Options count adapts to tier (Tier 1 = 2, Tier 2 = 3, Tier 3+ = 4)
-  const optionsCount = Math.min(ANIMALS.length, Math.max(2, tierConfig.choiceCount));
-  const options = ANIMALS.slice(0, optionsCount);
+  const optionsCount = Math.min(allAnimals.length, Math.max(2, tierConfig.choiceCount));
+  const options = allAnimals.slice(0, optionsCount);
 
   // Subscribe to AACB engine
   useEffect(() => {
@@ -89,9 +94,10 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
       playGentleChime();
       aacbEngine.recordSuccess();
 
+      const praiseWord = language === "hi" ? "बहुत बढ़िया!" : language === "as" ? "সাঁচাকৈয়ে সুন্দৰ!" : language === "bn" ? "খুব সুন্দর!" : "Wonderful!";
       setFeedback({
         isCorrect: true,
-        msg: `সাঁচাকৈয়ে সুন্দৰ! ${targetAnimal.trivia}`,
+        msg: `${praiseWord} ${targetAnimal.trivia}`,
       });
 
       setTimeout(() => {
@@ -188,10 +194,10 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
 
         <div style={{ textAlign: "center" }}>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--gray-900)" }}>
-            কাজিৰঙা চাফাৰী সন্ধান
+            {loc.kaziranga.native}
           </h2>
           <span style={{ fontSize: "0.82rem", color: "var(--green)", fontWeight: 700 }}>
-            Kaziranga Safari Search • Animal {currentIndex + 1} of 3
+            {loc.kaziranga.name} • {language === "hi" ? `वन्यजीव ${currentIndex + 1}/3` : language === "as" ? `প্ৰাণী ${currentIndex + 1}/৩` : language === "bn" ? `প্রাণী ${currentIndex + 1}/৩` : `Animal ${currentIndex + 1} of 3`}
           </span>
         </div>
 
@@ -213,10 +219,11 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
       {/* ── AACB Compassionate Family Guidance Banner ── */}
       <AACBBanner
         active={aacbState.triggered}
+        language={language}
         message={aacbState.nativeVoiceCue || aacbState.guidanceMessage}
         kinshipTitle={aacbState.kinshipTitle}
         onReplayVoice={() =>
-          aacbEngine.speakVoiceCue(aacbState.nativeVoiceCue || aacbState.guidanceMessage || "", "as")
+          aacbEngine.speakVoiceCue(aacbState.nativeVoiceCue || aacbState.guidanceMessage || "", language)
         }
       />
 
@@ -274,17 +281,17 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
 
         <h3
           style={{
-            fontSize: "1.45rem",
+            fontSize: "1.25rem",
             fontWeight: 800,
-            color: "#064e3b",
+            color: "#065f46",
             margin: "0 0 0.4rem 0",
           }}
         >
-          Spot the {targetAnimal.name}
+          {language === "hi" ? `पहचानें: ${targetAnimal.name}` : language === "as" ? `${targetAnimal.name} বিচাৰক` : language === "bn" ? `${targetAnimal.name} খুঁজুন` : `Spot the ${targetAnimal.name}`}
         </h3>
 
         <div style={{ fontSize: "1.15rem", fontWeight: 700, color: "#047857" }}>
-          বিচৰা প্ৰাণী: {targetAnimal.native}
+          {language === "hi" ? "खोजने वाला वन्यजीव: " : language === "as" ? "বিচৰা প্ৰাণী: " : language === "bn" ? "খোঁজার প্রাণী: " : "Target Animal: "}{targetAnimal.native}
         </div>
       </div>
 

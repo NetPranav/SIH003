@@ -12,7 +12,7 @@ interface Props {
   language?: string;
 }
 
-export default function ConnectScreen({ navigate, language = "as" }: Props) {
+export default function ConnectScreen({ navigate, language = "en" }: Props) {
   const loc = CONNECT_SCREEN_LOCALES[language] || CONNECT_SCREEN_LOCALES.en;
   const [activeTab, setActiveTab] = useState<"family" | "circle" | "stories">("family");
 

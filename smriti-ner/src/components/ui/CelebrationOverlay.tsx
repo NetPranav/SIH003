@@ -71,7 +71,7 @@ export default function CelebrationOverlay({
   isOpen,
   accuracy,
   timeSpentSeconds,
-  language = "as",
+  language = "en",
   gameTitle = "Cognitive Game",
   onContinue,
   onHome,

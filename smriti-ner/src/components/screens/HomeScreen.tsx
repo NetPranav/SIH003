@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import type { ScreenId } from "@/lib/types";
-import { DEFAULT_SCHEDULE } from "@/lib/constants";
+import { DEFAULT_SCHEDULE, getLocalizedSchedule } from "@/lib/constants";
 import { playBeep } from "@/lib/audio";
 import ElderCard from "@/components/ui/ElderCard";
 import CognitiveProgressRing from "@/components/ui/CognitiveProgressRing";
@@ -647,7 +647,7 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem" }}>
-          {DEFAULT_SCHEDULE.map((item, idx) => (
+          {getLocalizedSchedule(language || "en").map((item, idx) => (
             <div
               key={idx}
               style={{
@@ -725,6 +725,7 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
         isOpen={isPinModalOpen}
         onClose={() => setIsPinModalOpen(false)}
         onSuccess={handlePinVerified}
+        language={language}
       />
     </div>
   );

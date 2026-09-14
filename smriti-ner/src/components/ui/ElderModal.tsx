@@ -25,8 +25,8 @@ export default function ElderModal({
   title,
   nativeTitle,
   children,
-  confirmLabel = "ঠিক আছে / Understand",
-  cancelLabel = "বন্ধ কৰক / Close",
+  confirmLabel = "Understand",
+  cancelLabel = "Close",
   onConfirm,
   variant = "info",
 }: ElderModalProps) {

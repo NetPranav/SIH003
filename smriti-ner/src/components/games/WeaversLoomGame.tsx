@@ -13,9 +13,12 @@ import { type DifficultyTier, getTierConfig } from "@/lib/difficultyStateMachine
 import { aacbEngine, type AACBState } from "@/lib/aacbEngine";
 import AACBBanner from "@/components/ui/AACBBanner";
 
+import { GAMES_SCREEN_LOCALES } from "@/lib/screenLocalizations";
+
 interface Props {
   navigate: (target: ScreenId) => void;
   showSuccess: (time: string, accuracy: string, onNext?: () => void) => void;
+  language?: string;
 }
 
 // 20+ Traditional North-Eastern Textile Patterns
@@ -28,7 +31,9 @@ const TRADITIONAL_PATTERNS = [
   { id: "manipur_inaphi", name: "Manipuri Moirang Phee (ꯃꯣꯏꯔꯥꯡ ꯐꯤ)", sequence: [3, 4, 3, 1], region: "Manipur", desc: "Temple teeth pyramid border" },
 ];
 
-export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
+export default function WeaversLoomGame({ navigate, showSuccess, language = "en" }: Props) {
+  const loc = GAMES_SCREEN_LOCALES[language] || GAMES_SCREEN_LOCALES.en;
+
   const [tier, setTier] = useState<DifficultyTier>(2);
   const tierConfig = getTierConfig(tier);
 
@@ -192,10 +197,10 @@ export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
 
         <div style={{ textAlign: "center" }}>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--gray-900)" }}>
-            তাঁত শালৰ নক্সা
+            {loc.loom.native}
           </h2>
           <span style={{ fontSize: "0.82rem", color: "#4f46e5", fontWeight: 700 }}>
-            Weaver's Loom • Pattern {patternIndex + 1} of {TRADITIONAL_PATTERNS.length}
+            {loc.loom.name} • {language === "hi" ? `पैटर्न ${patternIndex + 1}/${TRADITIONAL_PATTERNS.length}` : `Pattern ${patternIndex + 1} of ${TRADITIONAL_PATTERNS.length}`}
           </span>
         </div>
 
@@ -217,10 +222,11 @@ export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
       {/* ── AACB Compassionate Family Guidance Banner ── */}
       <AACBBanner
         active={aacbState.triggered}
+        language={language}
         message={aacbState.nativeVoiceCue || aacbState.guidanceMessage}
         kinshipTitle={aacbState.kinshipTitle}
         onReplayVoice={() =>
-          aacbEngine.speakVoiceCue(aacbState.nativeVoiceCue || aacbState.guidanceMessage || "", "as")
+          aacbEngine.speakVoiceCue(aacbState.nativeVoiceCue || aacbState.guidanceMessage || "", language)
         }
       />
 
@@ -238,7 +244,7 @@ export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
           <div style={{ fontSize: "0.8rem", fontWeight: 800, color: "#92400e", textTransform: "uppercase" }}>
-            বয়নশাল (Traditional Loom) • {activePattern.region}
+            {language === "hi" ? "पारंपरिक करघा बुनाई" : language === "as" ? "বয়নশাল (Traditional Loom)" : language === "bn" ? "ঐতিহ্যবাহী তাঁতশিল্প" : "Traditional Loom"} • {activePattern.region}
           </div>
           <div style={{ fontSize: "0.8rem", fontWeight: 800, color: "#b45309" }}>
             🧺 Trunk: {culturalTrunkCount} Woven

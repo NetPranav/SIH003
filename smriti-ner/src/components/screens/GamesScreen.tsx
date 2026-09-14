@@ -9,7 +9,7 @@ interface Props {
   language?: string;
 }
 
-export default function GamesScreen({ navigate, language = "as" }: Props) {
+export default function GamesScreen({ navigate, language = "en" }: Props) {
   const loc = GAMES_SCREEN_LOCALES[language] || GAMES_SCREEN_LOCALES.en;
 
   const games = [

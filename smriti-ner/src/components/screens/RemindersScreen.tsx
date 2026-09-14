@@ -13,7 +13,7 @@ interface Props {
   language?: string;
 }
 
-export default function RemindersScreen({ navigate, language = "as" }: Props) {
+export default function RemindersScreen({ navigate, language = "en" }: Props) {
   const loc = REMINDERS_SCREEN_LOCALES[language] || REMINDERS_SCREEN_LOCALES.en;
 
   const [reminders, setReminders] = useState(
@@ -352,7 +352,7 @@ export default function RemindersScreen({ navigate, language = "as" }: Props) {
       <FullScreenReminderCard
         isOpen={!!fullScreenReminder}
         reminder={fullScreenReminder}
-        language="as"
+        language={language || "en"}
         onConfirm={handleConfirmFullScreen}
         onSnooze={handleSnoozeFullScreen}
         onDismiss={() => setFullScreenReminder(null)}

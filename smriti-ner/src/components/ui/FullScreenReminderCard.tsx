@@ -13,38 +13,75 @@ interface Props {
   onDismiss: () => void;
 }
 
-const MULTILINGUAL_LABELS: Record<string, { confirm: string; snooze: string; escalated: string }> = {
+const MULTILINGUAL_LABELS: Record<string, {
+  confirm: string;
+  snooze: string;
+  escalated: string;
+  voiceQuote: string;
+  confirmed: string;
+}> = {
   as: {
     confirm: "✓ মই খাইছো (খোৱা হ'ল)",
     snooze: "⏰ ১৫ মিনিট পিছত সোঁৱৰাব",
     escalated: "পৰিয়াল আৰু আশা দিদীক জনোৱা হৈছে (Caregiver Alerted)",
+    voiceQuote: '"দেউতা, সময় হৈছে! আপোনাৰ দৰবখিনি লওক..."',
+    confirmed: "✓ খোৱা হ'ল!",
   },
   bn: {
     confirm: "✓ আমি খেয়েছি (নেওয়া হলো)",
     snooze: "⏰ ১৫ মিনিট পর মনে করিয়ে দাও",
     escalated: "পরিবার ও আশা কর্মীকে জানানো হয়েছে",
+    voiceQuote: '"বাবা, সময় হয়েছে! আপনার ওষুধগুলো নিয়ে নিন..."',
+    confirmed: "✓ নেওয়া হলো!",
   },
   mni: {
     confirm: "✓ ꯑꯩ ꯆꯥꯈ꯭ꯔꯦ",
     snooze: "⏰ ꯃꯤꯅꯤꯠ ꯱꯵ ꯀꯣꯟꯅꯥ ꯅꯤꯡꯁꯤꯡꯕꯤꯌꯨ",
     escalated: "ꯏꯃꯨꯡꯗꯥ ꯈꯪꯍꯜꯂꯦ",
+    voiceQuote: '"ꯏꯄꯥ, ꯃꯇꯝ ꯑꯣꯏꯔꯦ! ꯍꯤꯗꯥꯛ ꯆꯥꯕꯤꯌꯨ..."',
+    confirmed: "✓ ꯆꯥꯈ꯭ꯔꯦ!",
   },
   hi: {
     confirm: "✓ मैंने दवा ले ली है",
     snooze: "⏰ १५ मिनट बाद याद दिलाएं",
     escalated: "परिवार और आशा कार्यकर्ता को सूचित किया गया",
+    voiceQuote: '"पिताजी, समय हो गया है! अपनी दवाइयाँ ले लीजिए..."',
+    confirmed: "✓ दवा ले ली!",
+  },
+  brx: {
+    confirm: "✓ आं मुलि जाबाय",
+    snooze: "⏰ १५ मिनिट उनाव गोसोखां",
+    escalated: "नखर आरो आशा मावथिया मिथिबाय",
+    voiceQuote: '"आफा, सम जाबाय! नोंथांनि मुलिखौ जादो..."',
+    confirmed: "✓ जाबाय!",
+  },
+  kha: {
+    confirm: "✓ Nga la shim ïa ka dawai",
+    snooze: "⏰ Kynmaw biang hadien 15 minit",
+    escalated: "Kiba ha ïing bad ka ASHA la pyntip",
+    voiceQuote: '"Pa, la dei ka por! Shim ïa ki dawai jong phi..."',
+    confirmed: "✓ La shim!",
+  },
+  lus: {
+    confirm: "✓ Damdawi ka ei tawh e",
+    snooze: "⏰ Minit 15 hnuah min hrilh leh rawh",
+    escalated: "Chhungte leh ASHA hrilh an ni tawh",
+    voiceQuote: '"Ka pa, a hun ta e! I damdawi ei tawh rawh le..."',
+    confirmed: "✓ Ka ei tawh e!",
   },
   en: {
     confirm: "✓ I have taken it",
     snooze: "⏰ Remind me in 15 mins",
     escalated: "Caregiver & ASHA Worker Notified",
+    voiceQuote: '"Dad, it’s time! Please take your medicine..."',
+    confirmed: "✓ Taken!",
   },
 };
 
 export default function FullScreenReminderCard({
   isOpen,
   reminder,
-  language = "as",
+  language = "en",
   onConfirm,
   onSnooze,
   onDismiss,
@@ -67,7 +104,7 @@ export default function FullScreenReminderCard({
 
   if (!isOpen || !reminder) return null;
 
-  const labels = MULTILINGUAL_LABELS[language] || MULTILINGUAL_LABELS.as;
+  const labels = MULTILINGUAL_LABELS[language] || MULTILINGUAL_LABELS.en;
   const isEscalated = reminder.status === "MISSED_ESCALATED" || reminder.snoozeCount >= 3;
 
   const handleConfirmClick = () => {
@@ -255,7 +292,7 @@ export default function FullScreenReminderCard({
               ))}
             </div>
             <p style={{ fontSize: "0.85rem", color: "#e0e7ff", marginTop: "0.4rem", fontStyle: "italic", margin: "0.4rem 0 0" }}>
-              "দেউতা, সময় হৈছে! আপোনাৰ দৰবখিনি লওক..."
+              {labels.voiceQuote}
             </p>
             <span style={{ fontSize: "0.7rem", color: "#93c5fd", display: "inline-block", marginTop: "0.25rem" }}>
               {isPlaying ? "🔊 Playing Voice..." : "▶ Tap to replay voice"}
@@ -305,7 +342,7 @@ export default function FullScreenReminderCard({
               marginBottom: "0.75rem",
             }}
           >
-            <span>{confirmed ? "✓ খোৱা হ'ল!" : labels.confirm}</span>
+            <span>{confirmed ? labels.confirmed : labels.confirm}</span>
           </button>
 
           {/* Secondary Action: Snooze 15 Mins */}

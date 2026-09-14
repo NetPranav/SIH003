@@ -11,15 +11,37 @@ interface AACBBannerProps {
   message?: string;
   kinshipTitle?: string;
   onReplayVoice?: () => void;
+  language?: string;
 }
 
 export default function AACBBanner({
   active,
   message,
-  kinshipTitle = "দেউতা",
+  kinshipTitle,
   onReplayVoice,
+  language = "en",
 }: AACBBannerProps) {
   if (!active || !message) return null;
+
+  const defaultKinship =
+    language === "as"
+      ? "দেউতা"
+      : language === "hi"
+      ? "पिताजी"
+      : language === "bn"
+      ? "বাবা"
+      : "Family";
+
+  const effectiveKinship = kinshipTitle || defaultKinship;
+
+  const headerTitle =
+    language === "as"
+      ? "পৰিয়ালৰ সহায় • Family Guidance"
+      : language === "hi"
+      ? "पारिवारिक मार्गदर्शन • Family Guidance"
+      : language === "bn"
+      ? "পারিবারিক সহায়তা • Family Guidance"
+      : "Family Guidance";
 
   return (
     <div
@@ -70,8 +92,8 @@ export default function AACBBanner({
               gap: "0.35rem",
             }}
           >
-            <span>পৰিয়ালৰ সহায় • Family Guidance</span>
-            <span>({kinshipTitle})</span>
+            <span>{headerTitle}</span>
+            <span>({effectiveKinship})</span>
           </div>
 
           <p

@@ -13,10 +13,12 @@ import { type DifficultyTier, getTierConfig } from "@/lib/difficultyStateMachine
 import { aacbEngine, type AACBState } from "@/lib/aacbEngine";
 import ElderCard from "@/components/ui/ElderCard";
 import AACBBanner from "@/components/ui/AACBBanner";
+import { GAMES_SCREEN_LOCALES } from "@/lib/screenLocalizations";
 
 interface Props {
   navigate: (target: ScreenId) => void;
   showSuccess: (time: string, accuracy: string, onNext?: () => void) => void;
+  language?: string;
 }
 
 // ── Market Produce Item ──────────────────────────────────────────
@@ -125,7 +127,9 @@ const REGIONAL_RECIPES: RegionalRecipe[] = [
 
 type GamePhase = "memorize" | "distractor" | "shopping" | "checkout";
 
-export default function DailyHaatGame({ navigate, showSuccess }: Props) {
+export default function DailyHaatGame({ navigate, showSuccess, language = "en" }: Props) {
+  const loc = GAMES_SCREEN_LOCALES[language] || GAMES_SCREEN_LOCALES.en;
+
   const [tier, setTier] = useState<DifficultyTier>(2);
   const tierConfig = getTierConfig(tier);
 
@@ -141,6 +145,104 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
   const interactionStartRef = useRef<number>(Date.now());
 
   const currentRecipe = REGIONAL_RECIPES[recipeIndex % REGIONAL_RECIPES.length];
+
+  const getProduceLabel = (p: HaatProduce) => {
+    if (language === "en") return p.name;
+    if (language === "hi") {
+      const hiMap: Record<string, string> = {
+        lai_xak: "सरसों साग",
+        koldil: "केले का फूल",
+        omita: "कच्चा पपीता",
+        bah_gaaj: "बांस की सब्जी",
+        rohu_fish: "रोहू मछली",
+        chital_fish: "चितल मछली",
+        river_prawn: "नदी का झींगा",
+        borali_fish: "बोराली मछली",
+        bhut_jolokia: "भूत जोलोकिया (मिर्च)",
+        turmeric: "कच्ची हल्दी",
+        ada: "अदरक",
+        soriyoh: "सरसों दाना",
+        joha_rice: "जोहा सुगंधित चावल",
+        assam_tea: "असम की चाय",
+        pitha_flour: "चावल का आटा",
+        laal_gur: "गुड़",
+      };
+      return hiMap[p.id] || p.name;
+    }
+    if (language === "bn") {
+      const bnMap: Record<string, string> = {
+        lai_xak: "লাই শাক",
+        koldil: "কলার মোচা",
+        omita: "কাঁচা পেঁপে",
+        bah_gaaj: "বাঁশের কোঁড়ল",
+        rohu_fish: "রুই মাছ",
+        chital_fish: "চিতল মাছ",
+        river_prawn: "নদীর চিংড়ি",
+        borali_fish: "বোয়াল মাছ",
+        bhut_jolokia: "ভূত লঙ্কা",
+        turmeric: "কাঁচা হলুদ",
+        ada: "আদা",
+        soriyoh: "সরিষা",
+        joha_rice: "সুগন্ধি চাল",
+        assam_tea: "আসামের চা",
+        pitha_flour: "চালের গুঁড়া",
+        laal_gur: "গুড়",
+      };
+      return bnMap[p.id] || p.name;
+    }
+    if (language === "as") return p.native;
+    return p.name;
+  };
+
+  const getStallLabel = (s: HaatStall) => {
+    if (language === "en") return s.label;
+    if (language === "hi") {
+      const hiStalls: Record<string, string> = {
+        all: "सभी दुकानें",
+        veggies: "ताज़ा सब्ज़ियाँ",
+        fish: "मछली बाज़ार",
+        spices: "मसाले",
+        tea: "चाय व अनाज",
+      };
+      return hiStalls[s.id] || s.label;
+    }
+    if (language === "bn") {
+      const bnStalls: Record<string, string> = {
+        all: "সব দোকান",
+        veggies: "শাকসবজি",
+        fish: "তাজা মাছ",
+        spices: "মশলা",
+        tea: "চা ও শস্য",
+      };
+      return bnStalls[s.id] || s.label;
+    }
+    if (language === "as") return s.native;
+    return s.label;
+  };
+
+  const getRecipeTitle = (r: RegionalRecipe) => {
+    if (language === "en") return r.name;
+    if (language === "as") return r.native;
+    if (language === "hi") {
+      const hiRecipes: Record<string, string> = {
+        fish_curry: "पारंपरिक मछली का झोल (असमिया फिश करी)",
+        omita_khar: "पारंपरिक कच्चे पपीते का खार",
+        manipuri_kangsoi: "मणिपुरी कांगसोई सब्जी",
+        bodo_onla: "बोडो नारज़ी अनला करी",
+      };
+      return hiRecipes[r.id] || r.name;
+    }
+    if (language === "bn") {
+      const bnRecipes: Record<string, string> = {
+        fish_curry: "আসামের মাছের ঝোল",
+        omita_khar: "কলার ক্ষার ও কাঁচা পেঁপে",
+        manipuri_kangsoi: "মণিপুরী কাংসোই স্টু",
+        bodo_onla: "বোডো নারজী অনলা",
+      };
+      return bnRecipes[r.id] || r.name;
+    }
+    return r.name;
+  };
 
   // Subscribe to AACB engine
   useEffect(() => {
@@ -342,10 +444,10 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
 
         <div style={{ textAlign: "center" }}>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--gray-900)" }}>
-            দৈনিক হাটৰ স্মৃতি
+            {loc.haat.native}
           </h2>
           <span style={{ fontSize: "0.82rem", color: "#b45309", fontWeight: 700 }}>
-            Daily Haat Recall • Recipe {recipeIndex + 1} of {REGIONAL_RECIPES.length}
+            {loc.haat.name} • Recipe {recipeIndex + 1} of {REGIONAL_RECIPES.length}
           </span>
         </div>
 
@@ -366,10 +468,11 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
       {phase === "shopping" && (
         <AACBBanner
           active={aacbState.triggered}
+          language={language}
           message={aacbState.nativeVoiceCue || aacbState.guidanceMessage}
           kinshipTitle={aacbState.kinshipTitle}
           onReplayVoice={() =>
-            aacbEngine.speakVoiceCue(aacbState.nativeVoiceCue || aacbState.guidanceMessage || "", "as")
+            aacbEngine.speakVoiceCue(aacbState.nativeVoiceCue || aacbState.guidanceMessage || "", language)
           }
         />
       )}
@@ -401,7 +504,15 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                 marginBottom: "0.5rem",
               }}>
                 <span>📖</span>
-                <span>পদক্ষেপ ১: মনত ৰাখক • Step 1: Memorize</span>
+                <span>
+                  {language === "as"
+                    ? "পদক্ষেপ ১: মনত ৰাখক • Step 1: Memorize"
+                    : language === "hi"
+                    ? "चरण १: याद रखें • Step 1: Memorize"
+                    : language === "bn"
+                    ? "পদক্ষেপ ১: মনে রাখুন • Step 1: Memorize"
+                    : "Step 1: Memorize Recipe"}
+                </span>
               </div>
 
               <h1 style={{
@@ -410,7 +521,7 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                 color: "var(--gray-900)",
                 margin: "0.25rem 0",
               }}>
-                {currentRecipe.native}
+                {getRecipeTitle(currentRecipe)}
               </h1>
               <div style={{
                 fontSize: "1.15rem",
@@ -418,7 +529,7 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                 color: "#b45309",
                 marginBottom: "0.4rem",
               }}>
-                {currentRecipe.name} ({currentRecipe.region})
+                {currentRecipe.region}
               </div>
 
               <p style={{
@@ -445,7 +556,13 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                   letterSpacing: "0.05em",
                   marginBottom: "0.75rem",
                 }}>
-                  বিচাৰি উলিয়াব লগা ৩ বিধ সামগ্ৰী • 3 Ingredients to Find:
+                  {language === "as"
+                    ? "বিচাৰি উলিয়াব লগা ৩ বিধ সামগ্ৰী • 3 Ingredients to Find:"
+                    : language === "hi"
+                    ? "खोजने के लिए ३ सामग्रियां • 3 Ingredients to Find:"
+                    : language === "bn"
+                    ? "খুঁজে বের করার ৩টি উপাদান • 3 Ingredients to Find:"
+                    : "3 Ingredients to Find:"}
                 </div>
 
                 <div style={{
@@ -456,6 +573,7 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                   {currentRecipe.ingredients.map((ingId) => {
                     const item = HAAT_PRODUCE.find((p) => p.id === ingId);
                     if (!item) return null;
+                    const label = getProduceLabel(item);
                     return (
                       <div
                         key={ingId}
@@ -473,11 +591,13 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                       >
                         <span style={{ fontSize: "2.4rem", marginBottom: "0.25rem" }}>{item.emoji}</span>
                         <span style={{ fontSize: "0.92rem", fontWeight: 800, color: "var(--gray-900)" }}>
-                          {item.native}
+                          {label}
                         </span>
-                        <span style={{ fontSize: "0.75rem", color: "var(--gray-600)", fontWeight: 600 }}>
-                          {item.name}
-                        </span>
+                        {language !== "en" && (
+                          <span style={{ fontSize: "0.75rem", color: "var(--gray-600)", fontWeight: 600 }}>
+                            {item.name}
+                          </span>
+                        )}
                       </div>
                     );
                   })}
@@ -505,7 +625,15 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                 }}
               >
                 <span>🛒</span>
-                <span>মই মনত ৰাখিছোঁ • Start Shopping</span>
+                <span>
+                  {language === "as"
+                    ? "মই মনত ৰাখিছোঁ • Start Shopping"
+                    : language === "hi"
+                    ? "मुझे याद है • खरीदारी शुरू करें"
+                    : language === "bn"
+                    ? "আমার মনে আছে • কেনাকাটা শুরু করুন"
+                    : "I Remember • Start Shopping"}
+                </span>
               </button>
             </div>
           </ElderCard>
@@ -531,10 +659,16 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
             🏪
           </div>
           <h2 style={{ fontSize: "1.8rem", fontWeight: 800, color: "var(--gray-900)" }}>
-            দৈনিক হাট মুকলি হ'ল!
+            {language === "as"
+              ? "দৈনিক হাট মুকলি হ'ল!"
+              : language === "hi"
+              ? "दैनिक ग्रामीण हाट खुल गया!"
+              : language === "bn"
+              ? "দৈনিক হাট খুলে গেছে!"
+              : "The Rural Haat is Open!"}
           </h2>
           <p style={{ fontSize: "1.15rem", color: "#b45309", fontWeight: 700, marginTop: "0.5rem" }}>
-            The Rural Haat Stalls are Ready!
+            {language === "as" ? "পোহাৰী সকল সাজু হৈছে!" : "The Rural Haat Stalls are Ready!"}
           </p>
           <p style={{ fontSize: "0.95rem", color: "var(--gray-600)", maxWidth: "340px", margin: "0.5rem auto 1.5rem" }}>
             Recalling the recipe ingredients from memory... Entering the weekly market!
@@ -576,10 +710,16 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
               <span style={{ fontSize: "1.8rem" }}>🧺</span>
               <div>
                 <div style={{ fontSize: "0.92rem", fontWeight: 800, color: "var(--gray-900)" }}>
-                  বাঁহৰ খৰাহী • Cane Basket
+                  {language === "as"
+                    ? "বাঁহৰ খৰাহী • Cane Basket"
+                    : language === "hi"
+                    ? "बांस की टोकरी • Cane Basket"
+                    : language === "bn"
+                    ? "বাঁশের ঝুড়ি • Cane Basket"
+                    : "Cane Basket"}
                 </div>
                 <div style={{ fontSize: "0.78rem", color: "#b45309", fontWeight: 700 }}>
-                  Recipe: {currentRecipe.native} ({currentRecipe.name})
+                  Recipe: {getRecipeTitle(currentRecipe)}
                 </div>
               </div>
             </div>
@@ -632,7 +772,7 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                   }}
                 >
                   <span>{stall.icon}</span>
-                  <span>{stall.native}</span>
+                  <span>{getStallLabel(stall)}</span>
                 </button>
               );
             })}
@@ -657,6 +797,8 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
               } else if (aacbState.triggered && !isRequired) {
                 cardClass = "aacb-dimmed";
               }
+
+              const produceLabel = getProduceLabel(item);
 
               return (
                 <button
@@ -697,16 +839,18 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                     color: "var(--gray-900)",
                     lineHeight: 1.2,
                   }}>
-                    {item.native}
+                    {produceLabel}
                   </span>
-                  <span style={{
-                    fontSize: "0.75rem",
-                    color: "var(--gray-500)",
-                    fontWeight: 600,
-                    marginTop: "0.15rem",
-                  }}>
-                    {item.name}
-                  </span>
+                  {language !== "en" && (
+                    <span style={{
+                      fontSize: "0.75rem",
+                      color: "var(--gray-500)",
+                      fontWeight: 600,
+                      marginTop: "0.15rem",
+                    }}>
+                      {item.name}
+                    </span>
+                  )}
 
                   {inBasket && (
                     <div style={{
@@ -718,7 +862,9 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                       padding: "0.2rem 0.5rem",
                       borderRadius: "999px",
                     }}>
-                      {isRequired ? "✓ খৰাহীত আছে" : "অপ্ৰয়োজনীয় (Tap to remove)"}
+                      {isRequired
+                        ? (language === "as" ? "✓ খৰাহীত আছে" : language === "hi" ? "✓ टोकरी में है" : language === "bn" ? "✓ ঝুড়িতে আছে" : "✓ In Basket")
+                        : (language === "as" ? "অপ্ৰয়োজনীয় (হটাওক)" : language === "hi" ? "अनावश्यक (हटाएं)" : language === "bn" ? "অপ্রয়োজনীয় (সরান)" : "Remove")}
                     </div>
                   )}
                 </button>
@@ -753,10 +899,22 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
             <div style={{ textAlign: "center", padding: "0.5rem 0" }}>
               <div style={{ fontSize: "3rem", marginBottom: "0.35rem" }}>🪙</div>
               <h2 style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--gray-900)" }}>
-                হাটীয়া দোকানীৰ হিচাপ
+                {language === "as"
+                  ? "হাটীয়া দোকানীৰ হিচাপ"
+                  : language === "hi"
+                  ? "दुकानदार का हिसाब"
+                  : language === "bn"
+                  ? "দোকানির হিসাব"
+                  : "Market Checkout"}
               </h2>
               <p style={{ fontSize: "1.05rem", fontWeight: 700, color: "#b45309", margin: "0.25rem 0 0.75rem" }}>
-                Market Checkout • Wooden Token Exchange
+                {language === "as"
+                  ? "বজাৰৰ হিচাপ • কাঠেৰে তৈয়াৰী মুদ্ৰা"
+                  : language === "hi"
+                  ? "बाज़ार भुगतान • लकड़ी के सिक्के"
+                  : language === "bn"
+                  ? "বাজারের বিল • কাঠের কয়েন"
+                  : "Wooden Token Currency Exchange"}
               </p>
               <p style={{ fontSize: "0.95rem", color: "var(--gray-600)", marginBottom: "1.25rem" }}>
                 All recipe ingredients gathered! Tap the wooden tokens below to pay the stall vendor.
@@ -779,7 +937,7 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                     <div key={ingId} style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
                       <span style={{ fontSize: "1.4rem" }}>{item?.emoji}</span>
                       <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "#166534" }}>
-                        {item?.native}
+                        {item ? getProduceLabel(item) : ""}
                       </span>
                     </div>
                   );
@@ -794,7 +952,13 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                 marginBottom: "0.85rem",
                 textTransform: "uppercase",
               }}>
-                পোহাৰীক দিব লগা: {currentRecipe.tokenCost - tokensPaid} টকা বাকী • {currentRecipe.tokenCost - tokensPaid} Tokens Remaining
+                {language === "as"
+                  ? `পোহাৰীক দিব লগা: ${currentRecipe.tokenCost - tokensPaid} টকা বাকী`
+                  : language === "hi"
+                  ? `दुकानदार को दें: ${currentRecipe.tokenCost - tokensPaid} टोकन शेष`
+                  : language === "bn"
+                  ? `দোকানিকে দিতে হবে: ${currentRecipe.tokenCost - tokensPaid} টোকেন বাকি`
+                  : `${currentRecipe.tokenCost - tokensPaid} Tokens Remaining`}
               </div>
 
               <div style={{
@@ -805,6 +969,25 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
               }}>
                 {Array.from({ length: currentRecipe.tokenCost }).map((_, idx) => {
                   const isPaid = idx < tokensPaid;
+                  const tokenSymbol = isPaid
+                    ? "✓"
+                    : language === "as"
+                    ? "₹ ১"
+                    : language === "hi"
+                    ? "₹ १"
+                    : language === "bn"
+                    ? "₹ ১"
+                    : "🪙 1";
+                  const tokenSub = isPaid
+                    ? "Paid"
+                    : language === "as"
+                    ? "টকা"
+                    : language === "hi"
+                    ? "रुपया"
+                    : language === "bn"
+                    ? "টাকা"
+                    : "Token";
+
                   return (
                     <button
                       key={idx}
@@ -833,9 +1016,9 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
                         transition: "all 0.2s ease",
                       }}
                     >
-                      <span>{isPaid ? "✓" : "₹ ১"}</span>
+                      <span>{tokenSymbol}</span>
                       <span style={{ fontSize: "0.65rem", fontWeight: 800 }}>
-                        {isPaid ? "Paid" : "টকা"}
+                        {tokenSub}
                       </span>
                     </button>
                   );

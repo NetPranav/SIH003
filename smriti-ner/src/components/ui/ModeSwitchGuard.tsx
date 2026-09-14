@@ -9,13 +9,32 @@ interface ModeSwitchGuardProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  language?: string;
 }
 
 const CORRECT_PIN = "1234";
 
-export default function ModeSwitchGuard({ isOpen, onClose, onSuccess }: ModeSwitchGuardProps) {
+export default function ModeSwitchGuard({ isOpen, onClose, onSuccess, language = "en" }: ModeSwitchGuardProps) {
   const [pin, setPin] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
+
+  const nativeTitle =
+    language === "as"
+      ? "🔒 অভিভাৱক প্ৰৱেশদ্বাৰ"
+      : language === "hi"
+      ? "🔒 अभिभावक पोर्टल"
+      : language === "bn"
+      ? "🔒 অভিভাবক প্রবেশদ্বার"
+      : undefined;
+
+  const cancelLabel =
+    language === "as"
+      ? "বাতিল কৰক / Cancel"
+      : language === "hi"
+      ? "रद्द करें / Cancel"
+      : language === "bn"
+      ? "বাতিল করুন / Cancel"
+      : "Cancel";
 
   const handleDigit = (digit: string) => {
     if (pin.length >= 4) return;
@@ -65,8 +84,8 @@ export default function ModeSwitchGuard({ isOpen, onClose, onSuccess }: ModeSwit
       isOpen={isOpen}
       onClose={onClose}
       title="Caregiver Portal Access"
-      nativeTitle="🔒 অভিভাৱক প্ৰৱেশদ্বাৰ"
-      cancelLabel="বাতিল কৰক / Cancel"
+      nativeTitle={nativeTitle}
+      cancelLabel={cancelLabel}
     >
       <div style={{ textAlign: "center", padding: "0.5rem 0" }}>
         <p style={{ fontSize: "0.95rem", color: "var(--gray-600)", marginBottom: "1.25rem" }}>
