@@ -652,6 +652,152 @@ async def generate_caregiver_weekly_summary(req: CaregiverSummaryRequest):
     )
 
 
+# ── Grandchild Connect (Async Co-Play) Models & Storage ─────────────────────
+class GrandchildClueRecordRequest(BaseModel):
+    patient_id: str
+    grandchild_name: str
+    kinship_title: Optional[str] = "নাতিনী"
+    media_type: str = "AUDIO"  # "AUDIO" | "VIDEO"
+    media_base64: Optional[str] = None
+    duration_seconds: float
+    transcript: str
+    language: str = "as"
+    target_game: str = "BIHU_LOOM"
+    round_id: str
+    target_hint_answer: str
+
+
+class GrandchildClueResponse(BaseModel):
+    id: str
+    patient_id: str
+    grandchild_name: str
+    kinship_title: str
+    media_type: str
+    duration_seconds: float
+    transcript: str
+    language: str
+    target_game: str
+    round_id: str
+    target_hint_answer: str
+    created_at: str
+    is_played: bool
+
+
+class ElderRoundCompleteRequest(BaseModel):
+    clue_id: str
+    patient_id: str
+    grandchild_name: str
+    game_round_id: str
+    score: int = 100
+    time_spent_ms: float = 6500.0
+    language: Optional[str] = "as"
+    kinship_title: Optional[str] = "ককা"
+    elder_voice_note_base64: Optional[str] = None
+
+
+class ElderResponseLoopResponse(BaseModel):
+    response_id: str
+    clue_id: str
+    patient_id: str
+    grandchild_name: str
+    game_round_id: str
+    status: str
+    score: int
+    time_spent_ms: float
+    elder_reaction_badge: str
+    celebration_message: str
+    completed_at: str
+
+
+GRANDCHILD_CLUES_STORE: Dict[str, dict] = {}
+
+CELEBRATION_MESSAGES = {
+    "as": "{kinship}য়ে তোমাৰ ক্লুৰে খেলি সম্পূৰ্ণ কৰিলে! ধন্যবাদ তোমাক মৰমৰ {grandchild}! 🌟",
+    "mni": "{kinship}ꯅꯥ ꯅꯍꯥꯛꯀꯤ ꯄꯥꯎꯇꯥꯛ ꯂꯧꯔꯒꯥ ꯃꯥꯏꯄꯥꯛꯂꯦ! ꯊꯥꯒꯠꯆꯔꯤ {grandchild}! 🌟",
+    "bn": "{kinship} তোমার ক্লু দিয়ে ধাঁধা সমাধান করেছেন! অনেক ধন্যবাদ তোমাকে {grandchild}! 🌟",
+    "brx": "{kinship} नोंनि क्लुजों देरहाबाय! गोजोनथों {grandchild}! 🌟",
+    "kha": "{kinship} u/ka la lah ban pyndep da ka jingiarap jong phi {grandchild}! 🌟",
+    "lus": "{kinship} chuan i hriattirna hmangin a hlawhtling e! Ka lawm e {grandchild}! 🌟",
+    "hi": "{kinship} ने आपके संकेत से पहेली पूरी कर ली! बहुत-बहुत प्यार और धन्यवाद {grandchild}! 🌟",
+    "en": "{kinship} successfully solved the puzzle using your clue! Thank you dear {grandchild}! 🌟",
+}
+
+
+@app.post("/api/v1/social/clues/record", response_model=GrandchildClueResponse, tags=["Social & Reminiscence"])
+async def record_grandchild_clue(req: GrandchildClueRecordRequest):
+    """Registers a 10-second async voice/video clue from a grandchild tied to a game round."""
+    if req.duration_seconds <= 0 or req.duration_seconds > 10.0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Clue duration must be between 0.1s and 10.0s (received: {req.duration_seconds:.1f}s)",
+        )
+
+    import uuid
+    from datetime import datetime, timezone
+
+    clue_id = f"clue_gcc_{uuid.uuid4().hex[:10]}"
+    created_at = datetime.now(timezone.utc).isoformat()
+
+    clue_record = {
+        "id": clue_id,
+        "patient_id": req.patient_id,
+        "grandchild_name": req.grandchild_name,
+        "kinship_title": req.kinship_title or "নাতিনী",
+        "media_type": req.media_type,
+        "duration_seconds": req.duration_seconds,
+        "transcript": req.transcript,
+        "language": req.language if req.language in SUPPORTED_VOICE_LANGUAGES else "as",
+        "target_game": req.target_game,
+        "round_id": req.round_id,
+        "target_hint_answer": req.target_hint_answer,
+        "created_at": created_at,
+        "is_played": False,
+    }
+
+    GRANDCHILD_CLUES_STORE[clue_id] = clue_record
+    return GrandchildClueResponse(**clue_record)
+
+
+@app.get("/api/v1/social/clues/pending/{patient_id}", response_model=List[GrandchildClueResponse], tags=["Social & Reminiscence"])
+async def get_pending_clues(patient_id: str, game_type: Optional[str] = None):
+    """Retrieves unplayed clues for an elder patient, optionally filtered by target game."""
+    results = []
+    for clue in GRANDCHILD_CLUES_STORE.values():
+        if clue["patient_id"] == patient_id and not clue["is_played"]:
+            if not game_type or clue["target_game"] == game_type:
+                results.append(GrandchildClueResponse(**clue))
+    return results
+
+
+@app.post("/api/v1/social/clues/complete-round", response_model=ElderResponseLoopResponse, tags=["Social & Reminiscence"])
+async def complete_clue_linked_round(req: ElderRoundCompleteRequest):
+    """Completes a clue-linked game round and dispatches a celebration reaction to the grandchild."""
+    import uuid
+    from datetime import datetime, timezone
+
+    if req.clue_id in GRANDCHILD_CLUES_STORE:
+        GRANDCHILD_CLUES_STORE[req.clue_id]["is_played"] = True
+
+    lang = req.language if req.language in CELEBRATION_MESSAGES else "as"
+    kinship = req.kinship_title or "ককা"
+    template = CELEBRATION_MESSAGES.get(lang, CELEBRATION_MESSAGES["en"])
+    celebration_msg = template.format(kinship=kinship, grandchild=req.grandchild_name)
+
+    return ElderResponseLoopResponse(
+        response_id=f"resp_gcc_{uuid.uuid4().hex[:10]}",
+        clue_id=req.clue_id,
+        patient_id=req.patient_id,
+        grandchild_name=req.grandchild_name,
+        game_round_id=req.game_round_id,
+        status="COMPLETED",
+        score=req.score,
+        time_spent_ms=req.time_spent_ms,
+        elder_reaction_badge="CELEBRATION_STAR",
+        celebration_message=celebration_msg,
+        completed_at=datetime.now(timezone.utc).isoformat(),
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 

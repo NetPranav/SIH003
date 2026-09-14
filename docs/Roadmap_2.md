@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 106 / 240+ Deliverables Completed (44.2% Deliverable Completion)  
+**Overall Velocity**: 109 / 240+ Deliverables Completed (45.4% Deliverable Completion)  
 **Phases Completed**: 6 / 20 (Phases 1, 2, 3, 4, 5 & 6 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 7 — Sub-Phase 7.1 In Progress)  
+**Phases In Progress**: 1 / 20 (Phase 7 — Sub-Phase 7.1 Complete, Sub-Phases 7.2–7.4 Pending)  
 **Phases Pending**: 13 / 20 (Phases 8 through 20)  
 **Milestones Achieved**: 6 / 20 (M1, M2, M3, M4, M5, M6 Signed Off; M7–M20 Pending)  
 
@@ -109,7 +109,7 @@ gantt
   - [x] Sub-Phase 6.3: Personalized Family Voice System (4/4 tasks done)
   - [x] Sub-Phase 6.4: Natural-Language Caregiver Summaries (3/3 tasks done)
 - [ ] **Phase 7: Social Connection & Reminiscence Layer** (Weeks 18–25) — **Milestone M7 Pending**
-  - [ ] Sub-Phase 7.1: Grandchild Connect (Async Co-Play) (0/3 tasks done)
+  - [x] Sub-Phase 7.1: Grandchild Connect (Async Co-Play) (3/3 tasks done)
   - [ ] Sub-Phase 7.2: Community Reminiscence Circles (0/4 tasks done)
   - [ ] Sub-Phase 7.3: Digital Legacy Storytelling (0/4 tasks done)
   - [ ] Sub-Phase 7.4: Consent & Content Moderation for Social Features (0/2 tasks done)
@@ -484,16 +484,16 @@ gantt
 ---
 
 # PHASE 7: SOCIAL CONNECTION & REMINISCENCE LAYER 👨‍👩‍👧 (New Phase)
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 7.1–7.4 Pending)  
+**Phase Status**: [/] IN PROGRESS (23% Complete — Sub-Phase 7.1 Done, Sub-Phases 7.2–7.4 Pending)  
 **Duration**: Weeks 18–25 | **Objective**: Directly answer the "social interaction" requirement with async family co-play, community group sessions, and legacy storytelling.
 
 ### Sub-Phase 7.1 — Grandchild Connect (Async Co-Play)
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Voice/Video Clue Recorder | Family member records a 10-second clue tied to a game round | Clue recording interface |
-| [ ] | Clue-Linked Game Round | Elder plays clue before attempting the puzzle round | Clue playback + game binding |
-| [ ] | Response Loop | Elder's completion triggers a short thank-you/celebration clip back to family app view | Response loop notification |
+| [x] | Voice/Video Clue Recorder | Family member records a 10-second clue tied to a game round | Clue recording interface |
+| [x] | Clue-Linked Game Round | Elder plays clue before attempting the puzzle round | Clue playback + game binding |
+| [x] | Response Loop | Elder's completion triggers a short thank-you/celebration clip back to family app view | Response loop notification |
 
 ### Sub-Phase 7.2 — Community Reminiscence Circles
 *Status: [ ] Pending*
