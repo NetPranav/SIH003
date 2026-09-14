@@ -1,16 +1,18 @@
 // ── SMRITI-NER GAME 4: DAILY HAAT RECALL (দৈনিক হাটৰ স্মৃতি) ───────────────────
-// Sub-Phase 4.4: Authentic rural Haat stalls, local produce, recipe cards,
-// delayed recall protocol, wooden token currency exchange, and telemetry.
+// Sub-Phase 4.5: Authentic rural Haat stalls, local produce, recipe cards,
+// delayed recall protocol, wooden token currency exchange, unified AACB de-escalation.
 
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import type { ScreenId } from "@/lib/types";
-import { playGentleChime, playSuccessJingle, playBeep } from "@/lib/audio";
+import { playGentleChime, playSuccessJingle, playBeep, playNeutralTap } from "@/lib/audio";
 import { decomposeLatency } from "@/lib/dcdaEngine";
 import { sessionManager } from "@/lib/gameSessionManager";
 import { type DifficultyTier, getTierConfig } from "@/lib/difficultyStateMachine";
+import { aacbEngine, type AACBState } from "@/lib/aacbEngine";
 import ElderCard from "@/components/ui/ElderCard";
+import AACBBanner from "@/components/ui/AACBBanner";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -132,17 +134,20 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
   const [activeStall, setActiveStall] = useState<"all" | "veggies" | "fish" | "spices" | "tea">("all");
   const [basket, setBasket] = useState<string[]>([]);
   const [tokensPaid, setTokensPaid] = useState<number>(0);
-  const [hintMessage, setHintMessage] = useState<string | null>(null);
   const [distractorCounter, setDistractorCounter] = useState<number>(4);
+  const [aacbState, setAacbState] = useState<AACBState>(aacbEngine.getState());
 
   const startTimeRef = useRef<number>(Date.now());
   const interactionStartRef = useRef<number>(Date.now());
-  const consecutiveMissesRef = useRef<number>(0);
 
   const currentRecipe = REGIONAL_RECIPES[recipeIndex % REGIONAL_RECIPES.length];
 
-  // Initialize session on mount
+  // Subscribe to AACB engine
   useEffect(() => {
+    const unsubscribe = aacbEngine.subscribe((state) => {
+      setAacbState(state);
+    });
+
     sessionManager.startSession({
       gameId: "daily-haat",
       conceptId: "delayed_episodic_recall",
@@ -150,6 +155,11 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
     });
     startTimeRef.current = Date.now();
     interactionStartRef.current = Date.now();
+
+    return () => {
+      unsubscribe();
+      aacbEngine.reset();
+    };
   }, []);
 
   // Distractor countdown effect
@@ -180,10 +190,9 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
     const totalReactionTime = Date.now() - interactionStartRef.current;
     const latency = decomposeLatency(totalReactionTime, 1.15);
 
-    playBeep(480, 110);
-
     // If item already in basket, allow gentle removal without penalty
     if (basket.includes(item.id)) {
+      playNeutralTap();
       setBasket(basket.filter((id) => id !== item.id));
       return;
     }
@@ -213,8 +222,7 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
 
     if (isTargetIngredient) {
       playGentleChime();
-      consecutiveMissesRef.current = 0;
-      setHintMessage(null);
+      aacbEngine.recordSuccess();
 
       const newBasket = [...basket, item.id];
       setBasket(newBasket);
@@ -230,20 +238,18 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
         }, 600);
       }
     } else {
-      // Gentle AACB assist on non-target item
-      consecutiveMissesRef.current += 1;
+      // Non-target produce selected: Zero failure sound, record in AACB engine
+      playNeutralTap();
       const newBasket = [...basket, item.id];
       setBasket(newBasket);
 
-      if (consecutiveMissesRef.current >= 2) {
-        // Find missing target item and give a calm location hint
-        const missingId = currentRecipe.ingredients.find((ing) => !newBasket.includes(ing));
-        const missingProduce = HAAT_PRODUCE.find((p) => p.id === missingId);
-        if (missingProduce) {
-          const stallObj = STALLS.find((s) => s.id === missingProduce.stall);
-          setHintMessage(`পোহাৰীৰ টিপ: ${missingProduce.native} (${missingProduce.name}) '${stallObj?.native}' ত পোৱা যাব!`);
-        }
-      }
+      const missingId = currentRecipe.ingredients.find((ing) => !newBasket.includes(ing));
+      aacbEngine.recordError({
+        gameId: "daily-haat",
+        targetId: missingId,
+        deliberationMs: totalReactionTime,
+        language: "as",
+      });
     }
   };
 
@@ -276,7 +282,7 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
           setPhase("memorize");
           setBasket([]);
           setTokensPaid(0);
-          setHintMessage(null);
+          aacbEngine.reset();
           startTimeRef.current = Date.now();
           interactionStartRef.current = Date.now();
           sessionManager.startSession({
@@ -300,7 +306,7 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
   return (
     <div style={{
       padding: "1.25rem 1.25rem 5rem",
-      backgroundColor: "var(--background)",
+      backgroundColor: "var(--bg)",
       minHeight: "100dvh",
       display: "flex",
       flexDirection: "column",
@@ -310,7 +316,7 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: "1rem",
+        marginBottom: "0.75rem",
         paddingBottom: "0.75rem",
         borderBottom: "1.5px solid var(--gray-200)",
       }}>
@@ -338,23 +344,35 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
           <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--gray-900)" }}>
             দৈনিক হাটৰ স্মৃতি
           </h2>
-          <span style={{ fontSize: "0.85rem", color: "#b45309", fontWeight: 700 }}>
+          <span style={{ fontSize: "0.82rem", color: "#b45309", fontWeight: 700 }}>
             Daily Haat Recall • Recipe {recipeIndex + 1} of {REGIONAL_RECIPES.length}
           </span>
         </div>
 
         <div style={{
-          background: "#fef3c7",
-          border: "1.5px solid #fde68a",
+          background: aacbState.triggered ? "#fef3c7" : "#fffbeb",
+          border: `1.5px solid ${aacbState.triggered ? "#fde68a" : "#fde68a"}`,
           borderRadius: "var(--radius)",
           padding: "0.35rem 0.65rem",
           fontSize: "0.82rem",
           fontWeight: 800,
           color: "#92400e",
         }}>
-          Tier {tier}
+          {aacbState.triggered ? "AACB Active" : `Tier ${tier}`}
         </div>
       </div>
+
+      {/* ── AACB Compassionate Family Guidance Banner ── */}
+      {phase === "shopping" && (
+        <AACBBanner
+          active={aacbState.triggered}
+          message={aacbState.nativeVoiceCue || aacbState.guidanceMessage}
+          kinshipTitle={aacbState.kinshipTitle}
+          onReplayVoice={() =>
+            aacbEngine.speakVoiceCue(aacbState.nativeVoiceCue || aacbState.guidanceMessage || "", "as")
+          }
+        />
+      )}
 
       {/* ── PHASE 1: MEMORIZATION SCREEN ───────────────────── */}
       {phase === "memorize" && (
@@ -579,26 +597,6 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
             </div>
           </div>
 
-          {/* Hint Message (AACB Assist) */}
-          {hintMessage && (
-            <div style={{
-              background: "#eff6ff",
-              border: "1.5px solid #bfdbfe",
-              borderRadius: "var(--radius)",
-              padding: "0.6rem 0.85rem",
-              marginBottom: "0.85rem",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              fontSize: "0.9rem",
-              color: "#1e40af",
-              fontWeight: 700,
-            }}>
-              <span>💡</span>
-              <span>{hintMessage}</span>
-            </div>
-          )}
-
           {/* Market Stall Filter Tabs */}
           <div style={{
             display: "flex",
@@ -640,7 +638,7 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
             })}
           </div>
 
-          {/* Market Produce Grid */}
+          {/* Market Produce Grid with AACB Golden Halo & Dimming */}
           <div style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
@@ -651,17 +649,30 @@ export default function DailyHaatGame({ navigate, showSuccess }: Props) {
             {displayedProduce.map((item) => {
               const inBasket = basket.includes(item.id);
               const isRequired = currentRecipe.ingredients.includes(item.id);
+              const isMissingRequired = isRequired && !inBasket;
+
+              let cardClass = "";
+              if (aacbState.triggered && isMissingRequired) {
+                cardClass = "aacb-golden-halo aacb-expanded-hitbox";
+              } else if (aacbState.triggered && !isRequired) {
+                cardClass = "aacb-dimmed";
+              }
 
               return (
                 <button
                   key={item.id}
+                  className={cardClass}
                   onClick={(e) => handleItemTap(item, e)}
                   style={{
                     background: inBasket
                       ? isRequired ? "#ecfdf5" : "#fef2f2"
+                      : isMissingRequired && aacbState.triggered
+                      ? "#fffbeb"
                       : "var(--white)",
                     border: inBasket
                       ? isRequired ? "2.5px solid var(--green)" : "2.5px solid #f87171"
+                      : isMissingRequired && aacbState.triggered
+                      ? "3px solid #f59e0b"
                       : "1.5px solid var(--gray-200)",
                     borderRadius: "var(--radius-lg)",
                     minHeight: "130px",

@@ -1,5 +1,8 @@
-// ── Web Audio Synthesis ───────────────────────────────────
-// On-device sound generation — zero streaming required (offline-first)
+// ── Web Audio Synthesis & Audio Suppression Guard ──────────────
+// On-device sound generation — zero streaming required (offline-first).
+// Anti-Agitation Circuit Breaker (AACB) compliant: 0 failure sounds.
+
+import { aacbEngine } from "./aacbEngine";
 
 let audioCtx: AudioContext | null = null;
 
@@ -19,18 +22,39 @@ function getAudioContext(): AudioContext | null {
   return audioCtx;
 }
 
+/**
+ * Audio Suppression Guard
+ * Strictly filters out dissonant error sounds, low-frequency buzzers,
+ * or aggressive square/sawtooth alarm tones.
+ */
+export const AudioSuppressionGuard = {
+  isPermitted(freq: number, type: OscillatorType): boolean {
+    return aacbEngine.isAudioPermitted(freq, type);
+  },
+  sanitize(freq: number, type: OscillatorType): { freq: number; type: OscillatorType } {
+    if (!this.isPermitted(freq, type)) {
+      // Substitute harsh buzzer with gentle sine wood tap
+      return { freq: 320, type: "sine" };
+    }
+    return { freq, type };
+  },
+};
+
 export function playTone(
   freq: number,
   duration = 0.4,
   type: OscillatorType = "sine"
 ): void {
   try {
+    // Pass through Audio Suppression Guard
+    const safeTone = AudioSuppressionGuard.sanitize(freq, type);
+
     const ctx = getAudioContext();
     if (!ctx) return;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    osc.type = safeTone.type;
+    osc.frequency.setValueAtTime(safeTone.freq, ctx.currentTime);
     gain.gain.setValueAtTime(0.2, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
     osc.connect(gain);

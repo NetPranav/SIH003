@@ -80,6 +80,42 @@
   animation: goldenHaloBreath 2.2s infinite ease-in-out;
 }
 
+/* ── Sub-Phase 4.5: Anti-Agitation Circuit Breaker (AACB) Scaffolding ── */
+@keyframes aacbGoldenPulse {
+  0% {
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.45), 0 0 18px 4px rgba(245, 158, 11, 0.35);
+    transform: scale(1.02);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(245, 158, 11, 0.85), 0 0 32px 10px rgba(245, 158, 11, 0.6);
+    transform: scale(1.06);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.45), 0 0 18px 4px rgba(245, 158, 11, 0.35);
+    transform: scale(1.02);
+  }
+}
+
+.aacb-golden-halo {
+  animation: aacbGoldenPulse 2.4s infinite ease-in-out !important;
+  border: 3px solid #f59e0b !important;
+  background-color: #fffbeb !important;
+  position: relative;
+  z-index: 20;
+}
+
+.aacb-dimmed {
+  opacity: 0.40 !important;
+  filter: grayscale(25%) !important;
+  transition: opacity 280ms ease, filter 280ms ease !important;
+}
+
+.aacb-expanded-hitbox {
+  transform: scale(1.15) !important;
+  touch-action: manipulation !important;
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
 /* Respect user's motion preference (prefers-reduced-motion) */
 @media (prefers-reduced-motion: reduce) {
   *,

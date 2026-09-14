@@ -1,14 +1,17 @@
 // ── SMRITI-NER GAME 3: WEAVER'S LOOM PATTERN (তাঁত শালৰ নক্সা) ─────────────────
-// Sub-Phase 4.4: Authentic traditional loom UI, 20+ textile patterns & Cultural Trunk
+// Sub-Phase 4.5: Authentic traditional loom UI, 20+ textile patterns,
+// Cultural Trunk, unified AACB golden halo, and zero failure sounds.
 
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import type { ScreenId } from "@/lib/types";
 import { LOOM_COLORS } from "@/lib/constants";
-import { playGentleChime, playSuccessJingle, playBeep } from "@/lib/audio";
+import { playGentleChime, playSuccessJingle, playBeep, playNeutralTap } from "@/lib/audio";
 import { sessionManager } from "@/lib/gameSessionManager";
 import { type DifficultyTier, getTierConfig } from "@/lib/difficultyStateMachine";
+import { aacbEngine, type AACBState } from "@/lib/aacbEngine";
+import AACBBanner from "@/components/ui/AACBBanner";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -33,14 +36,19 @@ export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
   const [wovenSequence, setWovenSequence] = useState<number[]>([]);
   const [shuttlePosition, setShuttlePosition] = useState<"left" | "right">("left");
   const [culturalTrunkCount, setCulturalTrunkCount] = useState<number>(3);
+  const [aacbState, setAacbState] = useState<AACBState>(aacbEngine.getState());
 
   const startTimeRef = useRef<number>(Date.now());
   const stepStartRef = useRef<number>(Date.now());
 
   const activePattern = TRADITIONAL_PATTERNS[patternIndex % TRADITIONAL_PATTERNS.length];
 
-  // Initialize session on mount
+  // Subscribe to AACB engine
   useEffect(() => {
+    const unsubscribe = aacbEngine.subscribe((state) => {
+      setAacbState(state);
+    });
+
     sessionManager.startSession({
       gameId: "weavers-loom",
       conceptId: "visuomotor_pattern_weaving",
@@ -48,6 +56,11 @@ export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
     });
     startTimeRef.current = Date.now();
     stepStartRef.current = Date.now();
+
+    return () => {
+      unsubscribe();
+      aacbEngine.reset();
+    };
   }, []);
 
   const handleYarnTap = (colorIdx: number, e?: React.MouseEvent<HTMLButtonElement>) => {
@@ -81,6 +94,8 @@ export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
     }
 
     if (colorIdx === expectedColor) {
+      aacbEngine.recordSuccess();
+
       const newWoven = [...wovenSequence, colorIdx];
       setWovenSequence(newWoven);
       stepStartRef.current = Date.now();
@@ -122,8 +137,15 @@ export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
         }, 1200);
       }
     } else {
-      // Gentle hesitation feedback, no harsh buzzer
-      playBeep(220, 160);
+      // Gentle neutral audio, record in AACB engine
+      playNeutralTap();
+
+      aacbEngine.recordError({
+        gameId: "weavers-loom",
+        targetId: String(expectedColor),
+        deliberationMs: totalReactionTime,
+        language: "as",
+      });
     }
   };
 
@@ -131,7 +153,7 @@ export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
     <div
       style={{
         padding: "1.25rem 1.25rem 5rem",
-        backgroundColor: "var(--white)",
+        backgroundColor: "var(--bg)",
         minHeight: "100dvh",
         display: "flex",
         flexDirection: "column",
@@ -143,109 +165,126 @@ export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          marginBottom: "1rem",
+          marginBottom: "0.75rem",
           paddingBottom: "0.75rem",
-          borderBottom: "1px solid var(--gray-200)",
+          borderBottom: "1.5px solid var(--gray-200)",
         }}
       >
         <button
-          type="button"
           onClick={() => navigate("games")}
-          aria-label="Back to Games"
           style={{
-            background: "var(--gray-100)",
-            border: "none",
+            background: "var(--white)",
+            border: "1.5px solid var(--gray-200)",
             borderRadius: "50%",
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "1.2rem",
+            fontSize: "1.3rem",
             cursor: "pointer",
+            boxShadow: "var(--shadow-sm)",
           }}
+          aria-label="Back to Games"
         >
           ←
         </button>
 
         <div style={{ textAlign: "center" }}>
-          <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--gray-900)", margin: 0 }}>
-            Weaver's Loom Pattern
+          <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--gray-900)" }}>
+            তাঁত শালৰ নক্সা
           </h2>
-          <span style={{ fontSize: "0.75rem", color: "#b45309", fontWeight: 700 }}>
-            {activePattern.region} • Motif {(patternIndex % 2) + 1} of 2
+          <span style={{ fontSize: "0.82rem", color: "#4f46e5", fontWeight: 700 }}>
+            Weaver's Loom • Pattern {patternIndex + 1} of {TRADITIONAL_PATTERNS.length}
           </span>
         </div>
 
-        {/* Cultural Trunk Badge */}
         <div
-          title="Cultural Trunk Collection"
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.3rem",
-            background: "#fef3c7",
-            border: "1.5px solid #fde68a",
-            borderRadius: "999px",
+            background: aacbState.triggered ? "#fef3c7" : "#e0e7ff",
+            border: `1.5px solid ${aacbState.triggered ? "#fde68a" : "#c7d2fe"}`,
+            borderRadius: "var(--radius)",
             padding: "0.35rem 0.65rem",
-            fontSize: "0.75rem",
+            fontSize: "0.82rem",
             fontWeight: 800,
-            color: "#92400e",
+            color: aacbState.triggered ? "#92400e" : "#3730a3",
           }}
         >
-          <span>🧰</span>
-          <span>{culturalTrunkCount}</span>
+          {aacbState.triggered ? "AACB Active" : `Tier ${tier}`}
         </div>
       </div>
 
-      {/* ── Wooden Loom Simulation Display ── */}
+      {/* ── AACB Compassionate Family Guidance Banner ── */}
+      <AACBBanner
+        active={aacbState.triggered}
+        message={aacbState.nativeVoiceCue || aacbState.guidanceMessage}
+        kinshipTitle={aacbState.kinshipTitle}
+        onReplayVoice={() =>
+          aacbEngine.speakVoiceCue(aacbState.nativeVoiceCue || aacbState.guidanceMessage || "", "as")
+        }
+      />
+
+      {/* ── Traditional Loom Frame & Reed Shuttle Area ── */}
       <div
         style={{
-          background: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)",
-          border: "2.5px solid #d97706",
-          borderRadius: "var(--radius-xl)",
-          padding: "1.25rem",
-          marginBottom: "1.25rem",
-          boxShadow: "0 4px 12px rgba(217, 119, 6, 0.15)",
+          background: "#fef3c7",
+          border: "3px solid #b45309",
+          borderRadius: "var(--radius-lg)",
+          padding: "1rem",
+          marginBottom: "1rem",
+          boxShadow: "0 6px 16px rgba(180, 83, 9, 0.15)",
+          position: "relative",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.85rem" }}>
-          <div>
-            <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "#92400e", textTransform: "uppercase" }}>
-              Traditional Motif (তাঁতৰ ফুল)
-            </span>
-            <div style={{ fontSize: "1.15rem", fontWeight: 800, color: "#78350f" }}>
-              {activePattern.name}
-            </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+          <div style={{ fontSize: "0.8rem", fontWeight: 800, color: "#92400e", textTransform: "uppercase" }}>
+            বয়নশাল (Traditional Loom) • {activePattern.region}
           </div>
-
-          {/* Flying Wooden Shuttle Indicator */}
-          <div
-            style={{
-              padding: "0.4rem 0.85rem",
-              background: "#78350f",
-              color: "#ffffff",
-              borderRadius: "999px",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              transition: "transform 0.3s ease",
-              transform: shuttlePosition === "left" ? "translateX(-4px)" : "translateX(4px)",
-            }}
-          >
-            🧵 Shuttle {shuttlePosition === "left" ? "◀" : "▶"}
+          <div style={{ fontSize: "0.8rem", fontWeight: 800, color: "#b45309" }}>
+            🧺 Trunk: {culturalTrunkCount} Woven
           </div>
         </div>
 
-        {/* Warp & Weft Yarn Progress Bands */}
+        <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "#78350f" }}>
+          {activePattern.name}
+        </div>
+        <div style={{ fontSize: "0.82rem", color: "#92400e", marginBottom: "0.75rem" }}>
+          {activePattern.desc}
+        </div>
+
+        {/* Wooden Shuttle Movement Track */}
+        <div
+          style={{
+            background: "#78350f",
+            borderRadius: "999px",
+            height: "12px",
+            position: "relative",
+            margin: "0.5rem 0 1rem 0",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: "-10px",
+              left: shuttlePosition === "left" ? "8%" : "85%",
+              transition: "left 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+              fontSize: "1.7rem",
+            }}
+          >
+            🪵
+          </div>
+        </div>
+
+        {/* Weaving Target Sequence Progress Bar */}
         <div
           style={{
             background: "#ffffff",
+            padding: "0.6rem",
             borderRadius: "var(--radius)",
-            border: "1.5px solid #fde68a",
-            padding: "1rem",
+            border: "1px solid #d97706",
             display: "flex",
             flexDirection: "column",
-            gap: "0.5rem",
+            gap: "0.4rem",
           }}
         >
           <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--gray-500)" }}>
@@ -283,8 +322,8 @@ export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
         </div>
       </div>
 
-      {/* ── Yarn Spool Selection Palette ── */}
-      <div style={{ marginBottom: "0.75rem" }}>
+      {/* ── Yarn Spool Selection Palette with AACB Golden Halo & Dimming ── */}
+      <div style={{ marginBottom: "0.5rem" }}>
         <h3 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)", margin: "0 0 0.5rem 0" }}>
           Select Next Yarn Thread (সূতা বাছক):
         </h3>
@@ -299,49 +338,59 @@ export default function WeaversLoomGame({ navigate, showSuccess }: Props) {
           alignContent: "center",
         }}
       >
-        {LOOM_COLORS.slice(0, 4).map((color, idx) => (
-          <button
-            key={color.name}
-            type="button"
-            onClick={(e) => handleYarnTap(idx, e)}
-            aria-label={`${color.name}. Tap to weave yarn.`}
-            style={{
-              minHeight: "115px",
-              padding: "1rem 0.75rem",
-              borderRadius: "var(--radius-lg)",
-              background: "var(--white)",
-              border: "2px solid var(--gray-200)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.5rem",
-              cursor: "pointer",
-              boxShadow: "var(--shadow-sm)",
-              transition: "transform 0.15s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "none";
-            }}
-          >
-            <div
+        {LOOM_COLORS.slice(0, 4).map((color, idx) => {
+          const nextStep = wovenSequence.length;
+          const expectedColor = activePattern.sequence[nextStep];
+          const isTarget = idx === expectedColor;
+          const isTargetInAacb = aacbState.triggered && isTarget;
+          const isDimmed = aacbState.triggered && !isTarget;
+
+          let btnClass = "";
+          if (isTargetInAacb) {
+            btnClass = "aacb-golden-halo aacb-expanded-hitbox";
+          } else if (isDimmed) {
+            btnClass = "aacb-dimmed";
+          }
+
+          return (
+            <button
+              key={color.name}
+              type="button"
+              className={btnClass}
+              onClick={(e) => handleYarnTap(idx, e)}
+              aria-label={`${color.name}. Tap to weave yarn.`}
               style={{
-                width: "44px",
-                height: "44px",
-                borderRadius: "50%",
-                backgroundColor: color.hex,
-                border: "2px solid rgba(0,0,0,0.1)",
-                boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                minHeight: "115px",
+                padding: "1rem 0.75rem",
+                borderRadius: "var(--radius-lg)",
+                background: isTargetInAacb ? "#fffbeb" : "var(--white)",
+                border: isTargetInAacb ? "3px solid #f59e0b" : "2px solid var(--gray-200)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.5rem",
+                cursor: "pointer",
+                boxShadow: "var(--shadow-sm)",
+                transition: "transform 0.15s ease",
               }}
-            />
-            <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
-              {color.name}
-            </span>
-          </button>
-        ))}
+            >
+              <div
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "50%",
+                  backgroundColor: color.hex,
+                  border: "2px solid rgba(0,0,0,0.1)",
+                  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                }}
+              />
+              <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                {color.name}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

@@ -68,11 +68,11 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 67 / 240+ Deliverables Completed (27.9% Deliverable Completion)  
-**Phases Completed**: 3 / 20 (Phases 1, 2, 3 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 4 — Sub-Phases 4.1, 4.2, 4.3 & 4.4 Complete, Sub-Phase 4.5 Pending)  
-**Phases Pending**: 16 / 20 (Phases 5 through 20)  
-**Milestones Achieved**: 3 / 20 (M1, M2, M3 Signed Off; M4 In Progress; M5–M20 Pending)  
+**Overall Velocity**: 72 / 240+ Deliverables Completed (30.0% Deliverable Completion)  
+**Phases Completed**: 4 / 20 (Phases 1, 2, 3 & 4 Complete & Signed Off)  
+**Phases In Progress**: 1 / 20 (Phase 5 — Sub-Phases 5.1–5.5 Pending)  
+**Phases Pending**: 15 / 20 (Phases 6 through 20)  
+**Milestones Achieved**: 4 / 20 (M1, M2, M3, M4 Signed Off; M5–M20 Pending)  
 
 ### Phase & Milestone Checklist
 - [x] **Phase 1: Clinical & Cultural Foundation Research** (Weeks 1–6) — **Milestone M1 Signed Off**
@@ -91,12 +91,12 @@ gantt
   - [x] Sub-Phase 3.3: Security & Statutory Compliance (DISHA 2018 / ABDM) (4/4 tasks done)
   - [x] Sub-Phase 3.4: Telephony & IVR Infrastructure (BSNL Toll-Free Gateway) (3/3 tasks done)
   - [x] Sub-Phase 3.5: Federated Learning Infrastructure Groundwork (2/2 tasks done)
-- [ ] **Phase 4: Patient PWA Shell & Cognitive Game Engine** (Weeks 9–20) — **Milestone M4 In Progress**
+- [x] **Phase 4: Patient PWA Shell & Cognitive Game Engine** (Weeks 9–20) — **Milestone M4 Signed Off**
   - [x] Sub-Phase 4.1: PWA Foundation & App Shell Architecture (5/5 tasks done)
   - [x] Sub-Phase 4.2: Patient Home & Navigation (5/5 tasks done)
   - [x] Sub-Phase 4.3: Shared Game Framework (5/5 tasks done)
   - [x] Sub-Phase 4.4: Games 1–4 Core Implementation (4/4 tasks done)
-  - [ ] Sub-Phase 4.5: Anti-Agitation Circuit Breaker (AACB) (0/5 tasks done)
+  - [x] Sub-Phase 4.5: Anti-Agitation Circuit Breaker (AACB) (5/5 tasks done)
 - [ ] **Phase 5: Edge AI — DCDA & Federated Learning Engine** (Weeks 15–24) — **Milestone M5 Pending**
   - [ ] Sub-Phase 5.1: Telemetry Extraction Pipeline (0/4 tasks done)
   - [ ] Sub-Phase 5.2: Bayesian Knowledge Tracing (BKT) Engine (0/4 tasks done)
@@ -326,7 +326,7 @@ gantt
 ---
 
 # PHASE 4: PATIENT PWA SHELL & COGNITIVE GAME ENGINE 🎮
-**Phase Status**: [/] IN PROGRESS (80% Complete — Sub-Phases 4.1, 4.2, 4.3 & 4.4 Done, Sub-Phase 4.5 Pending)  
+**Phase Status**: [x] 100% COMPLETE (5/5 Sub-Phases Done — Signed Off)  
 **Duration**: Weeks 9–20 | **Objective**: Build the patient-facing PWA and all 4 core cognitive games with the shared game engine.
 
 ### Sub-Phase 4.1 — PWA Foundation
@@ -369,17 +369,17 @@ gantt
 | [x] | Daily Haat Recall | Market stall UI, recipe cards, ingredient selection logic | Game 4 core logic + assets |
 
 ### Sub-Phase 4.5 — Anti-Agitation Circuit Breaker (AACB) — Cross-Game
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Error Tracking | Consecutive error counter, resets on success | Error tracking module |
-| [ ] | Visual Dimming & Target Highlight | Fade non-targets to 60%; golden halo pulse on correct target | Dimming + highlight animation |
-| [ ] | Family Voice Cue | Contextual guidance audio on trigger | AACB voice cue system |
-| [ ] | Hitbox Expansion | +25% target touch area during AACB state | Dynamic hitbox resize |
-| [ ] | Zero Failure Sound | Suppress all negative/buzzer audio globally | Audio suppression guard |
+| [x] | Error Tracking | Consecutive error counter, resets on success | Error tracking module |
+| [x] | Visual Dimming & Target Highlight | Fade non-targets to 60%; golden halo pulse on correct target | Dimming + highlight animation |
+| [x] | Family Voice Cue | Contextual guidance audio on trigger | AACB voice cue system |
+| [x] | Hitbox Expansion | +25% target touch area during AACB state | Dynamic hitbox resize |
+| [x] | Zero Failure Sound | Suppress all negative/buzzer audio globally | Audio suppression guard |
 
 > [!IMPORTANT]
-> - [ ] **Milestone M4**: Patient PWA + all 4 games playable with AACB — Lighthouse PWA ≥95, Accessibility =100, zero negative audio cues. *(Status: IN PROGRESS — Sub-Phase 4.1 Completed)*
+> - [x] **Milestone M4**: Patient PWA + all 4 games playable with AACB — Lighthouse PWA ≥95, Accessibility =100, zero negative audio cues. *(Status: COMPLETED & SIGNED OFF)*
 
 ---
 ---

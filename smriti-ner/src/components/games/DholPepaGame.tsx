@@ -1,16 +1,19 @@
 // ── SMRITI-NER GAME 1: DHOL-PEPA SUR-MILON (ঢোল-পেঁপা সুৰ-মিলন) ───────────────
-// Sub-Phase 4.4: 6-Instrument Web Audio synthesis, adaptive tier grid & telemetry
+// Sub-Phase 4.5: 6-Instrument Web Audio synthesis, adaptive tier grid,
+// unified AACB de-escalation, golden halo guidance, and zero failure sounds.
 
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import type { ScreenId } from "@/lib/types";
 import { INSTRUMENTS } from "@/lib/constants";
-import { playInstrumentSound, playSuccessJingle, playGentleChime } from "@/lib/audio";
-import { decomposeLatency, evaluateAACB, updateBKT, type BKTState } from "@/lib/dcdaEngine";
+import { playInstrumentSound, playSuccessJingle, playGentleChime, playNeutralTap } from "@/lib/audio";
+import { decomposeLatency, updateBKT, type BKTState } from "@/lib/dcdaEngine";
 import { sessionManager } from "@/lib/gameSessionManager";
 import { getTierConfig, type DifficultyTier } from "@/lib/difficultyStateMachine";
+import { aacbEngine, type AACBState } from "@/lib/aacbEngine";
 import ElderCard from "@/components/ui/ElderCard";
+import AACBBanner from "@/components/ui/AACBBanner";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -31,11 +34,7 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
   const [activeHighlight, setActiveHighlight] = useState<number | null>(null);
   const [round, setRound] = useState<number>(1);
   const [statusMsg, setStatusMsg] = useState<string>("Listen to the folk rhythm...");
-  const [aacbStatus, setAacbStatus] = useState<{
-    triggered: boolean;
-    goldenHaloActive: boolean;
-    guidanceMessage?: string;
-  }>({ triggered: false, goldenHaloActive: false });
+  const [aacbState, setAacbState] = useState<AACBState>(aacbEngine.getState());
 
   // DCDA Telemetry & BKT
   const [bkt, setBkt] = useState<BKTState>({
@@ -49,15 +48,23 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
 
   const startTimeRef = useRef<number>(Date.now());
   const tapStartRef = useRef<number>(Date.now());
-  const consecutiveErrorsRef = useRef<number>(0);
 
-  // Initialize session on mount
+  // Subscribe to AACB engine
   useEffect(() => {
+    const unsubscribe = aacbEngine.subscribe((state) => {
+      setAacbState(state);
+    });
+
     sessionManager.startSession({
       gameId: "dhol-pepa",
       conceptId: "auditory_folk_rhythm",
       initialTier: tier,
     });
+
+    return () => {
+      unsubscribe();
+      aacbEngine.reset();
+    };
   }, []);
 
   // Play sequence on load or round start
@@ -127,10 +134,9 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
     }
 
     if (isMatch) {
-      // Correct tap!
-      consecutiveErrorsRef.current = 0;
+      // Correct tap! Reset AACB
       setBkt((prev) => updateBKT(prev, true));
-      setAacbStatus({ triggered: false, goldenHaloActive: false });
+      aacbEngine.recordSuccess();
 
       const nextStep = playerStep + 1;
       setPlayerStep(nextStep);
@@ -174,25 +180,21 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
         tapStartRef.current = Date.now();
       }
     } else {
-      // Error detected: Evaluate Anti-Agitation Circuit Breaker (AACB)
-      consecutiveErrorsRef.current += 1;
+      // Miss detected: Zero failure buzzer, record in AACB engine
+      playNeutralTap();
       setBkt((prev) => updateBKT(prev, false));
 
-      const aacbEval = evaluateAACB(
-        consecutiveErrorsRef.current,
-        latencyReport.deliberationLatencyMs
-      );
-
-      setAacbStatus({
-        triggered: aacbEval.triggered,
-        goldenHaloActive: aacbEval.goldenHaloActive,
-        guidanceMessage: aacbEval.guidanceMessage,
+      const updated = aacbEngine.recordError({
+        gameId: "dhol-pepa",
+        targetId: String(expectedIdx),
+        deliberationMs: latencyReport.deliberationLatencyMs,
+        language: "as",
       });
 
-      if (aacbEval.triggered) {
-        setStatusMsg("Gentle guidance active: Follow the golden glowing instrument");
+      if (updated.triggered) {
+        setStatusMsg("মৰমৰ সহায়: সোণালী ৰঙেৰে জিলিকা বাদ্যটো স্পৰ্শ কৰক");
       } else {
-        setStatusMsg("Take your time — listen again!");
+        setStatusMsg("ধীৰে সুস্থে কৰক — পুনৰ শুনক!");
       }
     }
   };
@@ -207,102 +209,109 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
     <div
       style={{
         padding: "1.25rem 1.25rem 5rem",
-        backgroundColor: "var(--white)",
+        backgroundColor: "var(--bg)",
         minHeight: "100dvh",
         display: "flex",
         flexDirection: "column",
       }}
     >
-      {/* ── Top Bar with Back Navigation & Cognitive Tier Badge ── */}
+      {/* ── Top Bar ── */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          marginBottom: "1rem",
+          marginBottom: "0.75rem",
           paddingBottom: "0.75rem",
-          borderBottom: "1px solid var(--gray-200)",
+          borderBottom: "1.5px solid var(--gray-200)",
         }}
       >
         <button
-          type="button"
           onClick={() => navigate("games")}
-          aria-label="Back to Games"
           style={{
-            background: "var(--gray-100)",
-            border: "none",
+            background: "var(--white)",
+            border: "1.5px solid var(--gray-200)",
             borderRadius: "50%",
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "1.2rem",
+            fontSize: "1.3rem",
             cursor: "pointer",
+            boxShadow: "var(--shadow-sm)",
           }}
+          aria-label="Back to Games"
         >
           ←
         </button>
 
         <div style={{ textAlign: "center" }}>
-          <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--gray-900)", margin: 0 }}>
-            Dhol-Pepa Sur-Milon
+          <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--gray-900)" }}>
+            ঢোল-পেঁপা সুৰ-মিলন
           </h2>
-          <span style={{ fontSize: "0.75rem", color: "var(--primary)", fontWeight: 700 }}>
-            {tierConfig.nativeName} • Round {round} of 3
+          <span style={{ fontSize: "0.82rem", color: "#d97706", fontWeight: 700 }}>
+            Dhol-Pepa Folk Rhythm • Round {round} of 3
           </span>
         </div>
 
-        <button
-          type="button"
-          onClick={repeatPattern}
-          disabled={isPlayingSeq}
-          aria-label="Repeat Rhythm Sequence"
+        <div
           style={{
-            background: "#eff6ff",
-            border: "1.5px solid #bfdbfe",
-            borderRadius: "999px",
-            padding: "0.4rem 0.75rem",
-            fontSize: "0.75rem",
-            fontWeight: 700,
-            color: "#1d4ed8",
-            cursor: isPlayingSeq ? "not-allowed" : "pointer",
+            background: aacbState.triggered ? "#fef3c7" : "#eff6ff",
+            border: `1.5px solid ${aacbState.triggered ? "#fde68a" : "#bfdbfe"}`,
+            borderRadius: "var(--radius)",
+            padding: "0.35rem 0.65rem",
+            fontSize: "0.82rem",
+            fontWeight: 800,
+            color: aacbState.triggered ? "#92400e" : "#1e40af",
           }}
         >
-          🔁 Repeat
-        </button>
+          {aacbState.triggered ? "AACB Active" : `Tier ${tier}`}
+        </div>
       </div>
 
-      {/* ── Guidance & Reassurance Banner ── */}
+      {/* ── AACB Compassionate Family Guidance Banner ── */}
+      <AACBBanner
+        active={aacbState.triggered}
+        message={aacbState.nativeVoiceCue || aacbState.guidanceMessage}
+        kinshipTitle={aacbState.kinshipTitle}
+        onReplayVoice={() =>
+          aacbEngine.speakVoiceCue(aacbState.nativeVoiceCue || aacbState.guidanceMessage || "", "as")
+        }
+      />
+
+      {/* ── Instructions Card ── */}
       <div
         style={{
-          background: aacbStatus.triggered ? "#fffbeb" : "#f8fafc",
-          border: `1.5px solid ${aacbStatus.triggered ? "#fde68a" : "var(--gray-200)"}`,
+          background: aacbState.triggered ? "#fffbeb" : "var(--white)",
+          border: `1.5px solid ${aacbState.triggered ? "#fde68a" : "var(--gray-200)"}`,
           borderRadius: "var(--radius-lg)",
-          padding: "0.85rem 1rem",
-          marginBottom: "1.25rem",
+          padding: "1rem",
           textAlign: "center",
+          marginBottom: "1rem",
+          boxShadow: "var(--shadow-sm)",
         }}
       >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
+          <span style={{ fontSize: "1.2rem" }}>🎶</span>
+          <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--gray-500)", textTransform: "uppercase" }}>
+            {isPlayingSeq ? "Listening Phase" : "Your Turn to Play"}
+          </span>
+        </div>
+
         <p
           style={{
-            margin: 0,
+            margin: "0.4rem 0 0",
             fontSize: "0.95rem",
             fontWeight: 700,
-            color: aacbStatus.triggered ? "#92400e" : "var(--gray-700)",
+            color: aacbState.triggered ? "#92400e" : "var(--gray-700)",
           }}
         >
           {statusMsg}
         </p>
-
-        {aacbStatus.triggered && (
-          <span style={{ fontSize: "0.75rem", color: "#b45309", marginTop: "0.25rem", display: "inline-block" }}>
-            ✨ Compassionate Guidance: We’ve highlighted the correct folk instrument for you.
-          </span>
-        )}
       </div>
 
-      {/* ── 6-Instrument Responsive Grid ── */}
+      {/* ── 6-Instrument Responsive Grid with AACB Golden Halo & Dimming ── */}
       <div
         style={{
           display: "grid",
@@ -314,12 +323,22 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
       >
         {activeInstruments.map((inst, idx) => {
           const isHighlighted = activeHighlight === idx;
-          const isTargetInAacb = aacbStatus.goldenHaloActive && sequence[playerStep] === idx;
+          const isTarget = sequence[playerStep] === idx;
+          const isTargetInAacb = aacbState.triggered && isTarget;
+          const isDimmed = aacbState.triggered && !isTarget;
+
+          let btnClass = "";
+          if (isTargetInAacb) {
+            btnClass = "aacb-golden-halo aacb-expanded-hitbox";
+          } else if (isDimmed) {
+            btnClass = "aacb-dimmed";
+          }
 
           return (
             <button
               key={inst.id}
               type="button"
+              className={btnClass}
               onClick={(e) => handleInstrumentTap(idx, e)}
               disabled={isPlayingSeq}
               aria-label={`${inst.name} (${inst.native}). Tap to play sound.`}
@@ -330,16 +349,14 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
                 background: isHighlighted
                   ? "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)"
                   : isTargetInAacb
-                  ? "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)"
+                  ? "#fffbeb"
                   : "var(--white)",
                 border: isTargetInAacb
                   ? "3px solid #f59e0b"
                   : isHighlighted
                   ? "3px solid #2563eb"
                   : "2px solid var(--gray-200)",
-                boxShadow: isHighlighted || isTargetInAacb
-                  ? "0 10px 20px -3px rgba(37, 99, 235, 0.25)"
-                  : "var(--shadow-sm)",
+                boxShadow: isHighlighted ? "0 10px 20px -3px rgba(37, 99, 235, 0.25)" : "var(--shadow-sm)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -347,7 +364,6 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
                 gap: "0.35rem",
                 cursor: isPlayingSeq ? "not-allowed" : "pointer",
                 transition: "all 0.15s ease",
-                transform: isHighlighted ? "scale(1.05)" : "scale(1)",
                 outline: "none",
               }}
             >
@@ -378,20 +394,50 @@ export default function DholPepaGame({ navigate, showSuccess }: Props) {
         {sequence.map((_, sIdx) => {
           const isDone = sIdx < playerStep;
           const isCurrent = sIdx === playerStep;
-
           return (
             <div
               key={sIdx}
               style={{
                 width: isCurrent ? 24 : 12,
                 height: 12,
-                borderRadius: "999px",
-                backgroundColor: isDone ? "var(--green)" : isCurrent ? "var(--primary)" : "var(--gray-300)",
+                borderRadius: 999,
+                background: isDone
+                  ? "var(--green)"
+                  : isCurrent
+                  ? "#f59e0b"
+                  : "var(--gray-300)",
                 transition: "all 0.2s ease",
               }}
             />
           );
         })}
+      </div>
+
+      {/* ── Repeat Pattern Trigger Button ── */}
+      <div style={{ marginTop: "1rem" }}>
+        <button
+          onClick={repeatPattern}
+          disabled={isPlayingSeq}
+          style={{
+            width: "100%",
+            minHeight: "56px",
+            background: "var(--white)",
+            border: "1.5px solid var(--gray-300)",
+            borderRadius: "var(--radius)",
+            fontSize: "1.05rem",
+            fontWeight: 700,
+            color: "var(--gray-700)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.5rem",
+            cursor: isPlayingSeq ? "not-allowed" : "pointer",
+            boxShadow: "var(--shadow-sm)",
+          }}
+        >
+          <span>🔄</span>
+          <span>পুনৰ শুনক • Hear Rhythm Again</span>
+        </button>
       </div>
     </div>
   );

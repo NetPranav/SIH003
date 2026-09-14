@@ -1,15 +1,18 @@
 // ── SMRITI-NER GAME 2: KAZIRANGA SAFARI SEARCH (কাজিৰঙা চাফাৰী সন্ধান) ─────────
-// Sub-Phase 4.4: Grassland camouflage visual search, 5 indigenous fauna & telemetry
+// Sub-Phase 4.5: Grassland visual search with unified AACB de-escalation,
+// golden halo guidance, family voice prompts, and zero failure sounds.
 
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import type { ScreenId } from "@/lib/types";
 import { ANIMALS } from "@/lib/constants";
-import { playSuccessJingle, playGentleChime, playBeep } from "@/lib/audio";
-import { evaluateAACB, decomposeLatency } from "@/lib/dcdaEngine";
+import { playSuccessJingle, playGentleChime, playNeutralTap } from "@/lib/audio";
+import { decomposeLatency } from "@/lib/dcdaEngine";
 import { sessionManager } from "@/lib/gameSessionManager";
 import { type DifficultyTier, getTierConfig } from "@/lib/difficultyStateMachine";
+import { aacbEngine, type AACBState } from "@/lib/aacbEngine";
+import AACBBanner from "@/components/ui/AACBBanner";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -23,11 +26,10 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [selectedAnimalId, setSelectedAnimalId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ isCorrect: boolean; msg: string } | null>(null);
-  const [aacbActive, setAacbActive] = useState<boolean>(false);
+  const [aacbState, setAacbState] = useState<AACBState>(aacbEngine.getState());
 
   const startTimeRef = useRef<number>(Date.now());
   const questionStartRef = useRef<number>(Date.now());
-  const consecutiveErrorsRef = useRef<number>(0);
 
   // Target animal rotates through 5 indigenous species
   const targetAnimal = ANIMALS[currentIndex % ANIMALS.length];
@@ -35,8 +37,12 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
   const optionsCount = Math.min(ANIMALS.length, Math.max(2, tierConfig.choiceCount));
   const options = ANIMALS.slice(0, optionsCount);
 
-  // Initialize session on mount
+  // Subscribe to AACB engine
   useEffect(() => {
+    const unsubscribe = aacbEngine.subscribe((state) => {
+      setAacbState(state);
+    });
+
     sessionManager.startSession({
       gameId: "kaziranga",
       conceptId: "visuospatial_fauna_search",
@@ -44,6 +50,11 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
     });
     startTimeRef.current = Date.now();
     questionStartRef.current = Date.now();
+
+    return () => {
+      unsubscribe();
+      aacbEngine.reset();
+    };
   }, []);
 
   const handleSelect = (animalId: string, e?: React.MouseEvent<HTMLButtonElement>) => {
@@ -76,12 +87,11 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
 
     if (isCorrect) {
       playGentleChime();
-      consecutiveErrorsRef.current = 0;
-      setAacbActive(false);
+      aacbEngine.recordSuccess();
 
       setFeedback({
         isCorrect: true,
-        msg: `Excellent! ${targetAnimal.trivia}`,
+        msg: `সাঁচাকৈয়ে সুন্দৰ! ${targetAnimal.trivia}`,
       });
 
       setTimeout(() => {
@@ -117,22 +127,21 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
         }
       }, 1600);
     } else {
-      // Error detected
-      playBeep(260, 150);
-      consecutiveErrorsRef.current += 1;
+      // Error detected: Zero failure sound, record in AACB engine
+      playNeutralTap();
 
-      const aacb = evaluateAACB(consecutiveErrorsRef.current, latency.deliberationLatencyMs);
-      if (aacb.triggered) {
-        setAacbActive(true);
-      }
+      aacbEngine.recordError({
+        gameId: "kaziranga",
+        targetId: targetAnimal.id,
+        deliberationMs: latency.deliberationLatencyMs,
+        language: "as",
+      });
 
       setFeedback({
         isCorrect: false,
-        msg: aacb.triggered
-          ? `Compassionate Hint: Look for the golden glowing ${targetAnimal.name} (${targetAnimal.native})`
-          : `Take your time! Look for the ${targetAnimal.name} (${targetAnimal.native}).`,
+        msg: `অকণো চিন্তা নকৰিব, লক্ষ্য কৰক: ${targetAnimal.name} (${targetAnimal.native})`,
       });
-      setTimeout(() => setFeedback(null), 2400);
+      setTimeout(() => setFeedback(null), 2500);
     }
   };
 
@@ -140,7 +149,7 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
     <div
       style={{
         padding: "1.25rem 1.25rem 5rem",
-        backgroundColor: "var(--white)",
+        backgroundColor: "var(--bg)",
         minHeight: "100dvh",
         display: "flex",
         flexDirection: "column",
@@ -152,51 +161,73 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          marginBottom: "1rem",
+          marginBottom: "0.75rem",
           paddingBottom: "0.75rem",
-          borderBottom: "1px solid var(--gray-200)",
+          borderBottom: "1.5px solid var(--gray-200)",
         }}
       >
         <button
-          type="button"
           onClick={() => navigate("games")}
-          aria-label="Back to Games"
           style={{
-            background: "var(--gray-100)",
-            border: "none",
+            background: "var(--white)",
+            border: "1.5px solid var(--gray-200)",
             borderRadius: "50%",
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "1.2rem",
+            fontSize: "1.3rem",
             cursor: "pointer",
+            boxShadow: "var(--shadow-sm)",
           }}
+          aria-label="Back to Games"
         >
           ←
         </button>
 
         <div style={{ textAlign: "center" }}>
-          <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--gray-900)", margin: 0 }}>
-            Kaziranga Safari Search
+          <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--gray-900)" }}>
+            কাজিৰঙা চাফাৰী সন্ধান
           </h2>
-          <span style={{ fontSize: "0.75rem", color: "#15803d", fontWeight: 700 }}>
-            {tierConfig.nativeName} • Animal {(currentIndex % 3) + 1} of 3
+          <span style={{ fontSize: "0.82rem", color: "var(--green)", fontWeight: 700 }}>
+            Kaziranga Safari Search • Animal {currentIndex + 1} of 3
           </span>
         </div>
 
-        <div style={{ width: 44 }} />
+        <div
+          style={{
+            background: aacbState.triggered ? "#fef3c7" : "#dcfce7",
+            border: `1.5px solid ${aacbState.triggered ? "#fde68a" : "#bbf7d0"}`,
+            borderRadius: "var(--radius)",
+            padding: "0.35rem 0.65rem",
+            fontSize: "0.82rem",
+            fontWeight: 800,
+            color: aacbState.triggered ? "#92400e" : "#166534",
+          }}
+        >
+          {aacbState.triggered ? "AACB Active" : `Tier ${tier}`}
+        </div>
       </div>
 
-      {/* ── Grassland Camouflage Canvas ── */}
+      {/* ── AACB Compassionate Family Guidance Banner ── */}
+      <AACBBanner
+        active={aacbState.triggered}
+        message={aacbState.nativeVoiceCue || aacbState.guidanceMessage}
+        kinshipTitle={aacbState.kinshipTitle}
+        onReplayVoice={() =>
+          aacbEngine.speakVoiceCue(aacbState.nativeVoiceCue || aacbState.guidanceMessage || "", "as")
+        }
+      />
+
+      {/* ── Grassland Camouflage Mission Canvas ── */}
       <div
         style={{
-          background: "linear-gradient(180deg, #ecfdf5 0%, #d1fae5 50%, #a7f3d0 100%)",
-          border: "2px solid #6ee7b7",
+          background: "linear-gradient(145deg, #ecfdf5 0%, #d1fae5 50%, #fef3c7 100%)",
+          border: "2px solid #a7f3d0",
           borderRadius: "var(--radius-xl)",
-          padding: "1.5rem 1.25rem",
-          marginBottom: "1.25rem",
+          padding: "1.25rem 1rem",
+          marginBottom: "1rem",
           textAlign: "center",
           position: "relative",
           overflow: "hidden",
@@ -204,13 +235,22 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
         }}
       >
         {/* Camouflage foliage reeds decoration */}
-        <div style={{ position: "absolute", top: 10, left: 15, fontSize: "1.75rem", opacity: 0.6, pointerEvents: "none" }}>
+        <div
+          className={aacbState.triggered ? "aacb-dimmed" : undefined}
+          style={{ position: "absolute", top: 10, left: 15, fontSize: "1.75rem", opacity: 0.6, pointerEvents: "none" }}
+        >
           🌾
         </div>
-        <div style={{ position: "absolute", top: 15, right: 20, fontSize: "1.75rem", opacity: 0.6, pointerEvents: "none" }}>
+        <div
+          className={aacbState.triggered ? "aacb-dimmed" : undefined}
+          style={{ position: "absolute", top: 15, right: 20, fontSize: "1.75rem", opacity: 0.6, pointerEvents: "none" }}
+        >
           🌿
         </div>
-        <div style={{ position: "absolute", bottom: 10, left: "45%", fontSize: "1.5rem", opacity: 0.5, pointerEvents: "none" }}>
+        <div
+          className={aacbState.triggered ? "aacb-dimmed" : undefined}
+          style={{ position: "absolute", bottom: 10, left: "45%", fontSize: "1.5rem", opacity: 0.5, pointerEvents: "none" }}
+        >
           🌾
         </div>
 
@@ -243,7 +283,7 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
           Spot the {targetAnimal.name}
         </h3>
 
-        <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "#047857" }}>
+        <div style={{ fontSize: "1.15rem", fontWeight: 700, color: "#047857" }}>
           বিচৰা প্ৰাণী: {targetAnimal.native}
         </div>
       </div>
@@ -256,7 +296,7 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
             border: `1.5px solid ${feedback.isCorrect ? "#86efac" : "#fde68a"}`,
             borderRadius: "var(--radius-lg)",
             padding: "0.85rem 1rem",
-            marginBottom: "1.25rem",
+            marginBottom: "1rem",
             textAlign: "center",
             fontSize: "0.95rem",
             fontWeight: 700,
@@ -268,7 +308,7 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
         </div>
       )}
 
-      {/* ── Fauna Option Cards ── */}
+      {/* ── Fauna Option Cards with AACB Golden Halo & Dimming ── */}
       <div
         style={{
           display: "grid",
@@ -280,13 +320,22 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
       >
         {options.map((animal) => {
           const isSelected = selectedAnimalId === animal.id;
-          const isTargetInAacb = aacbActive && animal.id === targetAnimal.id;
-          const isDimmed = aacbActive && animal.id !== targetAnimal.id;
+          const isTarget = animal.id === targetAnimal.id;
+          const isTargetInAacb = aacbState.triggered && isTarget;
+          const isDimmed = aacbState.triggered && !isTarget;
+
+          let cardClass = "";
+          if (isTargetInAacb) {
+            cardClass = "aacb-golden-halo aacb-expanded-hitbox";
+          } else if (isDimmed) {
+            cardClass = "aacb-dimmed";
+          }
 
           return (
             <button
               key={animal.id}
               type="button"
+              className={cardClass}
               onClick={(e) => handleSelect(animal.id, e)}
               aria-label={`${animal.name} (${animal.native}). Tap to select.`}
               style={{
@@ -294,35 +343,29 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
                 padding: "1rem 0.75rem",
                 borderRadius: "var(--radius-lg)",
                 background: isSelected
-                  ? isCorrectSelection(animal.id, targetAnimal.id)
+                  ? isTarget
                     ? "linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)"
-                    : "#fee2e2"
+                    : "#fff7ed"
                   : isTargetInAacb
-                  ? "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)"
+                  ? "#fffbeb"
                   : "var(--white)",
                 border: isTargetInAacb
                   ? "3px solid #f59e0b"
-                  : isSelected
-                  ? isCorrectSelection(animal.id, targetAnimal.id)
-                    ? "3px solid #16a34a"
-                    : "3px solid #dc2626"
+                  : isSelected && isTarget
+                  ? "3px solid #16a34a"
                   : "2px solid var(--gray-200)",
-                opacity: isDimmed ? 0.45 : 1.0,
-                boxShadow: isTargetInAacb
-                  ? "0 0 20px rgba(245, 158, 11, 0.45)"
-                  : "var(--shadow-sm)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "0.35rem",
                 cursor: "pointer",
-                transition: "all 0.15s ease",
-                transform: isSelected || isTargetInAacb ? "scale(1.04)" : "scale(1)",
+                transition: "all 0.2s ease",
+                boxShadow: "var(--shadow-sm)",
                 outline: "none",
               }}
             >
-              <span style={{ fontSize: "2.5rem" }}>{animal.emoji}</span>
+              <span style={{ fontSize: "2.6rem" }}>{animal.emoji}</span>
               <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--gray-900)" }}>
                 {animal.native}
               </span>
@@ -335,8 +378,4 @@ export default function KazirangaGame({ navigate, showSuccess }: Props) {
       </div>
     </div>
   );
-}
-
-function isCorrectSelection(selectedId: string, targetId: string): boolean {
-  return selectedId === targetId;
 }
