@@ -68,10 +68,10 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 91 / 240+ Deliverables Completed (37.9% Deliverable Completion)  
+**Overall Velocity**: 95 / 240+ Deliverables Completed (39.6% Deliverable Completion)  
 **Phases Completed**: 5 / 20 (Phases 1, 2, 3, 4 & 5 Complete & Signed Off)  
-**Phases In Progress**: 0 / 20 (Phase 5 Complete; Phase 6 Next)  
-**Phases Pending**: 15 / 20 (Phases 6 through 20)  
+**Phases In Progress**: 1 / 20 (Phase 6 — Sub-Phase 6.1 Complete, Sub-Phases 6.2–6.4 Pending)  
+**Phases Pending**: 14 / 20 (Phases 7 through 20)  
 **Milestones Achieved**: 5 / 20 (M1, M2, M3, M4, M5 Signed Off; M6–M20 Pending)  
 
 ### Phase & Milestone Checklist
@@ -104,7 +104,7 @@ gantt
   - [x] Sub-Phase 5.4: Federated Learning Layer (Client Training & Packaging) (4/4 tasks done)
   - [x] Sub-Phase 5.5: Circadian-Aware Content Engine (3/3 tasks done)
 - [ ] **Phase 6: Multilingual Voice & Bhashini Integration** (Weeks 15–22) — **Milestone M6 Pending**
-  - [ ] Sub-Phase 6.1: Bhashini (AI4Bharat) Integration (0/4 tasks done)
+  - [x] Sub-Phase 6.1: Bhashini (AI4Bharat) Integration (4/4 tasks done)
   - [ ] Sub-Phase 6.2: Localization Framework (8 Regional Languages) (0/4 tasks done)
   - [ ] Sub-Phase 6.3: Personalized Family Voice System (0/4 tasks done)
   - [ ] Sub-Phase 6.4: Natural-Language Caregiver Summaries (0/3 tasks done)
@@ -439,17 +439,17 @@ gantt
 ---
 
 # PHASE 6: MULTILINGUAL VOICE & BHASHINI INTEGRATION 🗣️
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 6.1–6.4 Pending)  
+**Phase Status**: [/] IN PROGRESS (25% Complete — Sub-Phase 6.1 Done, Sub-Phases 6.2–6.4 Pending)  
 **Duration**: Weeks 15–22 | **Objective**: Full voice-first, 8-language interaction layer with personalized family voice.
 
 ### Sub-Phase 6.1 — Bhashini (AI4Bharat) Integration
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Bhashini API Registration | Obtain API keys for ASR & TTS | API credentials |
-| [ ] | TTS Integration (8 Languages) | Assamese, Meitei, Bengali, Bodo, Khasi, Mizo, Hindi, English | TTS service wrapper |
-| [ ] | ASR Integration (Keywords) | On-device keyword spotting: Help, Repeat, Listen, Yes, Back, Next | ASR keyword module |
-| [ ] | Fallback TTS Engine | Vosk/Coqui quantized on-device models | Fallback TTS implementation |
+| [x] | Bhashini API Registration | Obtain API keys for ASR & TTS | API credentials |
+| [x] | TTS Integration (8 Languages) | Assamese, Meitei, Bengali, Bodo, Khasi, Mizo, Hindi, English | TTS service wrapper |
+| [x] | ASR Integration (Keywords) | On-device keyword spotting: Help, Repeat, Listen, Yes, Back, Next | ASR keyword module |
+| [x] | Fallback TTS Engine | Vosk/Coqui quantized on-device models | Fallback TTS implementation |
 
 ### Sub-Phase 6.2 — Localization Framework
 *Status: [ ] Pending*

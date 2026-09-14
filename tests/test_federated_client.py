@@ -13,8 +13,10 @@ import json
 # Insert repository paths
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 AI_ENGINE_DIR = os.path.join(ROOT_DIR, "ai-engine")
-sys.path.insert(0, ROOT_DIR)
-sys.path.insert(0, AI_ENGINE_DIR)
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+if AI_ENGINE_DIR not in sys.path:
+    sys.path.append(AI_ENGINE_DIR)
 
 from fl_aggregator import (
     FederatedModelWeights,
@@ -23,6 +25,9 @@ from fl_aggregator import (
     ByzantineDefense,
     FederatedAggregationServer,
 )
+
+if AI_ENGINE_DIR in sys.path:
+    sys.path.remove(AI_ENGINE_DIR)
 
 try:
     from fastapi.testclient import TestClient
