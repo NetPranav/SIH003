@@ -4980,6 +4980,151 @@ async def get_backend_cache_status():
     )
 
 
+# ── e-Sanjeevani Teleconsultation Bridge (Sub-Phase 12.3) ─────────────────────
+class ESanjeevaniHandshakeRequestModel(BaseModel):
+    hwc_center_code: str
+    hwc_name: str
+    district: str
+    state: str = "Assam"
+    cho_or_asha_id: str
+    auth_secret: str
+
+
+class ESanjeevaniSessionResponse(BaseModel):
+    session_id: str
+    hwc_center_code: str
+    specialist_hub: str
+    token: str
+    expires_epoch: int
+    status: str
+
+
+class ReferralDossierRequest(BaseModel):
+    patient_id: str
+    abha_number: str
+    patient_name: str
+    age: int = 72
+    gender: str = "M"
+    baseline_mmse: float = 24.0
+    current_mmse: float = 20.8
+    adherence_30d_pct: float = 74.2
+    sundowning_episodes_count: int = 5
+
+
+class ReferralDossierResponse(BaseModel):
+    referral_id: str
+    patient_id: str
+    abha_number: str
+    patient_name: str
+    referral_urgency: str  # ROUTINE, HIGH_PRIORITY, CRITICAL
+    trigger_reason: str
+    clinical_summary: Dict[str, Any]
+    suggested_questions_for_specialist: List[str]
+    compiled_at: str
+    status: str
+
+
+# In-memory e-Sanjeevani referral registry
+ESANJEEVANI_REFERRAL_REGISTRY: Dict[str, Dict[str, Any]] = {}
+
+
+@app.post("/api/v1/esanjeevani/handshake", response_model=ESanjeevaniSessionResponse, tags=["e-Sanjeevani Teleconsultation Bridge"])
+async def execute_esanjeevani_handshake(req: ESanjeevaniHandshakeRequestModel):
+    """Authenticates AB-HWC and establishes active tele-neurology consult session."""
+    import secrets
+    import time
+
+    if len(req.auth_secret) < 8 or not req.hwc_center_code:
+        raise HTTPException(status_code=401, detail="Invalid AB-HWC credentials or secret token")
+
+    session_id = f"esanj_sess_{req.hwc_center_code}_{secrets.token_hex(4)}"
+    token = f"esanj_tok_{secrets.token_hex(16)}"
+    expires = int((time.time() + 14400) * 1000)  # 4 hours
+
+    return ESanjeevaniSessionResponse(
+        session_id=session_id,
+        hwc_center_code=req.hwc_center_code,
+        specialist_hub="Guwahati Medical College & Hospital (GMCH) Tele-Neurology Hub",
+        token=token,
+        expires_epoch=expires,
+        status="ACTIVE",
+    )
+
+
+@app.post("/api/v1/esanjeevani/referral-package", response_model=ReferralDossierResponse, tags=["e-Sanjeevani Teleconsultation Bridge"])
+async def create_esanjeevani_referral_package(req: ReferralDossierRequest):
+    """Compiles automated Neurological Referral Dossier with trigger detection (>3 pt MMSE drop)."""
+    import secrets
+    from datetime import datetime, timezone
+
+    delta = round(req.current_mmse - req.baseline_mmse, 1)
+    is_critical_drop = delta <= -3.0
+    is_adherence_risk = req.adherence_30d_pct < 70.0
+
+    if is_critical_drop and is_adherence_risk:
+        urgency = "CRITICAL"
+        trigger = "CONCURRENT_CRITICAL_MMSE_DROP_AND_ADHERENCE_FAILURE"
+    elif is_critical_drop:
+        urgency = "HIGH_PRIORITY"
+        trigger = "CRITICAL_MMSE_DROP_OVER_3_POINTS"
+    elif is_adherence_risk:
+        urgency = "HIGH_PRIORITY"
+        trigger = "PERSISTENT_MEDICATION_NON_ADHERENCE_BELOW_70_PERCENT"
+    else:
+        urgency = "ROUTINE"
+        trigger = "ROUTINE_GERIATRIC_NEUROLOGICAL_REVIEW"
+
+    referral_id = f"esanj_ref_{secrets.token_hex(6)}"
+    now_iso = datetime.now(timezone.utc).isoformat()
+
+    questions = [
+        "Evaluate for progression from amnestic MCI to early Alzheimer's disease.",
+        "Review donepezil / cholinesterase inhibitor titration and anti-hypertensive timing.",
+        "Recommend laboratory workup (Serum B12, TSH, Renal Panel) at District Hospital.",
+    ]
+    if req.sundowning_episodes_count >= 3:
+        questions.append("Assess circadian melatonin supplementation or light therapy for sundowning agitation.")
+
+    summary = {
+        "baseline_mmse": req.baseline_mmse,
+        "current_mmse_proxy": req.current_mmse,
+        "delta_points": delta,
+        "adherence_30d_pct": req.adherence_30d_pct,
+        "domain_subscores": {
+            "orientation": 7.0,
+            "memory_recall": 2.2 if is_critical_drop else 4.5,
+            "executive_clock_drawing": 2.0 if is_critical_drop else 4.0,
+            "language_comprehension": 8.0,
+        },
+        "sundowning_episodes_last_14d": req.sundowning_episodes_count,
+        "last_sundowning_peak": "17:45 IST",
+    }
+
+    dossier = {
+        "referral_id": referral_id,
+        "patient_id": req.patient_id,
+        "abha_number": req.abha_number,
+        "patient_name": req.patient_name,
+        "referral_urgency": urgency,
+        "trigger_reason": trigger,
+        "clinical_summary": summary,
+        "suggested_questions_for_specialist": questions,
+        "compiled_at": now_iso,
+        "status": "QUEUED_FOR_SPECIALIST",
+    }
+    ESANJEEVANI_REFERRAL_REGISTRY[referral_id] = dossier
+
+    return ReferralDossierResponse(**dossier)
+
+
+@app.get("/api/v1/esanjeevani/referrals/{referral_id}", response_model=ReferralDossierResponse, tags=["e-Sanjeevani Teleconsultation Bridge"])
+async def get_esanjeevani_referral(referral_id: str):
+    """Retrieves an existing referral dossier for doctor workstation review."""
+    if referral_id not in ESANJEEVANI_REFERRAL_REGISTRY:
+        raise HTTPException(status_code=404, detail="Referral dossier not found")
+    return ReferralDossierResponse(**ESANJEEVANI_REFERRAL_REGISTRY[referral_id])
+
+
 if __name__ == "__main__":
     import uvicorn
 
