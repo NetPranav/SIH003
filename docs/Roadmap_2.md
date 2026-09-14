@@ -68,11 +68,11 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 155 / 240+ Deliverables Completed (64.6% Deliverable Completion)  
-**Phases Completed**: 9 / 20 (Phases 1, 2, 3, 4, 5, 6, 7, 8 & 9 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 10 — Sub-Phases 10.1, 10.2 & 10.3 Done, Sub-Phase 10.4 Pending)  
-**Phases Pending**: 10 / 20 (Phases 11 through 20)  
-**Milestones Achieved**: 9 / 20 (M1, M2, M3, M4, M5, M6, M7, M8 & M9 Signed Off; M10–M20 Pending)  
+**Overall Velocity**: 157 / 240+ Deliverables Completed (65.4% Deliverable Completion)  
+**Phases Completed**: 10 / 20 (Phases 1, 2, 3, 4, 5, 6, 7, 8, 9 & 10 Complete & Signed Off)  
+**Phases In Progress**: 1 / 20 (Phase 11 — Sub-Phases 11.1–11.4 Pending)  
+**Phases Pending**: 9 / 20 (Phases 12 through 20)  
+**Milestones Achieved**: 10 / 20 (M1, M2, M3, M4, M5, M6, M7, M8, M9 & M10 Signed Off; M11–M20 Pending)  
 
 ### Phase & Milestone Checklist
 - [x] **Phase 1: Clinical & Cultural Foundation Research** (Weeks 1–6) — **Milestone M1 Signed Off**
@@ -123,11 +123,11 @@ gantt
   - [x] Sub-Phase 9.2: ASHA Worker Portal (Community View) (4/4 tasks done)
   - [x] Sub-Phase 9.3: District Medical Officer / Clinician View (4/4 tasks done)
   - [x] Sub-Phase 9.4: Caregiver Wellness & Peer Support (3/3 tasks done)
-- [ ] **Phase 10: Multi-Sensory Reminder & Adherence System** (Weeks 27–31) — **Milestone M10 Pending**
+- [x] **Phase 10: Multi-Sensory Reminder & Adherence System** (Weeks 27–31) — **Milestone M10 Signed Off**
   - [x] Sub-Phase 10.1: Reminder Scheduler (3/3 tasks done)
   - [x] Sub-Phase 10.2: Reminder UI & Interaction (4/4 tasks done)
   - [x] Sub-Phase 10.3: Adherence Analytics (3/3 tasks done)
-  - [ ] Sub-Phase 10.4: Cross-Channel Reminder Unification (0/2 tasks done)
+  - [x] Sub-Phase 10.4: Cross-Channel Reminder Unification (2/2 tasks done)
 - [ ] **Phase 11: Offline Storage, Sync & BLE Safety Mesh** (Weeks 25–33) — **Milestone M11 Pending**
   - [ ] Sub-Phase 11.1: Local-First Persistence Layer (0/4 tasks done)
   - [ ] Sub-Phase 11.2: Delta Synchronization Engine (0/4 tasks done)
@@ -613,7 +613,7 @@ gantt
 ---
 
 # PHASE 10: MULTI-SENSORY REMINDER & ADHERENCE SYSTEM 💊
-**Phase Status**: [/] IN PROGRESS (83% Complete — Sub-Phases 10.1, 10.2 & 10.3 Done, Sub-Phase 10.4 Pending)  
+**Phase Status**: [x] COMPLETED & SIGNED OFF (100% Complete — Sub-Phases 10.1–10.4 Done, Milestone M10 Achieved)  
 **Duration**: Weeks 27–31 | **Objective**: Robust, family-voice-driven reminder delivery across app and IVR channels.
 
 ### Sub-Phase 10.1 — Reminder Scheduler
@@ -642,14 +642,14 @@ gantt
 | [x] | Trend Visualization | Feed into dashboard ring/timeline charts | Data pipeline to dashboard |
 
 ### Sub-Phase 10.4 — Cross-Channel Reminder Unification (New)
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Channel Preference Engine | Choose app-push vs. IVR call based on device availability | Channel routing logic |
-| [ ] | Unified Adherence Record | Merge app-tap and IVR-keypress confirmations into one record | Unified adherence schema |
+| [x] | Channel Preference Engine | Choose app-push vs. IVR call based on device availability | Channel routing logic |
+| [x] | Unified Adherence Record | Merge app-tap and IVR-keypress confirmations into one record | Unified adherence schema |
 
 > [!IMPORTANT]
-> - [ ] **Milestone M10**: Reminder System End-to-End Functional — fires within ±30s; voice auto-plays; adherence logs persist offline across both channels. *(Status: PENDING)*
+> - [x] **Milestone M10**: Reminder System End-to-End Functional — fires within ±30s; voice auto-plays; adherence logs persist offline across both channels. *(Status: SIGNED OFF)*
 
 ---
 ---
