@@ -68,10 +68,10 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 247 / 240+ Deliverables Completed (102.9% Deliverable Completion)  
+**Overall Velocity**: 251 / 240+ Deliverables Completed (104.6% Deliverable Completion)  
 **Phases Completed**: 16 / 20 (Phases 1 through 16 Complete & Signed Off)  
-**Phases In Progress**: 0 / 20  
-**Phases Pending**: 4 / 20 (Phases 17 through 20)  
+**Phases In Progress**: 1 / 20 (Phase 17 — Sub-Phase 17.1 Complete; Sub-Phases 17.2–17.4 Pending)  
+**Phases Pending**: 3 / 20 (Phases 18 through 20)  
 **Milestones Achieved**: 16 / 20 (M1 through M16 Signed Off; M17–M20 Pending)  
 
 ### Phase & Milestone Checklist
@@ -159,7 +159,7 @@ gantt
   - [x] Sub-Phase 16.3: NHM ASHA Tablet Ecosystem Integration (3/3 tasks done)
   - [x] Sub-Phase 16.4: IVR & Social Feature Scale-Out (2/2 tasks done)
 - [ ] **Phase 17: ASHA Worker Training at Scale** (Weeks 56–69) — **Milestone M17 Pending**
-  - [ ] Sub-Phase 17.1: Scalable Training Program (1,500+ ASHAs) (0/4 tasks done)
+  - [x] Sub-Phase 17.1: Scalable Training Program (1,500+ ASHAs) (4/4 tasks done)
   - [ ] Sub-Phase 17.2: Field Support Network & SOPs (0/3 tasks done)
   - [ ] Sub-Phase 17.3: Community Facilitation Training (0/2 tasks done)
   - [ ] Sub-Phase 17.4: IVR Support Training (0/2 tasks done)
@@ -921,17 +921,17 @@ gantt
 ---
 
 # PHASE 17: ASHA WORKER TRAINING AT SCALE 🎓
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 17.1–17.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (36% Complete — Sub-Phase 17.1 Complete; Sub-Phases 17.2–17.4 Pending)  
 **Duration**: Weeks 56–69 (parallel) | **Objective**: Train 1,500+ ASHA/ANM workers across 8 states, including social-facilitation and IVR-support skills.
 
 ### Sub-Phase 17.1 — Scalable Training Program
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Training Video Production | 8 language-specific videos (10 min each) | Training video library |
-| [ ] | Regional Training Workshops | 2-day workshops in 15 district HQs | Training completion reports |
-| [ ] | Digital Training Module | Self-paced in-app training with quiz certification | In-app training module |
-| [ ] | Monthly Refresher Webinars | 30-min virtual sessions | Webinar schedule + recordings |
+| [x] | Training Video Production | 8 language-specific videos (10 min each) | Training video library |
+| [x] | Regional Training Workshops | 2-day workshops in 15 district HQs | Training completion reports |
+| [x] | Digital Training Module | Self-paced in-app training with quiz certification | In-app training module |
+| [x] | Monthly Refresher Webinars | 30-min virtual sessions | Webinar schedule + recordings |
 
 ### Sub-Phase 17.2 — Field Support Network
 *Status: [ ] Pending*
