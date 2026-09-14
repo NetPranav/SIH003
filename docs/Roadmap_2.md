@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 53 / 240+ Deliverables Completed (22.1% Deliverable Completion)  
+**Overall Velocity**: 58 / 240+ Deliverables Completed (24.2% Deliverable Completion)  
 **Phases Completed**: 3 / 20 (Phases 1, 2, 3 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 4 — Sub-Phase 4.1 Complete, Sub-Phases 4.2–4.5 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 4 — Sub-Phases 4.1 & 4.2 Complete, Sub-Phases 4.3–4.5 Pending)  
 **Phases Pending**: 16 / 20 (Phases 5 through 20)  
 **Milestones Achieved**: 3 / 20 (M1, M2, M3 Signed Off; M4 In Progress; M5–M20 Pending)  
 
@@ -93,7 +93,7 @@ gantt
   - [x] Sub-Phase 3.5: Federated Learning Infrastructure Groundwork (2/2 tasks done)
 - [ ] **Phase 4: Patient PWA Shell & Cognitive Game Engine** (Weeks 9–20) — **Milestone M4 In Progress**
   - [x] Sub-Phase 4.1: PWA Foundation & App Shell Architecture (5/5 tasks done)
-  - [ ] Sub-Phase 4.2: Patient Home & Navigation (0/5 tasks done)
+  - [x] Sub-Phase 4.2: Patient Home & Navigation (5/5 tasks done)
   - [ ] Sub-Phase 4.3: Shared Game Framework (0/5 tasks done)
   - [ ] Sub-Phase 4.4: Games 1–4 Core Implementation (0/4 tasks done)
   - [ ] Sub-Phase 4.5: Anti-Agitation Circuit Breaker (AACB) (0/5 tasks done)
@@ -326,7 +326,7 @@ gantt
 ---
 
 # PHASE 4: PATIENT PWA SHELL & COGNITIVE GAME ENGINE 🎮
-**Phase Status**: [/] IN PROGRESS (20% Complete — Sub-Phase 4.1 Done, Sub-Phases 4.2–4.5 Pending)  
+**Phase Status**: [/] IN PROGRESS (40% Complete — Sub-Phases 4.1 & 4.2 Done, Sub-Phases 4.3–4.5 Pending)  
 **Duration**: Weeks 9–20 | **Objective**: Build the patient-facing PWA and all 3 core cognitive games with the shared game engine.
 
 ### Sub-Phase 4.1 — PWA Foundation
@@ -340,14 +340,14 @@ gantt
 | [x] | Accessibility Layer | ARIA labels, focus management, screen reader, haptics | Accessibility middleware |
 
 ### Sub-Phase 4.2 — Patient Home & Navigation
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Daily Activity Cards | Games / Reminders / Memory Album / **Connect** (4th card) | Home screen implementation |
-| [ ] | Language Selector | 1-tap toggle across 8 languages | Language selector component |
-| [ ] | Voice Assistant Button | "কথাৰে কওক" floating TTS trigger | Voice button implementation |
-| [ ] | Patient ↔ Caregiver Mode Switch | PIN-protected toggle | Mode switch with PIN guard |
-| [ ] | Connectivity Status Indicator | Non-alarming online/offline dot | Status indicator component |
+| [x] | Daily Activity Cards | Games / Reminders / Memory Album / **Connect** (4th card) | Home screen implementation |
+| [x] | Language Selector | 1-tap toggle across 8 languages | Language selector component |
+| [x] | Voice Assistant Button | "কথাৰে কওক" floating TTS trigger | Voice button implementation |
+| [x] | Patient ↔ Caregiver Mode Switch | PIN-protected toggle | Mode switch with PIN guard |
+| [x] | Connectivity Status Indicator | Non-alarming online/offline dot | Status indicator component |
 
 ### Sub-Phase 4.3 — Shared Game Framework
 *Status: [ ] Pending*

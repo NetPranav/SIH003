@@ -30,6 +30,14 @@ export default function App() {
     onNext?: () => void;
   }>({ open: false, time: "", accuracy: "" });
 
+  // Load saved language
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("smriti_language");
+      if (saved) setLanguage(saved);
+    }
+  }, []);
+
   // Splash → language or home
   useEffect(() => {
     if (screen === "splash") {
@@ -54,6 +62,9 @@ export default function App() {
 
   const handleSelectLanguage = (code: string) => {
     setLanguage(code);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("smriti_language", code);
+    }
     setScreen("home");
   };
 
@@ -71,7 +82,13 @@ export default function App() {
     <div className={styles.shell}>
       {screen === "splash" && <SplashScreen />}
       {screen === "language" && <LanguageScreen onSelect={handleSelectLanguage} />}
-      {screen === "home" && <HomeScreen navigate={navigate} />}
+      {screen === "home" && (
+        <HomeScreen
+          navigate={navigate}
+          language={language || "as"}
+          onSelectLanguage={handleSelectLanguage}
+        />
+      )}
       {screen === "games" && <GamesScreen navigate={navigate} />}
       {screen === "dhol-pepa" && (
         <DholPepaGame navigate={navigate} showSuccess={showSuccess} />
