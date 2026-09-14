@@ -67,6 +67,7 @@ import {
   type PatientProfile,
 } from "@/lib/offlineMobileStorage";
 import { speakSpokenVoice } from "@/lib/audioVoiceService";
+import { welfareSchemeService } from "@/lib/welfareSchemeService";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -1469,6 +1470,89 @@ export default function CaregiverDashboard({ navigate }: Props) {
                 </div>
               </div>
             </div>
+
+            {/* Sub-Phase 12.4: Rashtriya Vayoshri Yojana (RVY) & NPHCE Welfare Integration */}
+            {(() => {
+              const rvy = welfareSchemeService.evaluateRvyEligibility(
+                patientProfile.id,
+                patientProfile.age,
+                true,
+                12000
+              );
+              return (
+                <div
+                  style={{
+                    background: "var(--white)",
+                    border: "1.5px solid #bfdbfe",
+                    borderRadius: "var(--radius-xl)",
+                    padding: "1.3rem",
+                    boxShadow: "var(--shadow-sm)",
+                    marginTop: "1.25rem",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "0.5rem" }}>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <span style={{ fontSize: "1.2rem" }}>🏛️</span>
+                        <h4 style={{ fontSize: "1.05rem", fontWeight: 800, color: "#1e3a8a" }}>
+                          Elder Welfare & Assistive Living Benefits (RVY & NPHCE)
+                        </h4>
+                        <span
+                          style={{
+                            fontSize: "0.7rem",
+                            fontWeight: 800,
+                            padding: "0.2rem 0.6rem",
+                            borderRadius: "999px",
+                            background: rvy.eligible_for_cognitive_kit ? "#dcfce7" : "#fef3c7",
+                            color: rvy.eligible_for_cognitive_kit ? "#166534" : "#b45309",
+                          }}
+                        >
+                          {rvy.eligible_for_cognitive_kit ? "100% Fully Subsidized" : "Evaluation Required"}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: "0.8rem", color: "var(--gray-600)", marginTop: "0.25rem" }}>
+                        National Programme for Health Care of the Elderly (MoHFW) & Rashtriya Vayoshri Yojana (MSJE / ALIMCO)
+                      </p>
+                    </div>
+
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: "1.2rem", fontWeight: 900, color: "#16a34a" }}>
+                        ₹{rvy.recommended_bundle.estimated_value_inr} Grant
+                      </div>
+                      <div style={{ fontSize: "0.7rem", color: "var(--gray-500)", fontWeight: 700 }}>
+                        ALIMCO Cognitive Safety Kit
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: "1rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
+                    <div style={{ background: "#eff6ff", borderRadius: "var(--radius)", padding: "0.85rem", border: "1px solid #dbeafe" }}>
+                      <div style={{ fontSize: "0.75rem", fontWeight: 800, color: "#1e40af" }}>RECOMMENDED ASSISTIVE BUNDLE</div>
+                      <div style={{ fontSize: "0.85rem", fontWeight: 800, color: "var(--gray-900)", marginTop: "0.2rem" }}>
+                        {rvy.recommended_bundle.bundle_name}
+                      </div>
+                      <ul style={{ margin: "0.4rem 0 0 1.1rem", padding: 0, fontSize: "0.78rem", color: "var(--gray-700)", lineHeight: "1.4" }}>
+                        {rvy.recommended_bundle.items.map((item, idx) => (
+                          <li key={idx}><strong>{item}</strong></li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div style={{ background: "#f0fdf4", borderRadius: "var(--radius)", padding: "0.85rem", border: "1px solid #bbf7d0" }}>
+                      <div style={{ fontSize: "0.75rem", fontWeight: 800, color: "#166534" }}>GOVERNMENT HEALTHCARE TIER ALIGNMENT</div>
+                      <div style={{ fontSize: "0.82rem", color: "var(--gray-800)", marginTop: "0.25rem" }}>
+                        • <strong>AB-HWC Kamalabari</strong>: Monthly domiciliary screening & free essential medications<br />
+                        • <strong>Majuli District Hospital</strong>: 10-bed dedicated Geriatric Ward & NPHCE OPD<br />
+                        • <strong>Tele-MANAS</strong>: 14416 (24x7 Dementia Crisis Line - LGBRIMH Tezpur)
+                      </div>
+                      <div style={{ fontSize: "0.75rem", color: "#15803d", fontWeight: 700, marginTop: "0.4rem" }}>
+                        ASHA Worker Jonali Saikia verified for domiciliary camp enrollment.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
