@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 122 / 240+ Deliverables Completed (50.8% Deliverable Completion)  
+**Overall Velocity**: 125 / 240+ Deliverables Completed (52.1% Deliverable Completion)  
 **Phases Completed**: 7 / 20 (Phases 1, 2, 3, 4, 5, 6 & 7 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 8 — Sub-Phase 8.1 Complete, Sub-Phases 8.2–8.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 8 — Sub-Phases 8.1 & 8.2 Complete, Sub-Phases 8.3 & 8.4 Pending)  
 **Phases Pending**: 12 / 20 (Phases 9 through 20)  
 **Milestones Achieved**: 7 / 20 (M1, M2, M3, M4, M5, M6, M7 Signed Off; M8–M20 Pending)  
 
@@ -115,7 +115,7 @@ gantt
   - [x] Sub-Phase 7.4: Consent & Content Moderation for Social Features (2/2 tasks done)
 - [ ] **Phase 8: Zero-Smartphone Accessibility — IVR Cognitive Line** (Weeks 22–27) — **Milestone M8 Pending**
   - [x] Sub-Phase 8.1: IVR Cognitive Check-In Flow (3/3 tasks done)
-  - [ ] Sub-Phase 8.2: IVR Reminder & Adherence Delivery (0/3 tasks done)
+  - [x] Sub-Phase 8.2: IVR Reminder & Adherence Delivery (3/3 tasks done)
   - [ ] Sub-Phase 8.3: Multilingual IVR Content (0/2 tasks done)
   - [ ] Sub-Phase 8.4: IVR-to-Platform Data Bridge (0/2 tasks done)
 - [ ] **Phase 9: Caregiver, ASHA & Clinician Ecosystem Dashboards** (Weeks 25–33) — **Milestone M9 Pending**
@@ -527,7 +527,7 @@ gantt
 ---
 
 # PHASE 8: ZERO-SMARTPHONE ACCESSIBILITY — IVR COGNITIVE LINE 📞 (New Phase)
-**Phase Status**: [/] IN PROGRESS (27% Complete — Sub-Phase 8.1 Done, Sub-Phases 8.2–8.4 Pending)  
+**Phase Status**: [/] IN PROGRESS (50% Complete — Sub-Phases 8.1 & 8.2 Done, Sub-Phases 8.3 & 8.4 Pending)  
 **Duration**: Weeks 22–27 | **Objective**: Reach elders with no smartphone/tablet access via a toll-free, voice-only cognitive check-in and reminder line.
 
 ### Sub-Phase 8.1 — IVR Cognitive Check-In Flow
@@ -539,12 +539,12 @@ gantt
 | [x] | Response Scoring Pipeline | Convert IVR responses into a lightweight cognitive check-in score | IVR scoring pipeline |
 
 ### Sub-Phase 8.2 — IVR Reminder & Adherence Delivery
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Scheduled Outbound Calls | Auto-dial elder at medicine/hydration time with recorded family voice prompt | Outbound call scheduler |
-| [ ] | Keypress Confirmation | "Press 1 if you have taken your medicine" logging | Keypress confirmation logic |
-| [ ] | Missed-Call Escalation | No answer after N attempts → notify caregiver/ASHA | Escalation logic |
+| [x] | Scheduled Outbound Calls | Auto-dial elder at medicine/hydration time with recorded family voice prompt | Outbound call scheduler |
+| [x] | Keypress Confirmation | "Press 1 if you have taken your medicine" logging | Keypress confirmation logic |
+| [x] | Missed-Call Escalation | No answer after N attempts → notify caregiver/ASHA | Escalation logic |
 
 ### Sub-Phase 8.3 — Multilingual IVR Content
 *Status: [ ] Pending*

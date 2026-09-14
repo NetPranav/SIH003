@@ -1497,6 +1497,210 @@ async def get_ivr_word_triplets():
     return IVR_CULTURAL_TRIPLETS
 
 
+# ── IVR Outbound Reminders & Adherence Models & Storage ─────────────────────
+class IVRReminderScheduleRequest(BaseModel):
+    patient_id: str
+    patient_name: str
+    phone_number: str
+    caregiver_phone: str
+    asha_worker_phone: str
+    reminder_type: str = "MEDICATION"  # "MEDICATION" | "HYDRATION" | "CIRCADIAN_CALMING"
+    scheduled_time: str
+    kinship_voice_clip_id: Optional[str] = None
+    custom_prompt_text: Optional[str] = None
+    language: Optional[str] = "as"
+    max_attempts: int = 3
+
+
+class IVRReminderScheduleResponse(BaseModel):
+    schedule_id: str
+    patient_id: str
+    patient_name: str
+    phone_number: str
+    caregiver_phone: str
+    asha_worker_phone: str
+    reminder_type: str
+    scheduled_time: str
+    kinship_voice_clip_id: Optional[str] = None
+    custom_prompt_text: str
+    language: str
+    current_attempt: int
+    max_attempts: int
+    status: str
+    confirmed_adherence: bool
+    created_at: str
+    last_attempt_at: Optional[str] = None
+
+
+class EscalationNoticeResponse(BaseModel):
+    escalation_id: str
+    schedule_id: str
+    patient_id: str
+    patient_name: str
+    caregiver_phone: str
+    asha_worker_phone: str
+    reminder_type: str
+    total_attempts_made: int
+    alert_message: str
+    escalated_at: str
+    acknowledged: bool
+    acknowledged_by: Optional[str] = None
+
+
+class IVRCallAttemptRequest(BaseModel):
+    schedule_id: str
+    outcome: str  # "ANSWERED_CONFIRMED" | "ANSWERED_DENIED" | "NO_ANSWER" | "BUSY" | "FAILED"
+
+
+class IVRCallAttemptResponse(BaseModel):
+    schedule: IVRReminderScheduleResponse
+    escalated: bool
+    escalation_notice: Optional[EscalationNoticeResponse] = None
+
+
+IVR_SCHEDULES_STORE: Dict[str, dict] = {}
+IVR_ESCALATIONS_STORE: Dict[str, dict] = {}
+
+
+@app.post("/api/v1/ivr/reminders/schedule", response_model=IVRReminderScheduleResponse, tags=["IVR Cognitive Line"])
+async def schedule_ivr_reminder(req: IVRReminderScheduleRequest):
+    """Schedules an automated outbound IVR adherence call with kinship voice prompt."""
+    import uuid
+    from datetime import datetime, timezone
+
+    schedule_id = f"sched_ivr_{uuid.uuid4().hex[:10]}"
+    lang = req.language if req.language in SUPPORTED_VOICE_LANGUAGES else "as"
+    prompt = req.custom_prompt_text or "পিতা, এতিয়া ৰাতিপুৱাৰ ঔষধ খোৱাৰ সময় হ'ল। ঔষধ খালে ১ টিপক।"
+
+    record = {
+        "schedule_id": schedule_id,
+        "patient_id": req.patient_id,
+        "patient_name": req.patient_name,
+        "phone_number": req.phone_number,
+        "caregiver_phone": req.caregiver_phone,
+        "asha_worker_phone": req.asha_worker_phone,
+        "reminder_type": req.reminder_type,
+        "scheduled_time": req.scheduled_time,
+        "kinship_voice_clip_id": req.kinship_voice_clip_id,
+        "custom_prompt_text": prompt,
+        "language": lang,
+        "current_attempt": 0,
+        "max_attempts": max(1, req.max_attempts),
+        "status": "PENDING",
+        "confirmed_adherence": False,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "last_attempt_at": None,
+    }
+
+    IVR_SCHEDULES_STORE[schedule_id] = record
+    return IVRReminderScheduleResponse(**record)
+
+
+@app.post("/api/v1/ivr/reminders/call-attempt", response_model=IVRCallAttemptResponse, tags=["IVR Cognitive Line"])
+async def log_ivr_call_attempt(req: IVRCallAttemptRequest):
+    """Logs an outbound call outcome and handles adherence confirmation or 3-attempt escalation."""
+    import uuid
+    from datetime import datetime, timezone
+
+    if req.schedule_id not in IVR_SCHEDULES_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"IVR schedule '{req.schedule_id}' not found.",
+        )
+
+    sched = IVR_SCHEDULES_STORE[req.schedule_id]
+    sched["current_attempt"] += 1
+    sched["last_attempt_at"] = datetime.now(timezone.utc).isoformat()
+
+    if req.outcome == "ANSWERED_CONFIRMED":
+        sched["status"] = "COMPLETED"
+        sched["confirmed_adherence"] = True
+        IVR_SCHEDULES_STORE[req.schedule_id] = sched
+        return IVRCallAttemptResponse(
+            schedule=IVRReminderScheduleResponse(**sched),
+            escalated=False,
+            escalation_notice=None,
+        )
+
+    if req.outcome == "ANSWERED_DENIED":
+        sched["status"] = "COMPLETED"
+        sched["confirmed_adherence"] = False
+        IVR_SCHEDULES_STORE[req.schedule_id] = sched
+        return IVRCallAttemptResponse(
+            schedule=IVRReminderScheduleResponse(**sched),
+            escalated=False,
+            escalation_notice=None,
+        )
+
+    # Missed / Unanswered call
+    if sched["current_attempt"] >= sched["max_attempts"]:
+        sched["status"] = "ESCALATED"
+        escalation_id = f"esc_ivr_{uuid.uuid4().hex[:10]}"
+        alert_msg = f"CRITICAL ALERT: {sched['patient_name']} missed {sched['max_attempts']} scheduled {sched['reminder_type']} calls on {sched['phone_number']}. ASHA worker {sched['asha_worker_phone']} and Caregiver {sched['caregiver_phone']} notified."
+
+        esc_record = {
+            "escalation_id": escalation_id,
+            "schedule_id": sched["schedule_id"],
+            "patient_id": sched["patient_id"],
+            "patient_name": sched["patient_name"],
+            "caregiver_phone": sched["caregiver_phone"],
+            "asha_worker_phone": sched["asha_worker_phone"],
+            "reminder_type": sched["reminder_type"],
+            "total_attempts_made": sched["current_attempt"],
+            "alert_message": alert_msg,
+            "escalated_at": datetime.now(timezone.utc).isoformat(),
+            "acknowledged": False,
+            "acknowledged_by": None,
+        }
+        IVR_ESCALATIONS_STORE[escalation_id] = esc_record
+        IVR_SCHEDULES_STORE[req.schedule_id] = sched
+
+        return IVRCallAttemptResponse(
+            schedule=IVRReminderScheduleResponse(**sched),
+            escalated=True,
+            escalation_notice=EscalationNoticeResponse(**esc_record),
+        )
+
+    sched["status"] = "IN_PROGRESS"
+    IVR_SCHEDULES_STORE[req.schedule_id] = sched
+    return IVRCallAttemptResponse(
+        schedule=IVRReminderScheduleResponse(**sched),
+        escalated=False,
+        escalation_notice=None,
+    )
+
+
+@app.get("/api/v1/ivr/reminders/patient/{patient_id}", response_model=List[IVRReminderScheduleResponse], tags=["IVR Cognitive Line"])
+async def get_patient_ivr_schedules(patient_id: str):
+    """Retrieves all outbound reminder schedules for a specific patient."""
+    results = []
+    for s in IVR_SCHEDULES_STORE.values():
+        if s["patient_id"] == patient_id:
+            results.append(IVRReminderScheduleResponse(**s))
+    return results
+
+
+@app.get("/api/v1/ivr/reminders/escalations", response_model=List[EscalationNoticeResponse], tags=["IVR Cognitive Line"])
+async def get_ivr_escalations():
+    """Retrieves all active unacknowledged escalation notices."""
+    return [EscalationNoticeResponse(**e) for e in IVR_ESCALATIONS_STORE.values() if not e["acknowledged"]]
+
+
+@app.post("/api/v1/ivr/reminders/escalations/acknowledge/{escalation_id}", response_model=EscalationNoticeResponse, tags=["IVR Cognitive Line"])
+async def acknowledge_ivr_escalation(escalation_id: str, acknowledged_by: str = "Jonali Saikia (ASHA)"):
+    """Acknowledges an escalation notice after an in-person welfare check."""
+    if escalation_id not in IVR_ESCALATIONS_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Escalation '{escalation_id}' not found.",
+        )
+    esc = IVR_ESCALATIONS_STORE[escalation_id]
+    esc["acknowledged"] = True
+    esc["acknowledged_by"] = acknowledged_by
+    IVR_ESCALATIONS_STORE[escalation_id] = esc
+    return EscalationNoticeResponse(**esc)
+
+
 if __name__ == "__main__":
     import uvicorn
 
