@@ -7,6 +7,12 @@
  * securely and persistently directly on the mobile device.
  */
 
+export interface EmergencyContactInfo {
+  name: string;
+  phone: string;
+  relation?: string;
+}
+
 export interface PatientProfile {
   id: string;
   name: string;
@@ -19,13 +25,33 @@ export interface PatientProfile {
   caregiverName: string;
   caregiverRelation: string;
   caregiverPhone: string;
+  relation?: string;
+  location?: string;
+  primaryLanguage?: string;
+  clinicalCondition?: string;
+  clinicalStage?: string;
+  mmseBaseline?: number;
+  fallRisk?: "Low" | "Moderate" | "High" | string;
+  sundowningRisk?: "None" | "Low" | "Moderate" | "Severe" | string;
   ashaWorkerName: string;
   ashaWorkerPhone: string;
   pin: string;
   preferredLanguage: string;
-  emergencyContact: string;
+  emergencyContact: EmergencyContactInfo;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface OfflineAlbumPhoto {
+  id: string;
+  title: string;
+  nativeTitle?: string;
+  year: string;
+  relation: string;
+  caption: string;
+  image: string;
+  audioStory?: string;
+  createdAt: string;
 }
 
 export interface OfflineReminder {
@@ -38,7 +64,7 @@ export interface OfflineReminder {
   completed: boolean;
   snoozedCount: number;
   lastCompletedAt?: string;
-  type: "medicine" | "hydration" | "activity";
+  type: "medicine" | "hydration" | "activity" | "nutrition";
 }
 
 export interface OfflineScheduleItem {
@@ -71,6 +97,7 @@ export interface CaregiverWellnessEntry {
   sleepHours: number;
   hydrationGlasses: number;
   sundowningObserved: boolean;
+  sundowningEpisode?: boolean;
   notes?: string;
 }
 
@@ -118,29 +145,75 @@ const KEYS = {
   ASHA_VISITS: "smriti_offline_asha_visits",
   CIRCLES: "smriti_offline_circles",
   REMINISCENCE: "smriti_offline_reminiscence",
+  ALBUM_PHOTOS: "smriti_offline_album_photos",
 } as const;
 
 // ── Default Seed Data ────────────────────────────────────────────
 const DEFAULT_PROFILE: PatientProfile = {
   id: "p_anand_01",
-  name: "Anand Sharma (বৰদেউতা)",
+  name: "Anandiram Baruah (আনন্দীৰাম বৰুৱা)",
   age: 74,
   gender: "male",
   village: "Kamalabari, Majuli",
   district: "Majuli",
   state: "Assam",
   abhaId: "91-4829-1049-2810",
-  caregiverName: "Priyanka Sharma",
-  caregiverRelation: "Granddaughter (নাতিনী)",
+  clinicalCondition: "Early-to-Moderate Dementia (Alzheimer's & VaD Spectrum)",
+  clinicalStage: "CDR 1.0 (Mild Cognitive Decline)",
+  mmseBaseline: 22,
+  fallRisk: "Low",
+  sundowningRisk: "Moderate",
+  relation: "Grandfather (ককা / दादाजी)",
+  location: "Kamalabari, Majuli, Assam",
+  primaryLanguage: "Assamese / English",
+  caregiverName: "Priyanka Baruah",
+  caregiverRelation: "Granddaughter (নাতিনী / पोती)",
   caregiverPhone: "+91 94350 12345",
-  ashaWorkerName: "Jonali Saikia",
+  ashaWorkerName: "Jonali Saikia (ASHA)",
   ashaWorkerPhone: "+91 98540 67890",
   pin: "1234",
   preferredLanguage: "en",
-  emergencyContact: "+91 94350 12345",
+  emergencyContact: {
+    name: "Priyanka Baruah",
+    phone: "+91 94350 12345",
+    relation: "Granddaughter",
+  },
   createdAt: "2026-01-01T00:00:00Z",
   updatedAt: new Date().toISOString(),
 };
+
+const DEFAULT_ALBUM_PHOTOS: OfflineAlbumPhoto[] = [
+  {
+    id: "photo_1",
+    title: "Rongali Bihu in Jorhat",
+    nativeTitle: "ৰঙালী বিহুৰ সোঁৱৰণি",
+    year: "1982",
+    relation: "Family & Cousins",
+    caption: "You in your traditional Muga Kurta playing the Dhol with family and cousins by the tea garden.",
+    image: "/photos/festival.jpg",
+    createdAt: "2026-01-01T00:00:00Z",
+  },
+  {
+    id: "photo_2",
+    title: "Priya’s Graduation Day",
+    nativeTitle: "প্ৰিয়াৰ বিশ্ববিদ্যালয় সমাবৰ্তন",
+    year: "2018",
+    relation: "Granddaughter Priya",
+    caption: "Gauhati University. You handed Priya her degree certificate with proud tears of joy.",
+    image: "/photos/graduation.jpg",
+    createdAt: "2026-01-02T00:00:00Z",
+  },
+  {
+    id: "photo_3",
+    title: "Brahmaputra Ferry to Majuli",
+    nativeTitle: "ব্ৰহ্মপুত্ৰ ফেৰী যাত্ৰা",
+    year: "1994",
+    relation: "Pilgrimage with Family",
+    caption: "Sunset over the mighty Brahmaputra river heading to Kamalabari Satra for the festival.",
+    image: "/photos/ferry.jpg",
+    createdAt: "2026-01-03T00:00:00Z",
+  },
+];
 
 const DEFAULT_REMINDERS_SEED: OfflineReminder[] = [
   {
@@ -296,6 +369,10 @@ class OfflineMobileStore {
     return this.read<PatientProfile>(KEYS.PROFILE, DEFAULT_PROFILE);
   }
 
+  public getPatientProfile(): PatientProfile {
+    return this.getProfile();
+  }
+
   public updateProfile(patch: Partial<PatientProfile>): PatientProfile {
     const current = this.getProfile();
     const updated: PatientProfile = {
@@ -305,6 +382,10 @@ class OfflineMobileStore {
     };
     this.write(KEYS.PROFILE, updated);
     return updated;
+  }
+
+  public updatePatientProfile(patch: Partial<PatientProfile>): PatientProfile {
+    return this.updateProfile(patch);
   }
 
   // ── Reminders & Medication Adherence ────────────────────────────
@@ -375,6 +456,32 @@ class OfflineMobileStore {
     };
     this.write(KEYS.REMINDERS, [...reminders, newRem]);
     return newRem;
+  }
+
+  public updateReminder(id: string, updates: Partial<OfflineReminder>): OfflineReminder | null {
+    const reminders = this.getReminders();
+    let updatedItem: OfflineReminder | null = null;
+    const updated = reminders.map((r) => {
+      if (r.id === id) {
+        updatedItem = { ...r, ...updates };
+        return updatedItem;
+      }
+      return r;
+    });
+    if (updatedItem) {
+      this.write(KEYS.REMINDERS, updated);
+    }
+    return updatedItem;
+  }
+
+  public deleteReminder(id: string): boolean {
+    const reminders = this.getReminders();
+    const filtered = reminders.filter((r) => r.id !== id);
+    if (filtered.length !== reminders.length) {
+      this.write(KEYS.REMINDERS, filtered);
+      return true;
+    }
+    return false;
   }
 
   public getAdherenceRate(): number {
@@ -466,6 +573,39 @@ class OfflineMobileStore {
     if (sessions.length === 0) return 3; // default initial streak
     const dates = new Set(sessions.map((s) => s.timestamp.slice(0, 10)));
     return Math.max(3, dates.size);
+  }
+
+  public getLatestGameScore(gameId: string): OfflineGameSessionRecord | null {
+    const sessions = this.getGameSessions();
+    return sessions.find((s) => s.gameId === gameId) || null;
+  }
+
+  public getGameSummaryStats(gameId: string): {
+    totalSessions: number;
+    latestAccuracy: number;
+    bestAccuracy: number;
+    latestDuration: number;
+    lastPlayedAt: string | null;
+  } {
+    const sessions = this.getGameSessions().filter((s) => s.gameId === gameId);
+    if (sessions.length === 0) {
+      return {
+        totalSessions: 0,
+        latestAccuracy: 92,
+        bestAccuracy: 95,
+        latestDuration: 42,
+        lastPlayedAt: null,
+      };
+    }
+    const latest = sessions[0];
+    const bestAcc = Math.max(...sessions.map((s) => s.accuracy));
+    return {
+      totalSessions: sessions.length,
+      latestAccuracy: latest.accuracy,
+      bestAccuracy: bestAcc,
+      latestDuration: latest.durationSeconds,
+      lastPlayedAt: latest.timestamp,
+    };
   }
 
   // ── Caregiver Daily Wellness Logs ───────────────────────────────
@@ -585,6 +725,32 @@ class OfflineMobileStore {
     };
     this.write(KEYS.REMINISCENCE, [newLog, ...history].slice(0, 50));
     return newLog;
+  }
+
+  // ── Family Reminiscence Memories ────────────────────────────────
+  public getAlbumPhotos(): OfflineAlbumPhoto[] {
+    return this.read<OfflineAlbumPhoto[]>(KEYS.ALBUM_PHOTOS, DEFAULT_ALBUM_PHOTOS);
+  }
+
+  public addAlbumPhoto(photo: Omit<OfflineAlbumPhoto, "id" | "createdAt">): OfflineAlbumPhoto {
+    const current = this.getAlbumPhotos();
+    const newPhoto: OfflineAlbumPhoto = {
+      ...photo,
+      id: `photo_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      createdAt: new Date().toISOString(),
+    };
+    this.write(KEYS.ALBUM_PHOTOS, [newPhoto, ...current]);
+    return newPhoto;
+  }
+
+  public deleteAlbumPhoto(id: string): boolean {
+    const current = this.getAlbumPhotos();
+    const filtered = current.filter((p) => p.id !== id);
+    if (filtered.length !== current.length) {
+      this.write(KEYS.ALBUM_PHOTOS, filtered);
+      return true;
+    }
+    return false;
   }
 
   // ── Storage Quota & Diagnostics ─────────────────────────────────

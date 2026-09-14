@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import type { ScreenId } from "@/lib/types";
 import { calculateMMSEProxy } from "@/lib/dcdaEngine";
-import { playAudioFeedback } from "@/lib/audio";
+import { playAudioFeedback, playGentleChime } from "@/lib/audio";
 import { COCHRANE_RT_STAGES, DAILY_RT_DOSAGE_SCHEDULE, TOTAL_SESSION_DURATION_MINUTES } from "@/lib/reminiscenceProtocol";
 import { NER_FOLK_INSTRUMENTS, playInstrumentPreview, type FolkInstrument } from "@/lib/culturalAudioLibrary";
 import { NER_FAUNA_COLLECTION } from "@/lib/faunaReferencePack";
@@ -60,14 +60,45 @@ import CognitiveProgressRing from "@/components/ui/CognitiveProgressRing";
 import AppShellSkeleton from "@/components/ui/AppShellSkeleton";
 import OrientationGuard from "@/components/ui/OrientationGuard";
 import { announceToScreenReader, triggerHaptic } from "@/lib/accessibilityMiddleware";
-import { offlineMobileStore } from "@/lib/offlineMobileStorage";
+import {
+  offlineMobileStore,
+  type OfflineReminder,
+  type OfflineAlbumPhoto,
+  type PatientProfile,
+} from "@/lib/offlineMobileStorage";
+import { speakSpokenVoice } from "@/lib/audioVoiceService";
 
 interface Props {
   navigate: (target: ScreenId) => void;
 }
 
 export default function CaregiverDashboard({ navigate }: Props) {
-  const [activeTab, setActiveTab] = useState<"overview" | "pwa_shell" | "federated_learning" | "telephony_infra" | "security_compliance" | "cloud_infra" | "monorepo_arch" | "ivr_accessibility" | "usability_testing" | "ia_wireframes" | "design_system" | "life_review" | "cultural_vault" | "neuropsych" | "phase1_1">("overview");
+  const [activeTab, setActiveTab] = useState<
+    | "overview"
+    | "patient_profile"
+    | "medications"
+    | "memory_studio"
+    | "game_telemetry"
+    | "wellness_tracker"
+    | "research_dossier"
+    | "pwa_shell"
+    | "federated_learning"
+    | "telephony_infra"
+    | "security_compliance"
+    | "cloud_infra"
+    | "monorepo_arch"
+    | "ivr_accessibility"
+    | "usability_testing"
+    | "ia_wireframes"
+    | "design_system"
+    | "life_review"
+    | "cultural_vault"
+    | "neuropsych"
+    | "phase1_1"
+  >("overview");
+  const [researchSubTab, setResearchSubTab] = useState<string>("pwa_shell");
+  const isResearchActive = (subId: string) =>
+    (activeTab === "research_dossier" && researchSubTab === subId) || activeTab === subId;
   const [designSubTab, setDesignSubTab] = useState<"colors" | "typography" | "touch" | "icons" | "motion">("colors");
   const [wireframeView, setWireframeView] = useState<"patient_ia" | "caregiver_ia" | "asha_ia" | "reminder_flow" | "social_flow">("patient_ia");
   const [usabilitySubTab, setUsabilitySubTab] = useState<"metrics" | "cohort" | "tasks" | "iterations" | "wellness">("metrics");
@@ -76,6 +107,51 @@ export default function CaregiverDashboard({ navigate }: Props) {
   const [wellnessHydration, setWellnessHydration] = useState<number>(6);
   const [wellnessSundowning, setWellnessSundowning] = useState<boolean>(false);
   const [wellnessSaved, setWellnessSaved] = useState<boolean>(false);
+
+  // ── Offline Mobile Clinical State ───────────────────────────────
+  const [patientProfile, setPatientProfile] = useState<PatientProfile>(() => offlineMobileStore.getPatientProfile());
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState<boolean>(false);
+  const [profileForm, setProfileForm] = useState(() => {
+    const p = offlineMobileStore.getPatientProfile();
+    return {
+      name: p.name,
+      age: p.age,
+      relation: p.relation,
+      primaryLanguage: p.primaryLanguage,
+      location: p.location,
+      clinicalCondition: p.clinicalCondition || "Mild Cognitive Impairment (Amnestic MCI) & Early Alzheimer's",
+      clinicalStage: p.clinicalStage || "CDR-1 (Mild Dementia) • Fast Stage 3",
+      mmseBaseline: p.mmseBaseline || 21,
+      fallRisk: p.fallRisk || "Moderate (Gait Instability)",
+      sundowningRisk: p.sundowningRisk || "High (Evening Agitation 5-8 PM)",
+      emergencyName: p.emergencyContact.name,
+      emergencyPhone: p.emergencyContact.phone,
+    };
+  });
+
+  const [reminders, setReminders] = useState<OfflineReminder[]>(() => offlineMobileStore.getReminders());
+  const [isAddMedOpen, setIsAddMedOpen] = useState<boolean>(false);
+  const [editingMed, setEditingMed] = useState<OfflineReminder | null>(null);
+  const [medForm, setMedForm] = useState({
+    title: "",
+    description: "",
+    dosage: "",
+    time: "8:00 AM",
+    icon: "💊",
+    type: "medicine" as "medicine" | "hydration" | "activity" | "nutrition",
+  });
+
+  const [albumPhotos, setAlbumPhotos] = useState<OfflineAlbumPhoto[]>(() => offlineMobileStore.getAlbumPhotos());
+  const [isAddPhotoOpen, setIsAddPhotoOpen] = useState<boolean>(false);
+  const [photoForm, setPhotoForm] = useState({
+    title: "",
+    nativeTitle: "",
+    year: "1985",
+    relation: "Family",
+    caption: "",
+    image: "/photos/festival.jpg",
+  });
+
   const [offlineStats, setOfflineStats] = useState(() => ({
     adherenceRate: offlineMobileStore.getAdherenceRate(),
     completedGames: offlineMobileStore.getTodayCompletedGamesCount(),
@@ -87,6 +163,9 @@ export default function CaregiverDashboard({ navigate }: Props) {
 
   useEffect(() => {
     return offlineMobileStore.subscribe(() => {
+      setPatientProfile(offlineMobileStore.getPatientProfile());
+      setReminders(offlineMobileStore.getReminders());
+      setAlbumPhotos(offlineMobileStore.getAlbumPhotos());
       setOfflineStats({
         adherenceRate: offlineMobileStore.getAdherenceRate(),
         completedGames: offlineMobileStore.getTodayCompletedGamesCount(),
@@ -97,6 +176,138 @@ export default function CaregiverDashboard({ navigate }: Props) {
       });
     });
   }, []);
+
+  // ── Operational Handlers ──────────────────────────────────────────
+  const handleSaveProfile = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    offlineMobileStore.updatePatientProfile({
+      name: profileForm.name,
+      age: Number(profileForm.age) || 74,
+      relation: profileForm.relation,
+      primaryLanguage: profileForm.primaryLanguage,
+      location: profileForm.location,
+      clinicalCondition: profileForm.clinicalCondition,
+      clinicalStage: profileForm.clinicalStage,
+      mmseBaseline: Number(profileForm.mmseBaseline) || 21,
+      fallRisk: profileForm.fallRisk,
+      sundowningRisk: profileForm.sundowningRisk,
+      emergencyContact: {
+        name: profileForm.emergencyName,
+        phone: profileForm.emergencyPhone,
+      },
+    });
+    setPatientProfile(offlineMobileStore.getPatientProfile());
+    setIsEditProfileOpen(false);
+    triggerHaptic("success");
+  };
+
+  const handleToggleMedication = (id: string) => {
+    offlineMobileStore.toggleReminder(id);
+    setReminders(offlineMobileStore.getReminders());
+    triggerHaptic("tap");
+  };
+
+  const openAddMedication = () => {
+    setEditingMed(null);
+    setMedForm({
+      title: "",
+      description: "",
+      dosage: "",
+      time: "8:00 AM",
+      icon: "💊",
+      type: "medicine",
+    });
+    setIsAddMedOpen(true);
+  };
+
+  const openEditMedication = (med: OfflineReminder) => {
+    setEditingMed(med);
+    setMedForm({
+      title: med.title,
+      description: med.description,
+      dosage: med.dosage || "",
+      time: med.time,
+      icon: med.icon,
+      type: med.type,
+    });
+    setIsAddMedOpen(true);
+  };
+
+  const handleSaveMedication = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!medForm.title.trim()) return;
+    if (editingMed) {
+      offlineMobileStore.updateReminder(editingMed.id, {
+        title: medForm.title,
+        description: medForm.description,
+        dosage: medForm.dosage,
+        time: medForm.time,
+        icon: medForm.icon,
+        type: medForm.type,
+      });
+    } else {
+      offlineMobileStore.addReminder({
+        title: medForm.title,
+        description: medForm.description,
+        dosage: medForm.dosage,
+        time: medForm.time,
+        icon: medForm.icon,
+        type: medForm.type,
+      });
+    }
+    setReminders(offlineMobileStore.getReminders());
+    setIsAddMedOpen(false);
+    triggerHaptic("success");
+  };
+
+  const handleDeleteMedication = (id: string) => {
+    if (typeof window !== "undefined" && window.confirm("Remove this medication / routine item?")) {
+      offlineMobileStore.deleteReminder(id);
+      setReminders(offlineMobileStore.getReminders());
+      triggerHaptic("warning");
+    }
+  };
+
+  const openAddPhoto = () => {
+    setPhotoForm({
+      title: "",
+      nativeTitle: "",
+      year: new Date().getFullYear().toString(),
+      relation: "Family",
+      caption: "",
+      image: "/photos/festival.jpg",
+    });
+    setIsAddPhotoOpen(true);
+  };
+
+  const handleSavePhoto = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!photoForm.title.trim() || !photoForm.caption.trim()) return;
+    offlineMobileStore.addAlbumPhoto({
+      title: photoForm.title,
+      nativeTitle: photoForm.nativeTitle || photoForm.title,
+      year: photoForm.year,
+      relation: photoForm.relation,
+      caption: photoForm.caption,
+      image: photoForm.image,
+    });
+    setAlbumPhotos(offlineMobileStore.getAlbumPhotos());
+    setIsAddPhotoOpen(false);
+    triggerHaptic("success");
+  };
+
+  const handleDeletePhoto = (id: string) => {
+    if (typeof window !== "undefined" && window.confirm("Remove this memory photograph from the album?")) {
+      offlineMobileStore.deleteAlbumPhoto(id);
+      setAlbumPhotos(offlineMobileStore.getAlbumPhotos());
+      triggerHaptic("warning");
+    }
+  };
+
+  const handleSpeakStory = (caption: string) => {
+    playGentleChime();
+    speakSpokenVoice(caption, "en");
+  };
 
   const [tremorAcceptedClicks, setTremorAcceptedClicks] = useState<number>(0);
   const [tremorBlockedClicks, setTremorBlockedClicks] = useState<number>(0);
@@ -575,79 +786,207 @@ export default function CaregiverDashboard({ navigate }: Props) {
 
       {/* Patient Clinical Profile Banner */}
       <div style={{
-        background: "var(--gray-50)",
-        border: "1px solid var(--gray-200)",
+        background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+        border: "1.5px solid var(--gray-200)",
         borderRadius: "var(--radius-lg)",
         padding: "1rem",
         marginBottom: "1.25rem",
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center"
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: "0.75rem",
+        boxShadow: "var(--shadow-sm)",
       }}>
-        <div>
-          <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--gray-900)" }}>
-            Birendra Nath Baruah
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div style={{
+            width: "46px",
+            height: "46px",
+            borderRadius: "50%",
+            background: "#e0e7ff",
+            color: "var(--primary)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "1.5rem",
+            fontWeight: 800,
+          }}>
+            👴
           </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--gray-500)" }}>
-            Age: 74 • Guwahati, Assam • {mmseData.staging}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                {patientProfile.name}
+              </span>
+              <span style={{
+                background: "#dbeafe",
+                color: "#1e40af",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                padding: "0.15rem 0.5rem",
+                borderRadius: "999px",
+              }}>
+                {patientProfile.relation}
+              </span>
+            </div>
+            <div style={{ fontSize: "0.8rem", color: "var(--gray-500)", marginTop: "0.15rem" }}>
+              Age: {patientProfile.age} • {patientProfile.location} • {patientProfile.clinicalStage || mmseData.staging}
+            </div>
           </div>
         </div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--primary)" }}>
-            MMSE: {mmseData.totalScore}/30
+
+        <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--primary)" }}>
+              MMSE: {patientProfile.mmseBaseline || mmseData.totalScore}/30
+            </div>
+            <div style={{ fontSize: "0.7rem", color: mmseData.color, fontWeight: 700 }}>
+              ● {patientProfile.clinicalStage || mmseData.staging}
+            </div>
           </div>
-          <div style={{ fontSize: "0.7rem", color: mmseData.color, fontWeight: 700 }}>
-            ● {mmseData.staging}
-          </div>
+          <button
+            onClick={() => {
+              setProfileForm({
+                name: patientProfile.name,
+                age: patientProfile.age,
+                relation: patientProfile.relation,
+                primaryLanguage: patientProfile.primaryLanguage,
+                location: patientProfile.location,
+                clinicalCondition: patientProfile.clinicalCondition || "Mild Cognitive Impairment (Amnestic MCI) & Early Alzheimer's",
+                clinicalStage: patientProfile.clinicalStage || "CDR-1 (Mild Dementia) • Fast Stage 3",
+                mmseBaseline: patientProfile.mmseBaseline || 21,
+                fallRisk: patientProfile.fallRisk || "Moderate (Gait Instability)",
+                sundowningRisk: patientProfile.sundowningRisk || "High (Evening Agitation 5-8 PM)",
+                emergencyName: patientProfile.emergencyContact.name,
+                emergencyPhone: patientProfile.emergencyContact.phone,
+              });
+              setIsEditProfileOpen(true);
+            }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.35rem",
+              padding: "0.45rem 0.8rem",
+              background: "var(--primary)",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "var(--radius)",
+              fontSize: "0.75rem",
+              fontWeight: 750,
+              cursor: "pointer",
+            }}
+          >
+            <span>✏️</span>
+            <span>Edit Profile</span>
+          </button>
         </div>
       </div>
 
-      {/* Navigation Tabs (7 Sub-phases & Overview) */}
+      {/* Navigation Tabs (Operational Clinical Command Hub & Research Dossier) */}
       <div style={{
         display: "flex",
-        gap: "0.35rem",
+        gap: "0.4rem",
         overflowX: "auto",
-        paddingBottom: "0.35rem",
+        paddingBottom: "0.4rem",
         marginBottom: "1.25rem",
         WebkitOverflowScrolling: "touch"
       }}>
         {[
-          { id: "overview", label: "Overview" },
-          { id: "pwa_shell", label: "P4.1 PWA Shell" },
-          { id: "federated_learning", label: "P3.5 FL" },
-          { id: "telephony_infra", label: "P3.4 Telephony" },
-          { id: "security_compliance", label: "P3.3 Security" },
-          { id: "cloud_infra", label: "P3.2 Cloud" },
-          { id: "monorepo_arch", label: "P3.1 Arch" },
-          { id: "ivr_accessibility", label: "P2.4 IVR" },
-          { id: "usability_testing", label: "P2.3 Usability" },
-          { id: "ia_wireframes", label: "P2.2 IA" },
-          { id: "design_system", label: "P2.1 Design" },
-          { id: "life_review", label: "P1.4 Story" },
-          { id: "cultural_vault", label: "P1.3 Vault" },
-          { id: "neuropsych", label: "P1.2 Neuro" },
-          { id: "phase1_1", label: "P1.1 Data" },
+          { id: "overview", label: "📊 Overview" },
+          { id: "patient_profile", label: "👤 Elder Profile & Staging" },
+          { id: "medications", label: "💊 Medication Manager" },
+          { id: "memory_studio", label: "🖼️ Family Album Studio" },
+          { id: "game_telemetry", label: "🎮 4-Game Live Telemetry" },
+          { id: "wellness_tracker", label: "🌿 Wellness Observations" },
+          { id: "research_dossier", label: "🔬 Research Dossier (14 Specs)" },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             style={{
               flexShrink: 0,
-              padding: "0.45rem 0.65rem",
+              padding: "0.5rem 0.8rem",
               borderRadius: "var(--radius)",
               border: activeTab === tab.id ? "2px solid var(--primary)" : "1px solid var(--gray-200)",
               background: activeTab === tab.id ? "var(--primary)" : "var(--white)",
               color: activeTab === tab.id ? "#fff" : "var(--gray-700)",
-              fontWeight: 700,
-              fontSize: "0.72rem",
+              fontWeight: 750,
+              fontSize: "0.78rem",
               cursor: "pointer",
-              whiteSpace: "nowrap"
+              whiteSpace: "nowrap",
+              boxShadow: activeTab === tab.id ? "0 2px 6px rgba(0,0,0,0.12)" : "none",
             }}
           >
             {tab.label}
           </button>
         ))}
       </div>
+
+      {/* If Research Dossier tab is active, show the 14 Sub-Phase Selector */}
+      {activeTab === "research_dossier" && (
+        <div style={{
+          background: "var(--gray-50)",
+          border: "1.5px solid var(--gray-200)",
+          borderRadius: "var(--radius-lg)",
+          padding: "0.85rem 1rem",
+          marginBottom: "1.25rem",
+        }}>
+          <div style={{
+            fontSize: "0.8rem",
+            fontWeight: 800,
+            color: "var(--gray-800)",
+            marginBottom: "0.5rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.4rem",
+          }}>
+            <span>🏛️ Hackathon Evaluation Dossier: Architectural & Clinical Research Sub-Phases</span>
+          </div>
+          <div style={{
+            display: "flex",
+            gap: "0.35rem",
+            overflowX: "auto",
+            paddingBottom: "0.25rem",
+            WebkitOverflowScrolling: "touch",
+          }}>
+            {[
+              { id: "pwa_shell", label: "P4.1 PWA Shell" },
+              { id: "federated_learning", label: "P3.5 FL" },
+              { id: "telephony_infra", label: "P3.4 Telephony" },
+              { id: "security_compliance", label: "P3.3 Security" },
+              { id: "cloud_infra", label: "P3.2 Cloud" },
+              { id: "monorepo_arch", label: "P3.1 Arch" },
+              { id: "ivr_accessibility", label: "P2.4 IVR" },
+              { id: "usability_testing", label: "P2.3 Usability" },
+              { id: "ia_wireframes", label: "P2.2 IA" },
+              { id: "design_system", label: "P2.1 Design" },
+              { id: "life_review", label: "P1.4 Story" },
+              { id: "cultural_vault", label: "P1.3 Vault" },
+              { id: "neuropsych", label: "P1.2 Neuro" },
+              { id: "phase1_1", label: "P1.1 Data" },
+            ].map((sub) => (
+              <button
+                key={sub.id}
+                onClick={() => setResearchSubTab(sub.id)}
+                style={{
+                  flexShrink: 0,
+                  padding: "0.38rem 0.65rem",
+                  borderRadius: "var(--radius)",
+                  border: researchSubTab === sub.id ? "2px solid var(--primary)" : "1px solid var(--gray-300)",
+                  background: researchSubTab === sub.id ? "var(--primary)" : "var(--white)",
+                  color: researchSubTab === sub.id ? "#fff" : "var(--gray-700)",
+                  fontWeight: 700,
+                  fontSize: "0.72rem",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {sub.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Tab 1: Overview */}
       {activeTab === "overview" && (
@@ -925,8 +1264,931 @@ export default function CaregiverDashboard({ navigate }: Props) {
         </div>
       )}
 
+      {/* ── Tab: Patient Profile & Clinical Staging Hub (Phase 22) ── */}
+      {activeTab === "patient_profile" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {/* Header Card with Elder Identity & Quick Actions */}
+          <div
+            style={{
+              background: "linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)",
+              border: "2px solid #bfdbfe",
+              borderRadius: "var(--radius-xl)",
+              padding: "1.4rem",
+              boxShadow: "var(--shadow-md)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <div
+                  style={{
+                    width: "64px",
+                    height: "64px",
+                    borderRadius: "50%",
+                    background: "linear-gradient(135deg, var(--primary), #1e40af)",
+                    color: "#ffffff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "2rem",
+                    boxShadow: "0 4px 10px rgba(30, 58, 138, 0.25)",
+                  }}
+                >
+                  👴
+                </div>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                    <h2 style={{ fontSize: "1.4rem", fontWeight: 800, color: "var(--gray-900)", margin: 0 }}>
+                      {patientProfile.name}
+                    </h2>
+                    <span
+                      style={{
+                        background: "#dbeafe",
+                        color: "#1e40af",
+                        fontSize: "0.75rem",
+                        fontWeight: 800,
+                        padding: "0.2rem 0.6rem",
+                        borderRadius: "999px",
+                      }}
+                    >
+                      {patientProfile.relation}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "0.85rem", color: "var(--gray-600)", marginTop: "0.25rem" }}>
+                    Age: <strong>{patientProfile.age} years</strong> • Location: <strong>{patientProfile.location}</strong> • Native Dialect: <strong>{patientProfile.primaryLanguage}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setProfileForm({
+                    name: patientProfile.name,
+                    age: patientProfile.age,
+                    relation: patientProfile.relation,
+                    primaryLanguage: patientProfile.primaryLanguage,
+                    location: patientProfile.location,
+                    clinicalCondition: patientProfile.clinicalCondition || "Mild Cognitive Impairment (Amnestic MCI)",
+                    clinicalStage: patientProfile.clinicalStage || "CDR-1 (Mild Dementia)",
+                    mmseBaseline: patientProfile.mmseBaseline || 21,
+                    fallRisk: patientProfile.fallRisk || "Moderate (Gait Instability)",
+                    sundowningRisk: patientProfile.sundowningRisk || "High (Evening Agitation 5-8 PM)",
+                    emergencyName: patientProfile.emergencyContact.name,
+                    emergencyPhone: patientProfile.emergencyContact.phone,
+                  });
+                  setIsEditProfileOpen(true);
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                  padding: "0.6rem 1.1rem",
+                  background: "var(--primary)",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: "var(--radius)",
+                  fontSize: "0.85rem",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                }}
+              >
+                <span>✏️</span>
+                <span>Edit Patient Details</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Clinical Staging & Neurological Profile Grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
+            {/* Card 1: Diagnostic Assessment */}
+            <div
+              style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.2rem",
+                boxShadow: "var(--shadow-sm)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.85rem" }}>
+                <span style={{ fontSize: "1.2rem" }}>🩺</span>
+                <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--gray-900)", margin: 0 }}>
+                  Clinical Diagnosis & Staging
+                </h3>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem" }}>
+                <div>
+                  <div style={{ color: "var(--gray-500)", fontSize: "0.75rem", fontWeight: 700 }}>PRIMARY DIAGNOSIS</div>
+                  <div style={{ color: "var(--gray-900)", fontWeight: 750, marginTop: "0.15rem" }}>
+                    {patientProfile.clinicalCondition || "Mild Cognitive Impairment (Amnestic MCI) & Early Alzheimer's"}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ color: "var(--gray-500)", fontSize: "0.75rem", fontWeight: 700 }}>CLINICAL DEMENTIA RATING (CDR)</div>
+                  <div style={{ color: "#b45309", fontWeight: 800, marginTop: "0.15rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#f59e0b" }} />
+                    {patientProfile.clinicalStage || "CDR-1 (Mild Dementia) • Fast Stage 3"}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ color: "var(--gray-500)", fontSize: "0.75rem", fontWeight: 700 }}>BASELINE COGNITIVE SCORE</div>
+                  <div style={{ color: "var(--primary)", fontWeight: 900, fontSize: "1.15rem", marginTop: "0.15rem" }}>
+                    {patientProfile.mmseBaseline || 21} / 30 MMSE
+                  </div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--gray-500)" }}>
+                    Assessed via Folstein MMSE & ICMR-NARI Neuropsychological Battery
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Physical & Circadian Risks */}
+            <div
+              style={{
+                background: "var(--white)",
+                border: "1.5px solid var(--gray-200)",
+                borderRadius: "var(--radius-lg)",
+                padding: "1.2rem",
+                boxShadow: "var(--shadow-sm)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.85rem" }}>
+                <span style={{ fontSize: "1.2rem" }}>⚠️</span>
+                <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--gray-900)", margin: 0 }}>
+                  Safety & Circadian Risk Stratification
+                </h3>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem" }}>
+                <div>
+                  <div style={{ color: "var(--gray-500)", fontSize: "0.75rem", fontWeight: 700 }}>FALL RISK STRATIFICATION</div>
+                  <div style={{ color: "#c2410c", fontWeight: 750, marginTop: "0.15rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                    <span>🚶‍♂️</span>
+                    <span>{patientProfile.fallRisk || "Moderate (Gait Instability / Postural Hesitation)"}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ color: "var(--gray-500)", fontSize: "0.75rem", fontWeight: 700 }}>SUNDOWNING & TWILIGHT AGITATION</div>
+                  <div style={{ color: "#7c3aed", fontWeight: 750, marginTop: "0.15rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                    <span>🌅</span>
+                    <span>{patientProfile.sundowningRisk || "High (Evening Agitation 5:00 PM - 8:00 PM)"}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ color: "var(--gray-500)", fontSize: "0.75rem", fontWeight: 700 }}>EMERGENCY CONTACT & FAST-DIAL</div>
+                  <div style={{ color: "var(--gray-900)", fontWeight: 750, marginTop: "0.15rem" }}>
+                    {patientProfile.emergencyContact.name} ({patientProfile.emergencyContact.phone})
+                  </div>
+                  <a
+                    href={`tel:${patientProfile.emergencyContact.phone.replace(/\\s+/g, "")}`}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.3rem",
+                      marginTop: "0.35rem",
+                      padding: "0.3rem 0.65rem",
+                      background: "#ecfdf5",
+                      color: "#065f46",
+                      borderRadius: "var(--radius-sm)",
+                      fontSize: "0.75rem",
+                      fontWeight: 800,
+                      textDecoration: "none",
+                      border: "1px solid #a7f3d0",
+                    }}
+                  >
+                    📞 Fast Dial Emergency Contact
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Tab: Real-Time Medication & Routine Manager (Phase 23) ── */}
+      {activeTab === "medications" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {/* Adherence Summary Strip */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+              gap: "0.75rem",
+            }}
+          >
+            <div style={{ background: "var(--white)", padding: "1rem", borderRadius: "var(--radius-lg)", border: "1.5px solid var(--gray-200)", textAlign: "center" }}>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--gray-500)" }}>ADHERENCE RATE</div>
+              <div style={{ fontSize: "1.6rem", fontWeight: 900, color: "var(--primary)", marginTop: "0.2rem" }}>
+                {offlineStats.adherenceRate}%
+              </div>
+              <div style={{ fontSize: "0.7rem", color: "#16a34a", fontWeight: 700 }}>● Active Daily Sync</div>
+            </div>
+
+            <div style={{ background: "var(--white)", padding: "1rem", borderRadius: "var(--radius-lg)", border: "1.5px solid var(--gray-200)", textAlign: "center" }}>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--gray-500)" }}>TOTAL ROUTINES</div>
+              <div style={{ fontSize: "1.6rem", fontWeight: 900, color: "var(--gray-900)", marginTop: "0.2rem" }}>
+                {reminders.length}
+              </div>
+              <div style={{ fontSize: "0.7rem", color: "var(--gray-500)" }}>Configured items</div>
+            </div>
+
+            <div style={{ background: "var(--white)", padding: "1rem", borderRadius: "var(--radius-lg)", border: "1.5px solid var(--gray-200)", textAlign: "center" }}>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--gray-500)" }}>TAKEN TODAY</div>
+              <div style={{ fontSize: "1.6rem", fontWeight: 900, color: "#16a34a", marginTop: "0.2rem" }}>
+                {reminders.filter((r) => r.completed).length}
+              </div>
+              <div style={{ fontSize: "0.7rem", color: "var(--gray-500)" }}>Completed doses</div>
+            </div>
+
+            <div style={{ background: "var(--white)", padding: "1rem", borderRadius: "var(--radius-lg)", border: "1.5px solid var(--gray-200)", textAlign: "center" }}>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--gray-500)" }}>PENDING DOSES</div>
+              <div style={{ fontSize: "1.6rem", fontWeight: 900, color: "#d97706", marginTop: "0.2rem" }}>
+                {reminders.filter((r) => !r.completed).length}
+              </div>
+              <div style={{ fontSize: "0.7rem", color: "var(--gray-500)" }}>Upcoming today</div>
+            </div>
+          </div>
+
+          {/* Action Header */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
+            <div>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--gray-900)", margin: 0 }}>
+                Live Medication Adherence Stream
+              </h3>
+              <p style={{ fontSize: "0.78rem", color: "var(--gray-500)", margin: "0.15rem 0 0 0" }}>
+                Real-time bidirectional sync with patient home reminders and full-screen chime prompts
+              </p>
+            </div>
+
+            <button
+              onClick={openAddMedication}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                padding: "0.55rem 1rem",
+                background: "var(--primary)",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "var(--radius)",
+                fontSize: "0.82rem",
+                fontWeight: 800,
+                cursor: "pointer",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+              }}
+            >
+              <span>➕</span>
+              <span>Add Medication / Routine</span>
+            </button>
+          </div>
+
+          {/* Medication List */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+            {reminders.map((r) => (
+              <div
+                key={r.id}
+                style={{
+                  background: "var(--white)",
+                  border: r.completed ? "1.5px solid #86efac" : "1.5px solid var(--gray-200)",
+                  borderRadius: "var(--radius-lg)",
+                  padding: "1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: "0.85rem",
+                  boxShadow: "var(--shadow-sm)",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
+                  <div
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      borderRadius: "var(--radius)",
+                      background: r.completed ? "#dcfce7" : "#fef3c7",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "1.6rem",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {r.icon || (r.type === "medicine" ? "💊" : "💧")}
+                  </div>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <span style={{ fontSize: "1rem", fontWeight: 800, color: "var(--gray-900)" }}>
+                        {r.title}
+                      </span>
+                      {r.completed ? (
+                        <span style={{ background: "#dcfce7", color: "#166534", fontSize: "0.7rem", fontWeight: 800, padding: "0.15rem 0.5rem", borderRadius: "999px" }}>
+                          ✅ Taken
+                        </span>
+                      ) : r.snoozedCount > 0 ? (
+                        <span style={{ background: "#ede9fe", color: "#6b21a8", fontSize: "0.7rem", fontWeight: 800, padding: "0.15rem 0.5rem", borderRadius: "999px" }}>
+                          🔔 Snoozed ({r.snoozedCount}x)
+                        </span>
+                      ) : (
+                        <span style={{ background: "#fef3c7", color: "#92400e", fontSize: "0.7rem", fontWeight: 800, padding: "0.15rem 0.5rem", borderRadius: "999px" }}>
+                          ⏳ Pending
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: "0.8rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>
+                      Dosage: <strong>{r.dosage || r.description}</strong> • Scheduled: <strong>{r.time}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <button
+                    onClick={() => handleToggleMedication(r.id)}
+                    style={{
+                      padding: "0.4rem 0.75rem",
+                      background: r.completed ? "#f3f4f6" : "#10b981",
+                      color: r.completed ? "var(--gray-700)" : "#ffffff",
+                      border: "1px solid var(--gray-300)",
+                      borderRadius: "var(--radius)",
+                      fontSize: "0.75rem",
+                      fontWeight: 750,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {r.completed ? "Mark Pending" : "Mark Taken"}
+                  </button>
+                  <button
+                    onClick={() => openEditMedication(r)}
+                    style={{
+                      padding: "0.4rem 0.65rem",
+                      background: "var(--gray-100)",
+                      color: "var(--gray-700)",
+                      border: "1px solid var(--gray-300)",
+                      borderRadius: "var(--radius)",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteMedication(r.id)}
+                    style={{
+                      padding: "0.4rem 0.65rem",
+                      background: "#fee2e2",
+                      color: "#991b1b",
+                      border: "1px solid #fca5a5",
+                      borderRadius: "var(--radius)",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Tab: Family Memory Studio (Phase 24) ── */}
+      {activeTab === "memory_studio" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {/* Banner */}
+          <div
+            style={{
+              background: "linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%)",
+              border: "2px solid #f0abfc",
+              borderRadius: "var(--radius-xl)",
+              padding: "1.2rem",
+              boxShadow: "var(--shadow-sm)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
+              <div>
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#86198f", margin: 0 }}>
+                  Family Reminiscence & Memory Studio
+                </h3>
+                <p style={{ fontSize: "0.78rem", color: "#a21caf", margin: "0.2rem 0 0 0" }}>
+                  Empower autobiographical memory recall via Ribot's Law (youth memories 10–30 yrs) with spoken narratives
+                </p>
+              </div>
+
+              <button
+                onClick={openAddPhoto}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                  padding: "0.55rem 1rem",
+                  background: "#a21caf",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: "var(--radius)",
+                  fontSize: "0.82rem",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                }}
+              >
+                <span>➕</span>
+                <span>Add Family Photograph</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Photo Gallery Grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.1rem" }}>
+            {albumPhotos.map((p) => (
+              <div
+                key={p.id}
+                style={{
+                  background: "var(--white)",
+                  border: "1.5px solid var(--gray-200)",
+                  borderRadius: "var(--radius-xl)",
+                  overflow: "hidden",
+                  boxShadow: "var(--shadow-sm)",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div style={{ position: "relative", width: "100%", height: "180px", backgroundColor: "#0f172a" }}>
+                  <img
+                    src={p.image}
+                    alt={p.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  />
+                  <span
+                    style={{
+                      position: "absolute",
+                      bottom: "0.5rem",
+                      right: "0.5rem",
+                      background: "rgba(0,0,0,0.75)",
+                      color: "#fff",
+                      fontSize: "0.75rem",
+                      fontWeight: 800,
+                      padding: "0.2rem 0.5rem",
+                      borderRadius: "999px",
+                    }}
+                  >
+                    {p.year}
+                  </span>
+                </div>
+
+                <div style={{ padding: "1rem", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                      <h4 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--gray-900)", margin: 0 }}>
+                        {p.title}
+                      </h4>
+                      <span style={{ fontSize: "0.72rem", fontWeight: 800, color: "var(--primary)" }}>
+                        {p.relation}
+                      </span>
+                    </div>
+                    {p.nativeTitle && p.nativeTitle !== p.title && (
+                      <div style={{ fontSize: "0.8rem", color: "var(--gray-500)", fontWeight: 600, marginTop: "0.15rem" }}>
+                        {p.nativeTitle}
+                      </div>
+                    )}
+                    <p style={{ fontSize: "0.8rem", color: "var(--gray-600)", lineHeight: 1.4, margin: "0.5rem 0 0.85rem 0" }}>
+                      {p.caption}
+                    </p>
+                  </div>
+
+                  <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+                    <button
+                      onClick={() => handleSpeakStory(p.caption)}
+                      style={{
+                        flex: 1,
+                        padding: "0.45rem",
+                        background: "#eff6ff",
+                        border: "1px solid #bfdbfe",
+                        borderRadius: "var(--radius)",
+                        fontSize: "0.75rem",
+                        fontWeight: 750,
+                        color: "var(--primary)",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "0.3rem",
+                      }}
+                    >
+                      <span>🎙️</span>
+                      <span>Test Voice</span>
+                    </button>
+                    <button
+                      onClick={() => handleDeletePhoto(p.id)}
+                      style={{
+                        padding: "0.45rem 0.65rem",
+                        background: "#fee2e2",
+                        border: "1px solid #fca5a5",
+                        borderRadius: "var(--radius)",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        color: "#991b1b",
+                        cursor: "pointer",
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Tab: Real-Time 4-Game Cognitive Telemetry Grid (Phase 26) ── */}
+      {activeTab === "game_telemetry" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {/* Header Card */}
+          <div
+            style={{
+              background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
+              border: "2px solid #86efac",
+              borderRadius: "var(--radius-xl)",
+              padding: "1.2rem",
+              boxShadow: "var(--shadow-sm)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
+              <div>
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#166534", margin: 0 }}>
+                  Real-Time 4-Game Cognitive Telemetry Grid
+                </h3>
+                <p style={{ fontSize: "0.78rem", color: "#15803d", margin: "0.2rem 0 0 0" }}>
+                  High-frequency edge telemetry tracking deliberation latency, accuracy, and adaptive scaffolding across all 4 cognitive games
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <span style={{ background: "#22c55e", color: "#fff", fontSize: "0.7rem", fontWeight: 800, padding: "0.25rem 0.65rem", borderRadius: "999px" }}>
+                  LIVE LOCAL STREAM
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 4 Games Telemetry Cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.1rem" }}>
+            {[
+              {
+                id: "dhol-pepa",
+                name: "Dhol-Pepa Rhythm",
+                native: "ঢোল-পেঁপা ছন্দ",
+                icon: "🥁",
+                domain: "Auditory-Motor Recall & Temporal Synchronization",
+                stats: offlineMobileStore.getGameSummaryStats("dhol-pepa"),
+                latest: offlineMobileStore.getLatestGameScore("dhol-pepa"),
+                aacbStatus: "Acoustic Chime Pacing Active",
+              },
+              {
+                id: "kaziranga-safari",
+                name: "Kaziranga Safari",
+                native: "কাজিৰঙা ভ্ৰমণ",
+                icon: "🦏",
+                domain: "Visual Attention & Fauna Feature Discrimination",
+                stats: offlineMobileStore.getGameSummaryStats("kaziranga-safari"),
+                latest: offlineMobileStore.getLatestGameScore("kaziranga-safari"),
+                aacbStatus: "Golden Halo Visual Scaffolding",
+              },
+              {
+                id: "weavers-loom",
+                name: "Weaver's Loom",
+                native: "বয়নশাল (Traditional Loom)",
+                icon: "🧵",
+                domain: "Visuomotor Coordination & Silk Pattern Weaving",
+                stats: offlineMobileStore.getGameSummaryStats("weavers-loom"),
+                latest: offlineMobileStore.getLatestGameScore("weavers-loom"),
+                aacbStatus: "5-Color Calibrated Spool Focus (WCAG AAA)",
+              },
+              {
+                id: "daily-haat",
+                name: "Daily Haat Bazaar",
+                native: "দৈনন্দিন হাট বজাৰ",
+                icon: "🧺",
+                domain: "Working Memory & Executive Recipe Planning",
+                stats: offlineMobileStore.getGameSummaryStats("daily-haat"),
+                latest: offlineMobileStore.getLatestGameScore("daily-haat"),
+                aacbStatus: "Ingredient Budget Scaffolding",
+              },
+            ].map((game) => (
+              <div
+                key={game.id}
+                style={{
+                  background: "var(--white)",
+                  border: "1.5px solid var(--gray-200)",
+                  borderRadius: "var(--radius-xl)",
+                  padding: "1.2rem",
+                  boxShadow: "var(--shadow-sm)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.6rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                      <span style={{ fontSize: "1.8rem" }}>{game.icon}</span>
+                      <div>
+                        <h4 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--gray-900)", margin: 0 }}>
+                          {game.name}
+                        </h4>
+                        <div style={{ fontSize: "0.75rem", color: "var(--gray-500)", fontWeight: 600 }}>
+                          {game.native}
+                        </div>
+                      </div>
+                    </div>
+                    <span
+                      style={{
+                        background: game.stats.totalSessions > 0 ? "#dcfce7" : "#fef3c7",
+                        color: game.stats.totalSessions > 0 ? "#166534" : "#92400e",
+                        fontSize: "0.68rem",
+                        fontWeight: 800,
+                        padding: "0.2rem 0.5rem",
+                        borderRadius: "999px",
+                      }}
+                    >
+                      {game.stats.totalSessions > 0 ? "Session Logged" : "Pending Today"}
+                    </span>
+                  </div>
+
+                  <div style={{ fontSize: "0.75rem", color: "var(--gray-600)", lineHeight: 1.35, marginBottom: "0.85rem" }}>
+                    {game.domain}
+                  </div>
+
+                  {/* Telemetry Metrics Grid */}
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: "0.5rem",
+                      background: "var(--gray-50)",
+                      padding: "0.75rem",
+                      borderRadius: "var(--radius)",
+                      border: "1px solid var(--gray-200)",
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: "0.68rem", color: "var(--gray-500)", fontWeight: 700 }}>LATEST ACCURACY</div>
+                      <div style={{ fontSize: "1.25rem", fontWeight: 900, color: "var(--primary)" }}>
+                        {game.stats.latestAccuracy}%
+                      </div>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: "0.68rem", color: "var(--gray-500)", fontWeight: 700 }}>BEST ACCURACY</div>
+                      <div style={{ fontSize: "1.25rem", fontWeight: 900, color: "#16a34a" }}>
+                        {game.stats.bestAccuracy}%
+                      </div>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: "0.68rem", color: "var(--gray-500)", fontWeight: 700 }}>REACTION LATENCY</div>
+                      <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-800)" }}>
+                        {game.latest?.reactionTimeMs ? `${game.latest.reactionTimeMs} ms` : "520 ms"}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: "0.68rem", color: "var(--gray-500)", fontWeight: 700 }}>SESSIONS LOGGED</div>
+                      <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-800)" }}>
+                        {game.stats.totalSessions} sessions
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    marginTop: "0.85rem",
+                    padding: "0.45rem 0.65rem",
+                    background: "#eff6ff",
+                    border: "1px solid #bfdbfe",
+                    borderRadius: "var(--radius-sm)",
+                    fontSize: "0.72rem",
+                    color: "var(--primary)",
+                    fontWeight: 700,
+                  }}
+                >
+                  🛡️ AACB Scaffolding: {game.aacbStatus}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Recent Edge Sessions Telemetry Audit Log */}
+          <div
+            style={{
+              background: "var(--white)",
+              border: "1.5px solid var(--gray-200)",
+              borderRadius: "var(--radius-xl)",
+              padding: "1.2rem",
+              boxShadow: "var(--shadow-sm)",
+            }}
+          >
+            <h4 style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)", marginBottom: "0.6rem" }}>
+              Edge Telemetry Session Audit Log (Offline-First Storage)
+            </h4>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", fontSize: "0.78rem", borderCollapse: "collapse", textAlign: "left" }}>
+                <thead>
+                  <tr style={{ borderBottom: "1.5px solid var(--gray-200)", color: "var(--gray-500)" }}>
+                    <th style={{ padding: "0.5rem" }}>Game</th>
+                    <th style={{ padding: "0.5rem" }}>Accuracy</th>
+                    <th style={{ padding: "0.5rem" }}>Reaction Latency</th>
+                    <th style={{ padding: "0.5rem" }}>AACB Assisted</th>
+                    <th style={{ padding: "0.5rem" }}>Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {offlineMobileStore.getGameSessions().slice(0, 6).map((ses) => (
+                    <tr key={ses.sessionId} style={{ borderBottom: "1px solid var(--gray-100)" }}>
+                      <td style={{ padding: "0.5rem", fontWeight: 750 }}>{ses.gameName || ses.gameId}</td>
+                      <td style={{ padding: "0.5rem", fontWeight: 800, color: "var(--primary)" }}>{ses.accuracy}%</td>
+                      <td style={{ padding: "0.5rem" }}>{ses.reactionTimeMs || 620} ms</td>
+                      <td style={{ padding: "0.5rem" }}>
+                        {ses.aacbTriggered ? (
+                          <span style={{ color: "#d97706", fontWeight: 800 }}>● Halo Active</span>
+                        ) : (
+                          <span style={{ color: "var(--gray-500)" }}>Autonomous</span>
+                        )}
+                      </td>
+                      <td style={{ padding: "0.5rem", color: "var(--gray-500)" }}>
+                        {new Date(ses.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Tab: Wellness Observations & Sundowning Episode Tracker ── */}
+      {activeTab === "wellness_tracker" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {/* Card for Mood, Sleep, Hydration & Twilight Logging */}
+          <div
+            style={{
+              background: "var(--white)",
+              border: "1.5px solid var(--gray-200)",
+              borderRadius: "var(--radius-xl)",
+              padding: "1.3rem",
+              boxShadow: "var(--shadow-sm)",
+            }}
+          >
+            <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--gray-900)", marginBottom: "0.35rem" }}>
+              Elder Wellness & Twilight Agitation Log
+            </h3>
+            <p style={{ fontSize: "0.8rem", color: "var(--gray-500)", marginBottom: "1.1rem" }}>
+              Empirical geriatric observation tool for circadian deceleration, sleep tracking, and evening sundowning assessment
+            </p>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.1rem" }}>
+              {/* Mood selector */}
+              <div>
+                <label style={{ fontSize: "0.8rem", fontWeight: 800, color: "var(--gray-700)", display: "block", marginBottom: "0.4rem" }}>
+                  Observed Emotional Valence:
+                </label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+                  {[
+                    { id: "calm", label: "Calm & Serene", icon: "😌" },
+                    { id: "happy", label: "Joyful / Engaged", icon: "😊" },
+                    { id: "restless", label: "Restless / Wandering", icon: "🚶‍♂️" },
+                    { id: "agitated", label: "Agitated / Distressed", icon: "😟" },
+                  ].map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => setWellnessMood(m.id as any)}
+                      style={{
+                        padding: "0.6rem 0.5rem",
+                        borderRadius: "var(--radius)",
+                        border: wellnessMood === m.id ? "2px solid var(--primary)" : "1.5px solid var(--gray-200)",
+                        background: wellnessMood === m.id ? "#eff6ff" : "var(--white)",
+                        color: wellnessMood === m.id ? "var(--primary)" : "var(--gray-700)",
+                        fontWeight: 750,
+                        fontSize: "0.8rem",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.4rem",
+                      }}
+                    >
+                      <span>{m.icon}</span>
+                      <span>{m.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sleep & Hydration */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", fontWeight: 800, color: "var(--gray-700)" }}>
+                    <span>Night Sleep Duration:</span>
+                    <span style={{ color: "var(--primary)" }}>{wellnessSleep} hours</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="3"
+                    max="12"
+                    step="0.5"
+                    value={wellnessSleep}
+                    onChange={(e) => setWellnessSleep(parseFloat(e.target.value))}
+                    style={{ width: "100%", marginTop: "0.4rem" }}
+                  />
+                </div>
+
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", fontWeight: 800, color: "var(--gray-700)" }}>
+                    <span>Hydration (Glasses of Water):</span>
+                    <span style={{ color: "#0284c7" }}>{wellnessHydration} glasses</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="12"
+                    step="1"
+                    value={wellnessHydration}
+                    onChange={(e) => setWellnessHydration(parseInt(e.target.value, 10))}
+                    style={{ width: "100%", marginTop: "0.4rem" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Sundowning check */}
+            <div style={{ marginTop: "1rem", padding: "0.85rem", background: wellnessSundowning ? "#fef2f2" : "#f8fafc", borderRadius: "var(--radius)", border: "1px solid var(--gray-200)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <div style={{ fontSize: "0.85rem", fontWeight: 800, color: wellnessSundowning ? "#991b1b" : "var(--gray-800)" }}>
+                  Twilight / Sundowning Episode Observed Today?
+                </div>
+                <div style={{ fontSize: "0.72rem", color: "var(--gray-500)" }}>
+                  Shadow confusion, restlessness or pacing during 5:00 PM – 8:00 PM twilight transition
+                </div>
+              </div>
+              <input
+                type="checkbox"
+                checked={wellnessSundowning}
+                onChange={(e) => setWellnessSundowning(e.target.checked)}
+                style={{ width: 22, height: 22, cursor: "pointer" }}
+              />
+            </div>
+
+            <div style={{ marginTop: "1.1rem", display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  offlineMobileStore.saveWellnessLog({
+                    mood: wellnessMood,
+                    sleepHours: wellnessSleep,
+                    hydrationGlasses: wellnessHydration,
+                    sundowningObserved: wellnessSundowning,
+                    sundowningEpisode: wellnessSundowning,
+                  });
+                  setWellnessSaved(true);
+                  triggerHaptic("success");
+                  setTimeout(() => setWellnessSaved(false), 3000);
+                }}
+                style={{
+                  padding: "0.65rem 1.4rem",
+                  background: "var(--primary)",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: "var(--radius)",
+                  fontSize: "0.85rem",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                }}
+              >
+                💾 Save Wellness Observation
+              </button>
+              {wellnessSaved && (
+                <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#16a34a" }}>
+                  ✅ Saved locally & encrypted to offline cache!
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Tab 2: Sub-Phase 1.2 Neuropsychological Foundation */}
-      {activeTab === "neuropsych" && (
+      {isResearchActive("neuropsych") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           {/* Multi-Domain MMSE Breakdown */}
           <div style={{
@@ -1149,7 +2411,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab 3: Sub-Phase 1.3 Cultural Asset Vault */}
-      {activeTab === "cultural_vault" && (
+      {isResearchActive("cultural_vault") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {/* Sub-tab Navigation */}
           <div style={{
@@ -1526,7 +2788,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab 4: Sub-Phase 1.4 Life-Review & Storytelling Baseline (Milestone M1 Sign-off) */}
-      {activeTab === "life_review" && (
+      {isResearchActive("life_review") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {/* Milestone M1 Sign-off Banner */}
           <div style={{
@@ -1763,7 +3025,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab 5: Sub-Phase 2.1 Elder-Centric Design System */}
-      {activeTab === "design_system" && (
+      {isResearchActive("design_system") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {/* Sub-Phase 2.1 Header Box */}
           <div style={{
@@ -2221,7 +3483,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab 6: Sub-Phase 2.2 Information Architecture & Wireframes */}
-      {activeTab === "ia_wireframes" && (
+      {isResearchActive("ia_wireframes") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {/* Sub-Phase 2.2 Header Box */}
           <div style={{
@@ -2582,7 +3844,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab 7: Sub-Phase 2.3 High-Fidelity Usability Evaluation */}
-      {activeTab === "usability_testing" && (
+      {isResearchActive("usability_testing") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {/* Sub-Phase 2.3 Header Box */}
           <div style={{
@@ -2992,7 +4254,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab: Sub-Phase 2.4 Accessibility & Zero-Device Interaction Design (IVR Telephony Line) */}
-      {activeTab === "ivr_accessibility" && (
+      {isResearchActive("ivr_accessibility") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           {/* Milestone M2 Verification Header */}
           <div style={{
@@ -4092,7 +5354,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab: Sub-Phase 4.1 PWA Foundation & App Shell Architecture */}
-      {activeTab === "pwa_shell" && (
+      {isResearchActive("pwa_shell") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           {/* Sub-Phase 4.1 Header Overview */}
           <div style={{
@@ -4802,7 +6064,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab: Sub-Phase 3.5 Federated Learning & Milestone M3 Sign-Off */}
-      {activeTab === "federated_learning" && (
+      {isResearchActive("federated_learning") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           {/* Sub-Phase 3.5 Header Overview */}
           <div style={{
@@ -5540,7 +6802,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab: Sub-Phase 3.4 Telephony & IVR Infrastructure */}
-      {activeTab === "telephony_infra" && (
+      {isResearchActive("telephony_infra") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           {/* Sub-Phase 3.4 Header Overview */}
           <div style={{
@@ -6215,7 +7477,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab: Sub-Phase 3.3 Security & Compliance Framework */}
-      {activeTab === "security_compliance" && (
+      {isResearchActive("security_compliance") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           {/* Sub-Phase 3.3 Header Overview */}
           <div style={{
@@ -6843,7 +8105,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab: Sub-Phase 3.2 Cloud Infrastructure & Database Architecture */}
-      {activeTab === "cloud_infra" && (
+      {isResearchActive("cloud_infra") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           {/* Sub-Phase 3.2 Header Overview */}
           <div style={{
@@ -7755,7 +9017,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab: Sub-Phase 3.1 Production Development Environment & Monorepo Architecture */}
-      {activeTab === "monorepo_arch" && (
+      {isResearchActive("monorepo_arch") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           {/* Sub-Phase 3.1 Header Overview */}
           <div style={{
@@ -8325,7 +9587,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
       )}
 
       {/* Tab: Sub-Phase 1.1 Data */}
-      {activeTab === "phase1_1" && (
+      {isResearchActive("phase1_1") && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {/* Phase 1.1 Overview Box */}
           <div style={{

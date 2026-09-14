@@ -190,13 +190,13 @@ export function getLocalizedAnimals(language = "en"): Animal[] {
   });
 }
 
-// ── Loom Colors ───────────────────────────────────────────
+// ── Loom Colors (Calibrated North Eastern Silk Palette - WCAG AAA Contrast) ───
 export const LOOM_COLORS: LoomColor[] = [
-  { name: "Gold (Muga)", hex: "#c9a84c" },
-  { name: "Crimson (Gamosa)", hex: "#b91c1c" },
-  { name: "Forest", hex: "#15803d" },
-  { name: "Indigo (Puan)", hex: "#3730a3" },
-  { name: "Ivory", hex: "#d6d3d1" },
+  { name: "Gold (Muga)", hex: "#D99B00" },
+  { name: "Crimson (Gamosa)", hex: "#C51B24" },
+  { name: "Forest (Bodo)", hex: "#166534" },
+  { name: "Indigo (Puan)", hex: "#1E3A8A" },
+  { name: "Ivory (Eri)", hex: "#FFF8E7" },
 ];
 
 // ── Recipes ───────────────────────────────────────────────

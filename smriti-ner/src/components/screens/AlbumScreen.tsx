@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ScreenId } from "@/lib/types";
-import { playBeep, playGentleChime } from "@/lib/audio";
+import { playGentleChime } from "@/lib/audio";
 import { ALBUM_SCREEN_LOCALES } from "@/lib/screenLocalizations";
-import { offlineMobileStore } from "@/lib/offlineMobileStorage";
+import { offlineMobileStore, type OfflineAlbumPhoto } from "@/lib/offlineMobileStorage";
+import { speakSpokenVoice } from "@/lib/audioVoiceService";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -13,46 +14,24 @@ interface Props {
 
 export default function AlbumScreen({ navigate, language = "en" }: Props) {
   const loc = ALBUM_SCREEN_LOCALES[language] || ALBUM_SCREEN_LOCALES.en;
-  const [playingStoryId, setPlayingStoryId] = useState<number | null>(null);
+  const [photos, setPhotos] = useState<OfflineAlbumPhoto[]>(() => offlineMobileStore.getAlbumPhotos());
+  const [playingStoryId, setPlayingStoryId] = useState<string | null>(null);
 
-  const photos = [
-    {
-      id: 1,
-      title: "Rongali Bihu in Jorhat",
-      native: loc.photos.bihu.native,
-      year: "1982",
-      relation: loc.photos.bihu.relation,
-      caption: "You in your traditional Muga Kurta playing the Dhol with family and cousins by the tea garden.",
-      image: "/photos/festival.jpg",
-    },
-    {
-      id: 2,
-      title: "Priya’s Graduation Day",
-      native: loc.photos.graduation.native,
-      year: "2018",
-      relation: loc.photos.graduation.relation,
-      caption: "Gauhati University. You handed Priya her degree certificate with proud tears of joy.",
-      image: "/photos/graduation.jpg",
-    },
-    {
-      id: 3,
-      title: "Brahmaputra Ferry to Majuli",
-      native: loc.photos.majuli.native,
-      year: "1994",
-      relation: loc.photos.majuli.relation,
-      caption: "Sunset over the mighty Brahmaputra river heading to Kamalabari Satra for the festival.",
-      image: "/photos/ferry.jpg",
-    }
-  ];
+  useEffect(() => {
+    return offlineMobileStore.subscribe(() => {
+      setPhotos(offlineMobileStore.getAlbumPhotos());
+    });
+  }, []);
 
-  const handlePlayStory = (id: number) => {
+  const handlePlayStory = (id: string) => {
     playGentleChime();
     setPlayingStoryId(id);
     const photo = photos.find((p) => p.id === id);
     if (photo) {
-      offlineMobileStore.recordReminiscence(String(id), photo.title);
+      offlineMobileStore.recordReminiscence(photo.id, photo.title);
+      speakSpokenVoice(photo.caption, language);
     }
-    setTimeout(() => setPlayingStoryId(null), 3500);
+    setTimeout(() => setPlayingStoryId(null), 4500);
   };
 
   return (
@@ -177,7 +156,7 @@ export default function AlbumScreen({ navigate, language = "en" }: Props) {
               <div style={{ padding: "1.1rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <h3 style={{ fontSize: "1.15rem", fontWeight: 800, color: "var(--gray-900)" }}>
-                    {language === "en" ? p.title : p.native}
+                    {language === "en" ? p.title : (p.nativeTitle || p.title)}
                   </h3>
                   <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--accent)" }}>
                     {p.relation}

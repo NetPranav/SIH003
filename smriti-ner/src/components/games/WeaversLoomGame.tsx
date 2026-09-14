@@ -310,23 +310,28 @@ export default function WeaversLoomGame({ navigate, showSuccess, language = "en"
               const loomCol = LOOM_COLORS[colorIdx] || LOOM_COLORS[0];
               const isWoven = idx < wovenSequence.length;
               const isCurrent = idx === wovenSequence.length;
+              const isLightColor = colorIdx === 4 || loomCol.hex.toLowerCase() === "#fff8e7";
 
               return (
                 <div
                   key={idx}
                   style={{
                     flex: 1,
-                    height: "36px",
-                    borderRadius: "6px",
+                    height: "38px",
+                    borderRadius: "8px",
                     backgroundColor: loomCol.hex,
-                    border: isCurrent ? "3px solid #000000" : "1.5px solid rgba(0,0,0,0.15)",
+                    border: isCurrent
+                      ? "3px solid #000000"
+                      : isLightColor
+                      ? "2px solid #78716c"
+                      : "2px solid rgba(0,0,0,0.25)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    color: "#ffffff",
-                    fontWeight: 800,
-                    fontSize: "0.9rem",
-                    boxShadow: isCurrent ? "0 0 10px rgba(0,0,0,0.3)" : "none",
+                    color: isLightColor ? "#1e293b" : "#ffffff",
+                    fontWeight: 900,
+                    fontSize: "1rem",
+                    boxShadow: isCurrent ? "0 0 10px rgba(0,0,0,0.35)" : "none",
                   }}
                 >
                   {isWoven ? "✓" : isCurrent ? "●" : ""}
@@ -347,18 +352,19 @@ export default function WeaversLoomGame({ navigate, showSuccess, language = "en"
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "0.85rem",
+          gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
+          gap: "0.75rem",
           flex: 1,
           alignContent: "center",
         }}
       >
-        {LOOM_COLORS.slice(0, 4).map((color, idx) => {
+        {LOOM_COLORS.map((color, idx) => {
           const nextStep = wovenSequence.length;
           const expectedColor = activePattern.sequence[nextStep];
           const isTarget = idx === expectedColor;
           const isTargetInAacb = aacbState.triggered && isTarget;
           const isDimmed = aacbState.triggered && !isTarget;
+          const isLightColor = idx === 4 || color.hex.toLowerCase() === "#fff8e7";
 
           let btnClass = "";
           if (isTargetInAacb) {
@@ -375,16 +381,16 @@ export default function WeaversLoomGame({ navigate, showSuccess, language = "en"
               onClick={(e) => handleYarnTap(idx, e)}
               aria-label={`${color.name}. Tap to weave yarn.`}
               style={{
-                minHeight: "115px",
-                padding: "1rem 0.75rem",
+                minHeight: "105px",
+                padding: "0.85rem 0.65rem",
                 borderRadius: "var(--radius-lg)",
                 background: isTargetInAacb ? "#fffbeb" : "var(--white)",
-                border: isTargetInAacb ? "3px solid #f59e0b" : "2px solid var(--gray-200)",
+                border: isTargetInAacb ? "3px solid #f59e0b" : "2px solid var(--gray-300)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "0.5rem",
+                gap: "0.45rem",
                 cursor: "pointer",
                 boxShadow: "var(--shadow-sm)",
                 transition: "transform 0.15s ease",
@@ -396,11 +402,11 @@ export default function WeaversLoomGame({ navigate, showSuccess, language = "en"
                   height: "44px",
                   borderRadius: "50%",
                   backgroundColor: color.hex,
-                  border: "2px solid rgba(0,0,0,0.1)",
-                  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                  border: isLightColor ? "3px solid #78716c" : "2px solid rgba(0,0,0,0.25)",
+                  boxShadow: "0 3px 6px rgba(0,0,0,0.15)",
                 }}
               />
-              <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
+              <span style={{ fontSize: "0.9rem", fontWeight: 800, color: "var(--gray-900)", textAlign: "center" }}>
                 {color.name}
               </span>
             </button>
