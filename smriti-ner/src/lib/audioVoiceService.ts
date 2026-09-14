@@ -87,13 +87,13 @@ export const REGIONAL_REMINDER_SPEECH: Record<string, (title: string, dosage?: s
   bn: (title, dosage) =>
     `নমস্কার দাদু। আপনার ${title}${dosage ? ` অর্থাৎ ${dosage}` : ""} নেওয়ার সময় হয়েছে। দয়া করে জলের সাথে ওষুধটি খেয়ে নিন।`,
   mni: (title, dosage) =>
-    `ꯏꯄꯥ, ꯅꯍꯥꯛꯀꯤ ${title} ꯍꯤꯗꯥꯛ ꯆꯥꯕꯒꯤ ꯃꯇꯝ ꯑꯣꯏꯔꯦ। ꯏꯁꯤꯡꯒꯥ ꯂꯣꯌꯅꯅꯥ ꯊꯛꯄꯤꯌꯨ।`,
+    `ꯏꯄꯥ, ꯅꯍꯥꯛꯀꯤ ${title}${dosage ? ` (${dosage})` : ""} ꯍꯤꯗꯥꯛ ꯆꯥꯕꯒꯤ ꯃꯇꯝ ꯑꯣꯏꯔꯦ। ꯏꯁꯤꯡꯒꯥ ꯂꯣꯌꯅꯅꯥ ꯊꯛꯄꯤꯌꯨ।`,
   brx: (title, dosage) =>
-    `आफा, नोंथांनि ${title} मुलिखौ जानो सम जाबाय। अननानै दैजों लोगोसे मुलिखौ जादो।`,
+    `आफा, नोंथांनि ${title}${dosage ? ` (${dosage})` : ""} मुलिखौ जानो सम जाबाय। अननानै दैजों लोगोसे मुलिखौ जादो।`,
   kha: (title, dosage) =>
-    `Kpa, la dei ka por ban shim ïa ka dawai ${title}. Sngewbha shim lem bad ka um.`,
+    `Kpa, la dei ka por ban shim ïa ka dawai ${title}${dosage ? ` (${dosage})` : ""}. Sngewbha shim lem bad ka um.`,
   lus: (title, dosage) =>
-    `Ka pa, i damdawi ${title} ei a hun ta e. Tui nen tlem te in la, ei rawh le.`,
+    `Ka pa, i damdawi ${title}${dosage ? ` (${dosage})` : ""} ei a hun ta e. Tui nen tlem te in la, ei rawh le.`,
   en: (title, dosage) =>
     `Hello grandfather. It is time for your ${title}${dosage ? `, which is ${dosage}` : ""}. Please take it gently with a glass of water.`,
 };
