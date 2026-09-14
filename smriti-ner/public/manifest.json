@@ -1,0 +1,45 @@
+{
+  "name": "Smriti-NER (স্মৃতি / ꯁ꯭ꯃ꯭ꯔꯤꯇꯤ) — AI Cognitive Wellness",
+  "short_name": "Smriti-NER",
+  "description": "AI-Enabled Culturally-Rooted Cognitive Wellness Platform for Dementia Patients in North East India (SIH 2026 / MDoNER PS ID: 26003)",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
+  "dir": "ltr",
+  "lang": "as-IN",
+  "categories": ["health", "medical", "accessibility", "wellness", "education"],
+  "icons": [
+    {
+      "src": "/globe.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/globe.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Daily Games",
+      "short_name": "খেল",
+      "description": "Cultural Cognitive Wellness Games (Dhol-Pepa, Kaziranga, Loom)",
+      "url": "/?screen=games",
+      "icons": [{ "src": "/globe.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Caregiver Portal",
+      "short_name": "তত্ত্বাৱধায়ক",
+      "description": "Caregiver and ASHA Worker Longitudinal Analytics Dashboard",
+      "url": "/?screen=caregiver",
+      "icons": [{ "src": "/globe.svg", "sizes": "96x96" }]
+    }
+  ],
+  "prefer_related_applications": false
+}
