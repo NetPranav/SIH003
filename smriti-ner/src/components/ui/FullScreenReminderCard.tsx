@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { playGentleChime, playBeep } from "@/lib/audio";
 import type { ReminderItem } from "@/lib/reminderSchedulerService";
+import { speakReminderVoice, stopAllSpeech } from "@/lib/audioVoiceService";
 
 interface Props {
   isOpen: boolean;
@@ -93,14 +94,23 @@ export default function FullScreenReminderCard({
     if (isOpen && reminder) {
       setIsPlaying(true);
       setConfirmed(false);
-      // Preamble chime on card open
-      playGentleChime();
-      const timer = setTimeout(() => {
-        setIsPlaying(false);
-      }, 4500);
-      return () => clearTimeout(timer);
+      speakReminderVoice(
+        {
+          title: reminder.title,
+          dosage: reminder.dosage,
+          type: reminder.type,
+          time: reminder.scheduledTime,
+        },
+        language,
+        () => {
+          setIsPlaying(false);
+        }
+      );
+      return () => {
+        stopAllSpeech();
+      };
     }
-  }, [isOpen, reminder]);
+  }, [isOpen, reminder, language]);
 
   if (!isOpen || !reminder) return null;
 
@@ -108,6 +118,7 @@ export default function FullScreenReminderCard({
   const isEscalated = reminder.status === "MISSED_ESCALATED" || reminder.snoozeCount >= 3;
 
   const handleConfirmClick = () => {
+    stopAllSpeech();
     playGentleChime();
     setConfirmed(true);
     setTimeout(() => {
@@ -116,14 +127,26 @@ export default function FullScreenReminderCard({
   };
 
   const handleSnoozeClick = () => {
+    stopAllSpeech();
     playBeep(440, 150);
     onSnooze(reminder.id);
   };
 
   const handleReplayVoice = () => {
-    playBeep(587.33, 200);
+    if (!reminder) return;
     setIsPlaying(true);
-    setTimeout(() => setIsPlaying(false), 3800);
+    speakReminderVoice(
+      {
+        title: reminder.title,
+        dosage: reminder.dosage,
+        type: reminder.type,
+        time: reminder.scheduledTime,
+      },
+      language,
+      () => {
+        setIsPlaying(false);
+      }
+    );
   };
 
   return (

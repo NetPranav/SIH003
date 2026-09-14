@@ -361,9 +361,9 @@ graph TD
 ## 📋 Comprehensive Deliverables Checklist
 
 ### Phase 21: Voice & Audio
-- [ ] Sub-Phase 21.1: Mobile WebAudio context unlock on touchstart / click
-- [ ] Sub-Phase 21.2: AI Companion automatic voice speech synthesis in active language
-- [ ] Sub-Phase 21.3: Audio voice reminder prompts with multi-tone harmonic chimes
+- [x] Sub-Phase 21.1: Mobile WebAudio context unlock on touchstart / click (Completed in `audioVoiceService.ts` & `HomeScreen.tsx`)
+- [x] Sub-Phase 21.2: AI Companion automatic voice speech synthesis in active language (Completed in `audioVoiceService.ts` & `geminiCompanionService.ts`)
+- [x] Sub-Phase 21.3: Audio voice reminder prompts with multi-tone harmonic chimes (Completed in `audioVoiceService.ts`, `RemindersScreen.tsx`, & `FullScreenReminderCard.tsx`)
 
 ### Phase 22: Caregiver Dashboard & Patient Bio Hub
 - [ ] Sub-Phase 22.1: Relocate theoretical PS text & M2 sign-off boilerplate to archival view

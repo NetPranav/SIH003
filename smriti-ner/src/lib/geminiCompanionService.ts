@@ -303,9 +303,11 @@ export async function generateGeminiCompanionAudioReply(
   return langDict.default;
 }
 
+import { speakSpokenVoice, stopAllSpeech } from "./audioVoiceService";
+
 /**
  * Normal Browser Text-To-Speech (TTS) Speaker Function
- * Uses Web Speech API (window.speechSynthesis) with geriatric calming pacing (0.85x)
+ * Uses resilient multi-tier speech engine with geriatric calming pacing (0.82x)
  */
 export function speakTextWithTTS(
   text: string,
@@ -313,60 +315,16 @@ export function speakTextWithTTS(
   onEnd?: () => void,
   onError?: () => void
 ): boolean {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-    onEnd?.();
-    return false;
-  }
-
-  try {
-    window.speechSynthesis.cancel(); // Stop any pending utterances
-    const utterance = new SpeechSynthesisUtterance(text);
-
-    // Map Smriti languages to browser BCP-47 tags
-    const voiceLangMap: Record<string, string> = {
-      as: "as-IN",
-      bn: "bn-IN",
-      hi: "hi-IN",
-      mni: "mni-IN",
-      brx: "hi-IN",
-      kha: "en-IN",
-      lus: "en-IN",
-      en: "en-IN",
-    };
-
-    utterance.lang = voiceLangMap[language] || "en-IN";
-    utterance.rate = 0.85; // Calming, clear, accessible speech rate for elderly listeners
-    utterance.pitch = 1.0;
-
-    // Pick best available native or regional Indian voice
-    const voices = window.speechSynthesis.getVoices();
-    if (voices && voices.length > 0) {
-      const targetLang = utterance.lang.toLowerCase();
-      const matched = voices.find(v => v.lang.toLowerCase() === targetLang || v.lang.toLowerCase().startsWith(language))
-        || voices.find(v => v.lang.includes("IN"))
-        || voices[0];
-      if (matched) {
-        utterance.voice = matched;
-      }
-    }
-
-    utterance.onend = () => onEnd?.();
-    utterance.onerror = () => onError?.();
-
-    window.speechSynthesis.speak(utterance);
-    return true;
-  } catch (err) {
-    console.warn("Browser TTS failed:", err);
-    onError?.();
-    return false;
-  }
+  return speakSpokenVoice(text, language, {
+    onEnd,
+    onError,
+    rate: 0.82,
+  });
 }
 
 /**
  * Stops any ongoing TTS playback immediately
  */
 export function stopTTS(): void {
-  if (typeof window !== "undefined" && "speechSynthesis" in window) {
-    window.speechSynthesis.cancel();
-  }
+  stopAllSpeech();
 }

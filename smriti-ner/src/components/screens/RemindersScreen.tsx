@@ -8,6 +8,7 @@ import FullScreenReminderCard from "@/components/ui/FullScreenReminderCard";
 import { reminderSchedulerDaemon, type ReminderItem } from "@/lib/reminderSchedulerService";
 import { REMINDERS_SCREEN_LOCALES } from "@/lib/screenLocalizations";
 import { offlineMobileStore, type OfflineReminder } from "@/lib/offlineMobileStorage";
+import { speakReminderVoice } from "@/lib/audioVoiceService";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -39,11 +40,21 @@ export default function RemindersScreen({ navigate, language = "en" }: Props) {
   };
 
   const handlePlayVoice = (id: string) => {
-    playBeep(587.33, 200); // D5 chime
+    const item = reminders.find((r) => r.id === id);
+    if (!item) return;
     setPlayingVoiceId(id);
-    setTimeout(() => {
-      setPlayingVoiceId(null);
-    }, 3200);
+    speakReminderVoice(
+      {
+        title: item.title,
+        dosage: item.description,
+        type: item.type,
+        time: item.time,
+      },
+      language,
+      () => {
+        setPlayingVoiceId(null);
+      }
+    );
   };
 
   const openFullScreenFor = (id: string) => {

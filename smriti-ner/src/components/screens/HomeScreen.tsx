@@ -11,6 +11,7 @@ import LanguageSelectorModal from "@/components/ui/LanguageSelectorModal";
 import VoiceAssistantButton from "@/components/ui/VoiceAssistantButton";
 import ModeSwitchGuard from "@/components/ui/ModeSwitchGuard";
 import { offlineMobileStore, type OfflineScheduleItem, type OfflineReminder } from "@/lib/offlineMobileStorage";
+import { initAudioContextUnlocker } from "@/lib/audioVoiceService";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -239,6 +240,7 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
   const [completedScheduleCount, setCompletedScheduleCount] = useState<number>(() => offlineMobileStore.getCompletedScheduleCount());
 
   useEffect(() => {
+    initAudioContextUnlocker();
     const unsub = offlineMobileStore.subscribe(() => {
       setScheduleItems(offlineMobileStore.getSchedule());
       setReminders(offlineMobileStore.getReminders());
