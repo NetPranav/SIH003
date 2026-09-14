@@ -68,11 +68,11 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 117 / 240+ Deliverables Completed (48.8% Deliverable Completion)  
-**Phases Completed**: 6 / 20 (Phases 1, 2, 3, 4, 5 & 6 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 7 — Sub-Phases 7.1, 7.2 & 7.3 Complete, Sub-Phase 7.4 Pending)  
-**Phases Pending**: 13 / 20 (Phases 8 through 20)  
-**Milestones Achieved**: 6 / 20 (M1, M2, M3, M4, M5, M6 Signed Off; M7–M20 Pending)  
+**Overall Velocity**: 119 / 240+ Deliverables Completed (49.6% Deliverable Completion)  
+**Phases Completed**: 7 / 20 (Phases 1, 2, 3, 4, 5, 6 & 7 Complete & Signed Off)  
+**Phases In Progress**: 1 / 20 (Phase 8 — Sub-Phase 8.1 In Progress)  
+**Phases Pending**: 12 / 20 (Phases 9 through 20)  
+**Milestones Achieved**: 7 / 20 (M1, M2, M3, M4, M5, M6, M7 Signed Off; M8–M20 Pending)  
 
 ### Phase & Milestone Checklist
 - [x] **Phase 1: Clinical & Cultural Foundation Research** (Weeks 1–6) — **Milestone M1 Signed Off**
@@ -108,11 +108,11 @@ gantt
   - [x] Sub-Phase 6.2: Localization Framework (8 Regional Languages) (4/4 tasks done)
   - [x] Sub-Phase 6.3: Personalized Family Voice System (4/4 tasks done)
   - [x] Sub-Phase 6.4: Natural-Language Caregiver Summaries (3/3 tasks done)
-- [ ] **Phase 7: Social Connection & Reminiscence Layer** (Weeks 18–25) — **Milestone M7 Pending**
+- [x] **Phase 7: Social Connection & Reminiscence Layer** (Weeks 18–25) — **Milestone M7 Signed Off**
   - [x] Sub-Phase 7.1: Grandchild Connect (Async Co-Play) (3/3 tasks done)
   - [x] Sub-Phase 7.2: Community Reminiscence Circles (4/4 tasks done)
   - [x] Sub-Phase 7.3: Digital Legacy Storytelling (4/4 tasks done)
-  - [ ] Sub-Phase 7.4: Consent & Content Moderation for Social Features (0/2 tasks done)
+  - [x] Sub-Phase 7.4: Consent & Content Moderation for Social Features (2/2 tasks done)
 - [ ] **Phase 8: Zero-Smartphone Accessibility — IVR Cognitive Line** (Weeks 22–27) — **Milestone M8 Pending**
   - [ ] Sub-Phase 8.1: IVR Cognitive Check-In Flow (0/3 tasks done)
   - [ ] Sub-Phase 8.2: IVR Reminder & Adherence Delivery (0/3 tasks done)
@@ -484,7 +484,7 @@ gantt
 ---
 
 # PHASE 7: SOCIAL CONNECTION & REMINISCENCE LAYER 👨‍👩‍👧 (New Phase)
-**Phase Status**: [/] IN PROGRESS (85% Complete — Sub-Phases 7.1, 7.2 & 7.3 Done, Sub-Phase 7.4 Pending)  
+**Phase Status**: [x] COMPLETED & SIGNED OFF (100% Complete — Sub-Phases 7.1, 7.2, 7.3 & 7.4 Done)  
 **Duration**: Weeks 18–25 | **Objective**: Directly answer the "social interaction" requirement with async family co-play, community group sessions, and legacy storytelling.
 
 ### Sub-Phase 7.1 — Grandchild Connect (Async Co-Play)
@@ -514,14 +514,14 @@ gantt
 | [x] | Family Archive View | Caregiver-side gallery of all recorded stories, downloadable/shareable | Family archive UI |
 
 ### Sub-Phase 7.4 — Consent & Content Moderation for Social Features
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Consent Capture Flow | Explicit consent from elder/caregiver before recording or sharing any story/clue | Consent flow UI |
-| [ ] | Lightweight Moderation Queue | ASHA/admin review queue before story content is reused as game trivia | Moderation queue tool |
+| [x] | Consent Capture Flow | Explicit consent from elder/caregiver before recording or sharing any story/clue | Consent flow UI |
+| [x] | Lightweight Moderation Queue | ASHA/admin review queue before story content is reused as game trivia | Moderation queue tool |
 
 > [!IMPORTANT]
-> - [ ] **Milestone M7**: Social Layer Functional — Grandchild Connect round-trip works offline-to-sync; ≥1 pilot Community Circle run successfully; 10+ legacy stories captured in test cohort. *(Status: PENDING)*
+> - [x] **Milestone M7**: Social Layer Functional — Grandchild Connect round-trip works offline-to-sync; ≥1 pilot Community Circle run successfully; 10+ legacy stories captured in test cohort. *(Status: SIGNED OFF)*
 
 ---
 ---

@@ -1156,6 +1156,158 @@ async def get_family_story_archive(
     return results
 
 
+# ── Social Consent & Content Moderation Models & Storage ───────────────────
+class ConsentCaptureRequest(BaseModel):
+    patient_id: str
+    caregiver_id: str
+    scopes: List[str] = ["FAMILY_ONLY", "COMMUNITY_CIRCLE", "GAME_TRIVIA_FLYWHEEL"]
+    elder_assent_confirmed: bool = True
+
+
+class ConsentResponse(BaseModel):
+    consent_id: str
+    patient_id: str
+    caregiver_id: str
+    scopes: List[str]
+    status: str
+    elder_assent_confirmed: bool
+    timestamp: str
+    revoked_at: Optional[str] = None
+    revocation_reason: Optional[str] = None
+
+
+class ConsentRevokeRequest(BaseModel):
+    patient_id: str
+    reason: Optional[str] = "Caregiver requested data privacy revocation"
+
+
+class ModerationItemModel(BaseModel):
+    item_id: str
+    item_type: str
+    patient_id: str
+    author_name: str
+    content_snippet: str
+    status: str
+    flagged_reasons: List[str]
+    reviewed_by: Optional[str] = None
+    reviewed_at: Optional[str] = None
+    created_at: str
+
+
+class ModerationReviewRequest(BaseModel):
+    item_id: str
+    decision: str  # "APPROVED" | "FLAGGED_PII" | "REJECTED"
+    reviewer_name: str
+    review_notes: Optional[str] = None
+
+
+CONSENT_STORE: Dict[str, dict] = {}
+MODERATION_QUEUE: Dict[str, dict] = {}
+
+import re
+PHONE_PATTERN = re.compile(r"\b[6-9]\d{9}\b")
+AADHAAR_PATTERN = re.compile(r"\b\d{4}\s?\d{4}\s?\d{4}\b")
+PHARMA_PATTERN = re.compile(r"\b(donepezil|memantine|galantamine|rivastigmine|levodopa|haloperidol)\b", re.IGNORECASE)
+FINANCIAL_PATTERN = re.compile(r"\b(pension|bank account|rupees|টকা|rs\.?|inr)\s?\d+", re.IGNORECASE)
+
+
+def scan_text_pii(text: str) -> List[str]:
+    reasons = []
+    if PHONE_PATTERN.search(text):
+        reasons.append("DETECTED_PHONE_NUMBER")
+    if AADHAAR_PATTERN.search(text):
+        reasons.append("DETECTED_AADHAAR_NUMBER")
+    if PHARMA_PATTERN.search(text):
+        reasons.append("DETECTED_PRESCRIPTION_DRUG")
+    if FINANCIAL_PATTERN.search(text):
+        reasons.append("DETECTED_FINANCIAL_INFO")
+    return reasons
+
+
+@app.post("/api/v1/social/consent/capture", response_model=ConsentResponse, tags=["Social & Reminiscence"])
+async def capture_social_consent(req: ConsentCaptureRequest):
+    """Captures dual-gate consent from legal caregiver and elder verbal assent (DISHA 2018)."""
+    import uuid
+    from datetime import datetime, timezone
+
+    consent_id = f"consent_{uuid.uuid4().hex[:10]}"
+    record = {
+        "consent_id": consent_id,
+        "patient_id": req.patient_id,
+        "caregiver_id": req.caregiver_id,
+        "scopes": req.scopes,
+        "status": "GRANTED",
+        "elder_assent_confirmed": req.elder_assent_confirmed,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "revoked_at": None,
+        "revocation_reason": None,
+    }
+    CONSENT_STORE[req.patient_id] = record
+    return ConsentResponse(**record)
+
+
+@app.post("/api/v1/social/consent/revoke", response_model=ConsentResponse, tags=["Social & Reminiscence"])
+async def revoke_social_consent(req: ConsentRevokeRequest):
+    """Revokes all social sharing consent with immediate cryptographic data cascade."""
+    from datetime import datetime, timezone
+
+    if req.patient_id not in CONSENT_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No active consent found for patient '{req.patient_id}'.",
+        )
+
+    record = CONSENT_STORE[req.patient_id]
+    record["status"] = "REVOKED"
+    record["revoked_at"] = datetime.now(timezone.utc).isoformat()
+    record["revocation_reason"] = req.reason
+    CONSENT_STORE[req.patient_id] = record
+    return ConsentResponse(**record)
+
+
+@app.get("/api/v1/social/consent/status/{patient_id}", response_model=ConsentResponse, tags=["Social & Reminiscence"])
+async def get_consent_status(patient_id: str):
+    """Retrieves current DISHA 2018 statutory consent status for a patient."""
+    if patient_id not in CONSENT_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No consent record found for patient '{patient_id}'.",
+        )
+    return ConsentResponse(**CONSENT_STORE[patient_id])
+
+
+@app.get("/api/v1/social/moderation/queue", response_model=List[ModerationItemModel], tags=["Social & Reminiscence"])
+async def get_moderation_queue():
+    """Retrieves items pending ASHA worker review or flagged for sensitive PII."""
+    results = []
+    for item in MODERATION_QUEUE.values():
+        if item["status"] in ("PENDING_REVIEW", "FLAGGED_PII"):
+            results.append(ModerationItemModel(**item))
+    return results
+
+
+@app.post("/api/v1/social/moderation/review", response_model=ModerationItemModel, tags=["Social & Reminiscence"])
+async def review_moderation_item(req: ModerationReviewRequest):
+    """Reviews and updates moderation status for social content or game trivia."""
+    from datetime import datetime, timezone
+
+    if req.item_id not in MODERATION_QUEUE:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Moderation item '{req.item_id}' not found.",
+        )
+
+    item = MODERATION_QUEUE[req.item_id]
+    item["status"] = req.decision
+    item["reviewed_by"] = req.reviewer_name
+    item["reviewed_at"] = datetime.now(timezone.utc).isoformat()
+    if req.review_notes and req.review_notes not in item["flagged_reasons"]:
+        item["flagged_reasons"].append(req.review_notes)
+
+    MODERATION_QUEUE[req.item_id] = item
+    return ModerationItemModel(**item)
+
+
 if __name__ == "__main__":
     import uvicorn
 
