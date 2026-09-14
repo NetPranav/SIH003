@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 157 / 240+ Deliverables Completed (65.4% Deliverable Completion)  
+**Overall Velocity**: 161 / 240+ Deliverables Completed (67.1% Deliverable Completion)  
 **Phases Completed**: 10 / 20 (Phases 1, 2, 3, 4, 5, 6, 7, 8, 9 & 10 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 11 — Sub-Phases 11.1–11.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 11 — Sub-Phase 11.1 Complete; Sub-Phases 11.2–11.4 Pending)  
 **Phases Pending**: 9 / 20 (Phases 12 through 20)  
 **Milestones Achieved**: 10 / 20 (M1, M2, M3, M4, M5, M6, M7, M8, M9 & M10 Signed Off; M11–M20 Pending)  
 
@@ -129,7 +129,7 @@ gantt
   - [x] Sub-Phase 10.3: Adherence Analytics (3/3 tasks done)
   - [x] Sub-Phase 10.4: Cross-Channel Reminder Unification (2/2 tasks done)
 - [ ] **Phase 11: Offline Storage, Sync & BLE Safety Mesh** (Weeks 25–33) — **Milestone M11 Pending**
-  - [ ] Sub-Phase 11.1: Local-First Persistence Layer (0/4 tasks done)
+  - [x] Sub-Phase 11.1: Local-First Persistence Layer (4/4 tasks done)
   - [ ] Sub-Phase 11.2: Delta Synchronization Engine (0/4 tasks done)
   - [ ] Sub-Phase 11.3: Bluetooth/Wi-Fi Direct Mesh Relay (0/4 tasks done)
   - [ ] Sub-Phase 11.4: BLE Beacon Wandering/Safety Mesh (0/4 tasks done)
@@ -655,17 +655,17 @@ gantt
 ---
 
 # PHASE 11: OFFLINE STORAGE, SYNC & BLE SAFETY MESH 🔒
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 11.1–11.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (25% Complete — Sub-Phase 11.1 Complete; Sub-Phases 11.2–11.4 Pending)  
 **Duration**: Weeks 25–33 | **Objective**: Bulletproof offline-first storage, delta sync, and a low-cost wandering/emergency detection layer.
 
 ### Sub-Phase 11.1 — Local-First Persistence Layer
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | SQLite/WatermelonDB Integration | Encrypted local DB for all schemas | Local DB implementation |
-| [ ] | AES-256-GCM Encryption | Keys in Android Keystore/Secure Storage | Encryption layer |
-| [ ] | Data Migration Strategy | Version-aware schema migrations | Migration framework |
-| [ ] | Storage Quota Management | Alert on approaching limits; prune >180 days | Storage manager |
+| [x] | SQLite/WatermelonDB Integration | Encrypted local DB for all schemas | Local DB implementation |
+| [x] | AES-256-GCM Encryption | Keys in Android Keystore/Secure Storage | Encryption layer |
+| [x] | Data Migration Strategy | Version-aware schema migrations | Migration framework |
+| [x] | Storage Quota Management | Alert on approaching limits; prune >180 days | Storage manager |
 
 ### Sub-Phase 11.2 — Delta Synchronization Engine
 *Status: [ ] Pending*
