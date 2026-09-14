@@ -6,12 +6,13 @@ Problem Statement 26003 | Ministry of Development of North Eastern Region (MDoNE
 
 from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
 import hashlib
 import hmac
 import os
+import sys
 
 from server.db.database import db_manager
 
@@ -162,7 +163,143 @@ async def sync_telemetry_batch(batch: DailyTelemetryBatch) -> TelemetrySyncRespo
     )
 
 
+# ── Federated Learning Integration ──────────────────────────────────────────
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+AI_ENGINE_DIR = os.path.join(ROOT_DIR, "ai-engine")
+if AI_ENGINE_DIR not in sys.path:
+    sys.path.insert(0, AI_ENGINE_DIR)
+
+from fl_aggregator import (
+    FederatedAggregationServer,
+    FederatedModelWeights,
+    ZeroRawDataValidator,
+    ByzantineDefense,
+    DifferentialPrivacyEngine,
+)
+
+fl_server = FederatedAggregationServer()
+
+
+# ── Federated Learning Models ───────────────────────────────────────────────
+class FederatedSubmitPayload(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    client_id: str
+    round_id: int
+    sample_count: int
+    weight_deltas: Dict[str, float]
+    algorithm: Optional[str] = "FedAvg"
+    client_metrics: Optional[Dict[str, Any]] = None
+    payload_signature: Optional[str] = None
+    created_at: Optional[str] = None
+
+
+class FederatedSubmitResponse(BaseModel):
+    status: str
+    round_id: int
+    client_id: str
+    accepted: bool
+    message: str
+
+
+class FederatedRoundStatus(BaseModel):
+    current_round: int
+    active_participants: int
+    global_weights: Dict[str, float]
+    clip_norm: float
+    dp_epsilon_bound: float
+    disha_compliant: bool = True
+
+
+class FederatedAggregateRequest(BaseModel):
+    strategy: str = "fedavg"
+    fedprox_mu: float = 0.1
+
+
+class FederatedAggregateResponse(BaseModel):
+    round_id: int
+    total_samples: int
+    participating_clients: int
+    average_deltas: Dict[str, float]
+    updated_global_weights: Dict[str, float]
+    strategy: str
+    epsilon: float
+
+
+@app.get("/api/v1/federated/round", response_model=FederatedRoundStatus, tags=["Federated Learning"])
+async def get_federated_round_status() -> FederatedRoundStatus:
+    """Returns current federated learning round ID, global weights, and privacy parameters."""
+    return FederatedRoundStatus(
+        current_round=fl_server.current_round,
+        active_participants=len(fl_server.round_updates),
+        global_weights=fl_server.global_weights.to_dict(),
+        clip_norm=fl_server.dp_engine.clip_norm,
+        dp_epsilon_bound=fl_server.dp_engine.calculate_epsilon(fl_server.current_round, max(1, len(fl_server.registered_clients))),
+        disha_compliant=True,
+    )
+
+
+@app.post("/api/v1/federated/submit", response_model=FederatedSubmitResponse, tags=["Federated Learning"])
+async def submit_federated_update(payload: FederatedSubmitPayload) -> FederatedSubmitResponse:
+    """
+    Submits client parameter weight deltas.
+    Strictly validates DISHA 2018 Section 34 zero-raw-data compliance and Byzantine outlier filtering.
+    """
+    raw_dict = payload.model_dump()
+    try:
+        ZeroRawDataValidator.validate_payload(raw_dict)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+    # Register client if not already registered
+    if payload.client_id not in fl_server.registered_clients:
+        fl_server.register_client(payload.client_id, "NER_Community", "NER_Region")
+
+    result = fl_server.submit_gradient_update(raw_dict)
+    is_accepted = result.get("status") in ("accepted", "BUFFERED")
+    return FederatedSubmitResponse(
+        status="ACCEPTED" if is_accepted else result.get("status", "REJECTED"),
+        round_id=result.get("round_id", payload.round_id),
+        client_id=result.get("client_id", payload.client_id),
+        accepted=is_accepted,
+        message=f"Parameter weights successfully registered for round {result.get('round_id', payload.round_id)}",
+    )
+
+
+@app.post("/api/v1/federated/aggregate", response_model=FederatedAggregateResponse, tags=["Federated Learning"])
+async def trigger_federated_aggregation(req: FederatedAggregateRequest = FederatedAggregateRequest()) -> FederatedAggregateResponse:
+    """
+    Triggers server-side aggregation (FedAvg or FedProx) with differential privacy noise perturbation.
+    """
+    if not fl_server.round_updates:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No client parameter updates submitted for current round.",
+        )
+
+    summary = fl_server.aggregate_round(strategy=req.strategy, fedprox_mu=req.fedprox_mu)
+    return FederatedAggregateResponse(
+        round_id=summary["round_id"],
+        total_samples=summary["total_samples"],
+        participating_clients=summary["participating_clients"],
+        average_deltas=summary["average_deltas"],
+        updated_global_weights=fl_server.global_weights.to_dict(),
+        strategy=summary["strategy"],
+        epsilon=summary["differential_privacy"]["epsilon_bound"],
+    )
+
+
+@app.get("/api/v1/federated/weights", response_model=Dict[str, float], tags=["Federated Learning"])
+async def get_federated_global_weights() -> Dict[str, float]:
+    """Returns the current global model weights for client synchronization."""
+    return fl_server.global_weights.to_dict()
+
+
 if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+

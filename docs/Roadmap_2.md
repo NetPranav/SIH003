@@ -101,7 +101,7 @@ gantt
   - [x] Sub-Phase 5.1: Telemetry Extraction Pipeline (4/4 tasks done)
   - [x] Sub-Phase 5.2: Bayesian Knowledge Tracing (BKT) Engine (4/4 tasks done)
   - [x] Sub-Phase 5.3: Difficulty Orchestrator & MMSE Proxy (4/4 tasks done)
-  - [ ] Sub-Phase 5.4: Federated Learning Layer (Client Training & Packaging) (0/4 tasks done)
+  - [x] Sub-Phase 5.4: Federated Learning Layer (Client Training & Packaging) (4/4 tasks done)
   - [ ] Sub-Phase 5.5: Circadian-Aware Content Engine (0/3 tasks done)
 - [ ] **Phase 6: Multilingual Voice & Bhashini Integration** (Weeks 15–22) — **Milestone M6 Pending**
   - [ ] Sub-Phase 6.1: Bhashini (AI4Bharat) Integration (0/4 tasks done)
@@ -385,7 +385,7 @@ gantt
 ---
 
 # PHASE 5: EDGE AI — DCDA & FEDERATED LEARNING ENGINE 🧠
-**Phase Status**: [/] IN PROGRESS (60% Complete — Sub-Phases 5.1, 5.2 & 5.3 Done, Sub-Phases 5.4 & 5.5 Pending)  
+**Phase Status**: [/] IN PROGRESS (80% Complete — Sub-Phases 5.1, 5.2, 5.3 & 5.4 Done, Sub-Phase 5.5 Pending)  
 **Duration**: Weeks 15–24 | **Objective**: Real-time adaptive difficulty plus privacy-preserving on-device model improvement.
 
 ### Sub-Phase 5.1 — Telemetry Extraction Pipeline
@@ -416,13 +416,13 @@ gantt
 | [x] | Longitudinal Trajectory | Rolling 7-day/30-day trend computation | Trajectory computation |
 
 ### Sub-Phase 5.4 — Federated Learning Layer (New)
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | On-Device Local Training | Local BKT/MMSE-proxy parameter updates using only that patient's data | Local training module |
-| [ ] | Secure Model Update Packaging | Encrypt & compress model deltas (not raw telemetry) for upload | Model delta packager |
-| [ ] | Federated Aggregation Service | Server-side averaging (FedAvg-style) across devices during sync windows | Aggregation server |
-| [ ] | Privacy Validation | Confirm no raw behavioral/PII data leaves device — only model weights | Privacy audit report |
+| [x] | On-Device Local Training | Local BKT/MMSE-proxy parameter updates using only that patient's data | Local training module |
+| [x] | Secure Model Update Packaging | Encrypt & compress model deltas (not raw telemetry) for upload | Model delta packager |
+| [x] | Federated Aggregation Service | Server-side averaging (FedAvg-style) across devices during sync windows | Aggregation server |
+| [x] | Privacy Validation | Confirm no raw behavioral/PII data leaves device — only model weights | Privacy audit report |
 
 ### Sub-Phase 5.5 — Circadian-Aware Content Engine (New)
 *Status: [ ] Pending*
