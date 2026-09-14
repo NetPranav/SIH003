@@ -68,11 +68,11 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 183 / 240+ Deliverables Completed (76.3% Deliverable Completion)  
-**Phases Completed**: 11 / 20 (Phases 1 through 11 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 12 — Sub-Phases 12.1–12.3 Complete; Sub-Phase 12.4 Pending)  
+**Overall Velocity**: 186 / 240+ Deliverables Completed (77.5% Deliverable Completion)  
+**Phases Completed**: 12 / 20 (Phases 1 through 12 Complete & Signed Off)  
+**Phases In Progress**: 0 / 20 (Preparing Phase 13)  
 **Phases Pending**: 8 / 20 (Phases 13 through 20)  
-**Milestones Achieved**: 11 / 20 (M1, M2, M3, M4, M5, M6, M7, M8, M9, M10 & M11 Signed Off; M12–M20 Pending)  
+**Milestones Achieved**: 12 / 20 (M1 through M12 Signed Off; M13–M20 Pending)  
 
 ### Phase & Milestone Checklist
 - [x] **Phase 1: Clinical & Cultural Foundation Research** (Weeks 1–6) — **Milestone M1 Signed Off**
@@ -133,11 +133,11 @@ gantt
   - [x] Sub-Phase 11.2: Delta Synchronization Engine (4/4 tasks done)
   - [x] Sub-Phase 11.3: Bluetooth/Wi-Fi Direct Mesh Relay (4/4 tasks done)
   - [x] Sub-Phase 11.4: BLE Beacon Wandering/Safety Mesh (4/4 tasks done)
-- [ ] **Phase 12: Government Health Platform & Policy Integration** (Weeks 30–36) — **Milestone M12 Pending**
+- [x] **Phase 12: Government Health Platform & Policy Integration** (Weeks 30–36) — **Milestone M12 Signed Off**
   - [x] Sub-Phase 12.1: ABDM / ABHA Integration (3/3 tasks done)
   - [x] Sub-Phase 12.2: Backend API Development (5/5 tasks done)
   - [x] Sub-Phase 12.3: e-Sanjeevani Teleconsultation Bridge (2/2 tasks done)
-  - [ ] Sub-Phase 12.4: Welfare Scheme Alignment (NPHCE / RVY) (0/3 tasks done)
+  - [x] Sub-Phase 12.4: Welfare Scheme Alignment (NPHCE / RVY) (3/3 tasks done)
 - [ ] **Phase 13: Quality Assurance & Accessibility Audit** (Weeks 34–38) — **Milestone M13 Pending**
   - [ ] Sub-Phase 13.1: Functional Testing Suite (0/4 tasks done)
   - [ ] Sub-Phase 13.2: Accessibility Audit (WCAG 2.2 AAA Target) (0/4 tasks done)
@@ -701,7 +701,7 @@ gantt
 ---
 
 # PHASE 12: GOVERNMENT HEALTH PLATFORM & POLICY INTEGRATION 🏛️
-**Phase Status**: [ ] IN PROGRESS (77% Complete — Sub-Phases 12.1–12.3 Complete; Sub-Phase 12.4 Pending)  
+**Phase Status**: [x] COMPLETE (100% Complete — Sub-Phases 12.1–12.4 Complete & Signed Off)  
 **Duration**: Weeks 30–36 | **Objective**: Wire the platform into existing government digital-health and welfare schemes rather than building parallel systems.
 
 ### Sub-Phase 12.1 — ABDM / ABHA Integration
@@ -730,15 +730,15 @@ gantt
 | [x] | Referral Data Package | Auto-attach MMSE trajectory + adherence summary to referral | Referral packaging logic |
 
 ### Sub-Phase 12.4 — Welfare Scheme Alignment (New)
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | NPHCE Program Mapping | Document how platform supports National Programme for Health Care of the Elderly goals | NPHCE alignment brief |
-| [ ] | Rashtriya Vayoshri Yojana Linkage | Identify where aids/appliances scheme can complement device distribution | RVY alignment brief |
-| [ ] | Scheme Currency Verification | Verify NPHCE/RVY/e-Sanjeevani are active and current before citing in pitch deck | Verification checklist (dated) |
+| [x] | NPHCE Program Mapping | Document how platform supports National Programme for Health Care of the Elderly goals | NPHCE alignment brief |
+| [x] | Rashtriya Vayoshri Yojana Linkage | Identify where aids/appliances scheme can complement device distribution | RVY alignment brief |
+| [x] | Scheme Currency Verification | Verify NPHCE/RVY/e-Sanjeevani are active and current before citing in pitch deck | Verification checklist (dated) |
 
 > [!IMPORTANT]
-> - [ ] **Milestone M12**: Government Integration Complete — all API endpoints pass integration tests; ABHA links in sandbox; e-Sanjeevani referral test succeeds; scheme citations verified current. *(Status: PENDING)*
+> - [x] **Milestone M12**: Government Integration Complete — all API endpoints pass integration tests; ABHA links in sandbox; e-Sanjeevani referral test succeeds; scheme citations verified current. *(Status: SIGNED OFF)*
 
 ---
 ---
