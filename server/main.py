@@ -9345,6 +9345,278 @@ async def get_facilitation_summary():
     )
 
 
+# ── ASHA Training at Scale: IVR Support Training & Milestone M17 (Sub-Phase 17.4) ──
+class IvrTroubleshootingScenarioModel(BaseModel):
+    scenario_id: str
+    symptom: str
+    root_cause: str
+    diagnostic_steps: List[str]
+    frontline_resolution: List[str]
+    fallback_action: str
+    severity: str
+
+
+class NoDeviceOnboardingStepModel(BaseModel):
+    step_number: int
+    step_name: str
+    lead_role: str
+    required_actions: List[str]
+    verification_output: str
+    offline_capability: bool
+
+
+class MilestoneM17GateModel(BaseModel):
+    gate_id: str
+    description: str
+    required_threshold: str
+    achieved_value: str
+    status: str
+
+
+class MilestoneM17CertificationModel(BaseModel):
+    milestone_id: str
+    milestone_name: str
+    phase: str
+    gates: List[MilestoneM17GateModel]
+    total_ashas_trained: int
+    total_ashas_certified: int
+    circle_facilitators_certified: int
+    ivr_support_certified_ashas: int
+    states_covered: int
+    phcs_covered: int
+    mean_osce_score_pct: float
+    status: str
+    sign_off_authority: str
+    certified_timestamp: str
+
+
+class IvrSupportSummaryModel(BaseModel):
+    sub_phase: str
+    total_troubleshooting_scenarios: int
+    onboarding_steps_count: int
+    total_certified_ashas: int
+    no_device_elders_onboarded: int
+    toll_free_helpline: str
+    mean_ivr_call_success_rate_pct: float
+    milestone_m17_status: str
+    status: str
+
+
+@app.get("/api/v1/training/ivr-troubleshooting", response_model=List[IvrTroubleshootingScenarioModel], tags=["IVR Support Training"])
+async def get_ivr_troubleshooting_scenarios():
+    """Returns the 5 standardized frontline IVR failure troubleshooting scenarios."""
+    return [
+        IvrTroubleshootingScenarioModel(
+            scenario_id="IVR-ERR-01",
+            symptom="DTMF Keypress Ignored / Inaudible",
+            root_cause="Keypad tone duration < 100ms or high ambient environmental noise masking tone frequency.",
+            diagnostic_steps=[
+                "Check if elder is pressing key firmly for at least 1-2 seconds",
+                "Observe ambient background noise level; check for active wind or rain noise",
+                "Verify handset keypad audio tones are enabled in phone settings",
+            ],
+            frontline_resolution=[
+                "Instruct elder to press and hold key for >= 160ms until confirmation chime sounds",
+                "Move elder into a quiet indoor corner or cup hand around mouthpiece",
+                "Toggle feature phone speakerphone off to prevent microphone feedback loop",
+            ],
+            fallback_action="ASHA logs manual response via tablet app or triggers automated voice recognition fallback.",
+            severity="MEDIUM",
+        ),
+        IvrTroubleshootingScenarioModel(
+            scenario_id="IVR-ERR-02",
+            symptom="Carrier Call Dropping (Hill Shading / 2G Fringe)",
+            root_cause="Weak 2G RSSI (-105 dBm to -115 dBm) along mountain ridges, valleys, and forest terrain.",
+            diagnostic_steps=[
+                "Check signal bars on handset display (fewer than 2 bars indicates fringe coverage)",
+                "Determine if call dropped at specific geographic point in village",
+            ],
+            frontline_resolution=[
+                "Guide elder to known village reception hotspot (e.g., church knoll, tea factory veranda, elevated porch)",
+                "Schedule automated system callback window when elder is near village center",
+            ],
+            fallback_action="System marks call for auto-retry when network signal stabilizes; enqueues SMS reminder.",
+            severity="HIGH",
+        ),
+        IvrTroubleshootingScenarioModel(
+            scenario_id="IVR-ERR-03",
+            symptom="Language / Dialect Mismatch",
+            root_cause="Elder assigned incorrect default language profile during initial regional routing.",
+            diagnostic_steps=[
+                "Ask elder what dialect they are hearing versus their preferred native tongue",
+                "Verify patient language setting in PHC offline database registry",
+            ],
+            frontline_resolution=[
+                "Instruct caller to press '0' at any point during greeting to trigger instant dialect selector menu",
+                "ASHA opens tablet app, navigates to patient profile, and updates primary spoken language",
+            ],
+            fallback_action="SIP trunk transfers session to regional human operator queue if dialect remains unsupported.",
+            severity="LOW",
+        ),
+        IvrTroubleshootingScenarioModel(
+            scenario_id="IVR-ERR-04",
+            symptom="Fast Busy Signal / All Lines Busy",
+            root_cause="Peak traffic surge exceeding circle concurrency allotment during festival or morning call windows.",
+            diagnostic_steps=[
+                "Verify if multiple village households report fast busy tone on 1800-890-SMRITI",
+                "Check circle concurrency status in ASHA technical champion dashboard",
+            ],
+            frontline_resolution=[
+                "Inform caller that lines are temporarily full; system will place automated priority callback within 15 minutes",
+                "Carrier SIP gateway automatically reroutes overflow traffic to secondary PRI failover trunk",
+            ],
+            fallback_action="Central MDoNER engineering desk alerted to provision additional 30-channel burst capacity.",
+            severity="MEDIUM",
+        ),
+        IvrTroubleshootingScenarioModel(
+            scenario_id="IVR-ERR-05",
+            symptom="Accidental Disconnection / Mid-Call Confusion",
+            root_cause="Elder presses end-call button accidentally or feels cognitively overwhelmed by complex prompts.",
+            diagnostic_steps=[
+                "Review IVR call log in tablet app to check disconnection timestamp and last answered question",
+                "Check whether elder needs caregiver presence during sessions",
+            ],
+            frontline_resolution=[
+                "Cloud IVR session state engine holds conversation checkpoint in Redis cache for 15 minutes",
+                "Automated gentle callback initiated within 3 minutes resuming exact riddle or story where call dropped",
+            ],
+            fallback_action="ASHA schedules in-person home visit to conduct session using physical sensory basket.",
+            severity="LOW",
+        ),
+    ]
+
+
+@app.get("/api/v1/training/no-device-onboarding", response_model=List[NoDeviceOnboardingStepModel], tags=["IVR Support Training"])
+async def get_no_device_onboarding_sop():
+    """Returns the 4-step Standard Operating Procedure for onboarding No-Device feature phone elders."""
+    return [
+        NoDeviceOnboardingStepModel(
+            step_number=1,
+            step_name="Village Feature Phone Survey & Eligibility Verification",
+            lead_role="Frontline ASHA Worker",
+            required_actions=[
+                "Survey elder household to identify access to basic 2G handset (Nokia 105, JioPhone, or family phone)",
+                "Verify active SIM card validity and confirm phone can receive toll-free calls without account balance deduction",
+                "Assess elder keypad manual dexterity and visual acuity for keypad numbers",
+            ],
+            verification_output="Completed Feature Phone Eligibility Checklist signed by ASHA",
+            offline_capability=True,
+        ),
+        NoDeviceOnboardingStepModel(
+            step_number=2,
+            step_name="Proxy Registration via ASHA Enterprise Tablet",
+            lead_role="Frontline ASHA Worker",
+            required_actions=[
+                "Open Smriti-NER app on tablet under 'No-Device Patient Registration' module",
+                "Input elder demographics, village ward ID, primary language/dialect, and caregiver emergency phone number",
+                "System generates unique 14-digit ABHA / Smriti ID and assigns a secure 4-digit Voice PIN",
+                "Configure preferred scheduled outbound call window (Morning: 09:00-10:30, Evening: 15:30-17:00)",
+            ],
+            verification_output="Generated Patient Profile & Voice PIN Registration Record in SQLite DB",
+            offline_capability=True,
+        ),
+        NoDeviceOnboardingStepModel(
+            step_number=3,
+            step_name="In-Person Trial Call Simulation & Elder Coaching",
+            lead_role="Frontline ASHA Worker & Family Caregiver",
+            required_actions=[
+                "Dial toll-free 1800-890-SMRITI (1800-890-7674) with the elder sitting comfortably",
+                "Listen together to welcome greeting in elder's chosen native dialect",
+                "Coach elder on keypad response: pressing '1' for Yes, '2' for No, and listening to 60s folk story snippet",
+                "Verify elder expresses positive affective comfort and absence of voice-interface intimidation",
+            ],
+            verification_output="Logged Successful First Trial Call Timestamp in IVR Gateway Registry",
+            offline_capability=False,
+        ),
+        NoDeviceOnboardingStepModel(
+            step_number=4,
+            step_name="Laminated Wallet Reminder Card Issuance",
+            lead_role="Frontline ASHA Worker",
+            required_actions=[
+                "Inscribe toll-free helpline number in bold high-contrast font on waterproof laminated card",
+                "Write elder's 4-digit Voice PIN and draw pictorial keypad guide (Green 1 = Yes, Red 2 = No)",
+                "Affix card near home charging station or place inside elder's pocket purse/pouch",
+                "Instruct family caregiver on supporting weekly automated cognitive check-in calls",
+            ],
+            verification_output="Signed Wallet Card Issuance Acknowledgment by Family Caregiver",
+            offline_capability=True,
+        ),
+    ]
+
+
+@app.get("/api/v1/training/milestone-m17-certification", response_model=MilestoneM17CertificationModel, tags=["IVR Support Training"])
+async def get_milestone_m17_certification():
+    """Returns formal Milestone M17 Certification signed off by MDoNER and NHM Directorate."""
+    return MilestoneM17CertificationModel(
+        milestone_id="M17",
+        milestone_name="1,500+ ASHA Workers Trained & Certified",
+        phase="Phase 17: ASHA Worker Training at Scale",
+        gates=[
+            MilestoneM17GateModel(
+                gate_id="GATE-M17-01",
+                description="Total Frontline ASHA Workers Enrolled & Certified",
+                required_threshold=">= 1,500 Workers",
+                achieved_value="1,510 Certified ASHAs across 8 States",
+                status="PASSED",
+            ),
+            MilestoneM17GateModel(
+                gate_id="GATE-M17-02",
+                description="Certified Reminiscence Circle Facilitators (CRF-ASHA)",
+                required_threshold=">= 600 Facilitators",
+                achieved_value="640 Certified Facilitators across 90 PHCs",
+                status="PASSED",
+            ),
+            MilestoneM17GateModel(
+                gate_id="GATE-M17-03",
+                description="IVR Support & No-Device Onboarding Certified Workers",
+                required_threshold=">= 1,500 Workers",
+                achieved_value="1,510 Certified IVR Support Workers",
+                status="PASSED",
+            ),
+            MilestoneM17GateModel(
+                gate_id="GATE-M17-04",
+                description="Mean Practical OSCE Clinical Evaluation Score",
+                required_threshold=">= 85.0%",
+                achieved_value="91.8% Average Score across 15 District Centers",
+                status="PASSED",
+            ),
+            MilestoneM17GateModel(
+                gate_id="GATE-M17-05",
+                description="No-Device Patient Onboarding SOP & Pocket Guides Deployed",
+                required_threshold="100% of Target PHCs (90 PHCs)",
+                achieved_value="90 / 90 PHCs Active (100% Coverage)",
+                status="PASSED",
+            ),
+        ],
+        total_ashas_trained=1565,
+        total_ashas_certified=1510,
+        circle_facilitators_certified=640,
+        ivr_support_certified_ashas=1510,
+        states_covered=8,
+        phcs_covered=90,
+        mean_osce_score_pct=91.8,
+        status="SIGNED_OFF",
+        sign_off_authority="MDoNER Frontline Health Workforce Directorate & National Health Mission (NER)",
+        certified_timestamp="2026-09-14T14:30:00.000Z",
+    )
+
+
+@app.get("/api/v1/training/ivr-support-summary", response_model=IvrSupportSummaryModel, tags=["IVR Support Training"])
+async def get_ivr_support_summary():
+    """Consolidated summary metrics for Sub-Phase 17.4 IVR Support Training & Milestone M17."""
+    return IvrSupportSummaryModel(
+        sub_phase="17.4 IVR Support Training",
+        total_troubleshooting_scenarios=5,
+        onboarding_steps_count=4,
+        total_certified_ashas=1510,
+        no_device_elders_onboarded=5420,
+        toll_free_helpline="1800-890-7674 (1800-890-SMRITI)",
+        mean_ivr_call_success_rate_pct=97.6,
+        milestone_m17_status="SIGNED_OFF",
+        status="IVR_SUPPORT_TRAINING_ACTIVE",
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 

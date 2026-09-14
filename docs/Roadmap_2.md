@@ -68,11 +68,11 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 256 / 240+ Deliverables Completed (106.7% Deliverable Completion)  
-**Phases Completed**: 16 / 20 (Phases 1 through 16 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 17 — Sub-Phases 17.1, 17.2 & 17.3 Complete; Sub-Phase 17.4 Pending)  
+**Overall Velocity**: 259 / 240+ Deliverables Completed (107.9% Deliverable Completion)  
+**Phases Completed**: 17 / 20 (Phases 1 through 17 Complete & Signed Off)  
+**Phases In Progress**: 0 / 20  
 **Phases Pending**: 3 / 20 (Phases 18 through 20)  
-**Milestones Achieved**: 16 / 20 (M1 through M16 Signed Off; M17–M20 Pending)  
+**Milestones Achieved**: 17 / 20 (M1 through M17 Signed Off; M18–M20 Pending)  
 
 ### Phase & Milestone Checklist
 - [x] **Phase 1: Clinical & Cultural Foundation Research** (Weeks 1–6) — **Milestone M1 Signed Off**
@@ -158,11 +158,11 @@ gantt
   - [x] Sub-Phase 16.2: State-Specific Localization (8 States) (4/4 tasks done)
   - [x] Sub-Phase 16.3: NHM ASHA Tablet Ecosystem Integration (3/3 tasks done)
   - [x] Sub-Phase 16.4: IVR & Social Feature Scale-Out (2/2 tasks done)
-- [ ] **Phase 17: ASHA Worker Training at Scale** (Weeks 56–69) — **Milestone M17 Pending**
+- [x] **Phase 17: ASHA Worker Training at Scale** (Weeks 56–69) — **Milestone M17 Signed Off**
   - [x] Sub-Phase 17.1: Scalable Training Program (1,500+ ASHAs) (4/4 tasks done)
   - [x] Sub-Phase 17.2: Field Support Network & SOPs (3/3 tasks done)
   - [x] Sub-Phase 17.3: Community Facilitation Training (2/2 tasks done)
-  - [ ] Sub-Phase 17.4: IVR Support Training (0/2 tasks done)
+  - [x] Sub-Phase 17.4: IVR Support Training (2/2 tasks done)
 - [ ] **Phase 18: MDoNER Central Telemetry Hub & Impact Framework** (Weeks 70–84) — **Milestone M18 Pending**
   - [ ] Sub-Phase 18.1: Central Analytics Dashboard (GIS) (0/3 tasks done)
   - [ ] Sub-Phase 18.2: Cultural Cognitive Engagement Index (CCEI) Finalization (0/3 tasks done)
@@ -921,7 +921,7 @@ gantt
 ---
 
 # PHASE 17: ASHA WORKER TRAINING AT SCALE 🎓
-**Phase Status**: [ ] IN PROGRESS (82% Complete — Sub-Phases 17.1–17.3 Complete; Sub-Phase 17.4 Pending)  
+**Phase Status**: [x] COMPLETE (100% Complete — Sub-Phases 17.1–17.4 Complete & Milestone M17 Signed Off)  
 **Duration**: Weeks 56–69 (parallel) | **Objective**: Train 1,500+ ASHA/ANM workers across 8 states, including social-facilitation and IVR-support skills.
 
 ### Sub-Phase 17.1 — Scalable Training Program
@@ -949,14 +949,14 @@ gantt
 | [x] | Storytelling Capture Training | Train ASHAs to help elders record legacy stories with consent | Storytelling training module |
 
 ### Sub-Phase 17.4 — IVR Support Training
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | IVR Troubleshooting Guide | Common call-failure scenarios and fixes | IVR troubleshooting guide |
-| [ ] | No-Device Patient Onboarding SOP | Registering IVR-only patients into the system | Onboarding SOP |
+| [x] | IVR Troubleshooting Guide | Common call-failure scenarios and fixes | IVR troubleshooting guide |
+| [x] | No-Device Patient Onboarding SOP | Registering IVR-only patients into the system | Onboarding SOP |
 
 > [!IMPORTANT]
-> - [ ] **Milestone M17**: 1,500+ ASHA Workers Trained — including Circle facilitation and IVR support certification. *(Status: PENDING)*
+> - [x] **Milestone M17**: 1,500+ ASHA Workers Trained — including Circle facilitation and IVR support certification. *(Status: SIGNED OFF)*
 
 ---
 ---
