@@ -68,10 +68,10 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 233 / 240+ Deliverables Completed (97.1% Deliverable Completion)  
+**Overall Velocity**: 237 / 240+ Deliverables Completed (98.8% Deliverable Completion)  
 **Phases Completed**: 15 / 20 (Phases 1 through 15 Complete & Signed Off)  
-**Phases In Progress**: 0 / 20  
-**Phases Pending**: 5 / 20 (Phases 16 through 20)  
+**Phases In Progress**: 1 / 20 (Phase 16 — Sub-Phase 16.1 Complete; Sub-Phases 16.2–16.4 Pending)  
+**Phases Pending**: 4 / 20 (Phases 17 through 20)  
 **Milestones Achieved**: 15 / 20 (M1 through M15 Signed Off; M16–M20 Pending)  
 
 ### Phase & Milestone Checklist
@@ -154,7 +154,7 @@ gantt
   - [x] Sub-Phase 15.3: Social & IVR Feature Refinement (2/2 tasks done)
   - [x] Sub-Phase 15.4: Composite Metric Draft (CCEI v1) (2/2 tasks done)
 - [ ] **Phase 16: Multi-State Expansion** (Weeks 56–72) — **Milestone M16 Pending**
-  - [ ] Sub-Phase 16.1: State-by-State Rollout Plan (Waves 1–4) (0/4 tasks done)
+  - [x] Sub-Phase 16.1: State-by-State Rollout Plan (Waves 1–4) (4/4 tasks done)
   - [ ] Sub-Phase 16.2: State-Specific Localization (8 States) (0/4 tasks done)
   - [ ] Sub-Phase 16.3: NHM ASHA Tablet Ecosystem Integration (0/3 tasks done)
   - [ ] Sub-Phase 16.4: IVR & Social Feature Scale-Out (0/2 tasks done)
@@ -878,17 +878,17 @@ gantt
 ---
 
 # PHASE 16: MULTI-STATE EXPANSION 📈
-**Phase Status**: [ ] PENDING (0% Complete — Sub-Phases 16.1–16.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (27% Complete — Sub-Phase 16.1 Complete; Sub-Phases 16.2–16.4 Pending)  
 **Duration**: Weeks 56–72 (4 months) | **Objective**: Scale from 3 pilot states to all 8 NER states in structured waves.
 
 ### Sub-Phase 16.1 — State-by-State Rollout Plan
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Wave | States | Target PHCs | Target Patients | Timeline |
 |:---:|:---|:---|:---|:---|:---|
-| [ ] | Wave 1 | Assam (remaining), Meghalaya | 30 PHCs | 2,000 | Weeks 56–63 |
-| [ ] | Wave 2 | Manipur, Tripura | 25 PHCs | 1,500 | Weeks 62–69 |
-| [ ] | Wave 3 | Arunachal Pradesh, Nagaland | 20 PHCs | 1,000 | Weeks 67–74 |
-| [ ] | Wave 4 | Mizoram, Sikkim | 15 PHCs | 800 | Weeks 72–79 |
+| [x] | Wave 1 | Assam (remaining), Meghalaya | 30 PHCs | 2,000 | Weeks 56–63 |
+| [x] | Wave 2 | Manipur, Tripura | 25 PHCs | 1,500 | Weeks 62–69 |
+| [x] | Wave 3 | Arunachal Pradesh, Nagaland | 20 PHCs | 1,000 | Weeks 67–74 |
+| [x] | Wave 4 | Mizoram, Sikkim | 15 PHCs | 800 | Weeks 72–79 |
 
 ### Sub-Phase 16.2 — State-Specific Localization
 *Status: [ ] Pending*

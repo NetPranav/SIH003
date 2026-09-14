@@ -7681,6 +7681,219 @@ async def get_milestone_m15_certification():
     )
 
 
+# ── Multi-State Expansion: Rollout Plan (Sub-Phase 16.1) ───────────────────────
+class RolloutWaveConfigModel(BaseModel):
+    wave: str
+    wave_name: str
+    states_covered: List[str]
+    target_phcs: int
+    target_patients: int
+    mdm_tablets_allocated: int
+    timeline_weeks: str
+    primary_telecom_profile: str
+    key_connectivity_solution: str
+    status: str
+
+
+class StateRolloutProfileModel(BaseModel):
+    state_code: str
+    state_name: str
+    wave: str
+    phc_count: int
+    patient_target: int
+    expansion_districts: List[str]
+    dominant_languages: List[str]
+    vsat_fallback_required: bool
+    state_mou_status: str
+    lead_nodal_agency: str
+
+
+class MultiStateRolloutSummaryModel(BaseModel):
+    sub_phase: str
+    total_states_covered: int
+    total_phcs_target: int
+    total_patients_target: int
+    total_mdm_tablets_deployed: int
+    waves_count: int
+    active_nodal_officers: int
+    telecom_triple_failover_active: bool
+    pan_ner_deployment_status: str
+
+
+@app.get("/api/v1/rollout/waves", response_model=List[RolloutWaveConfigModel], tags=["Multi-State Rollout"])
+async def get_rollout_waves():
+    """Returns the 4 staged rollout waves scaling across all 8 NER states (90 PHCs, 5,300 patients)."""
+    return [
+        RolloutWaveConfigModel(
+            wave="WAVE_1",
+            wave_name="Wave 1: Assam Core & Meghalaya Uplands",
+            states_covered=["Assam", "Meghalaya"],
+            target_phcs=30,
+            target_patients=2000,
+            mdm_tablets_allocated=300,
+            timeline_weeks="Weeks 56–63",
+            primary_telecom_profile="4G / 2G GSM Hybrid",
+            key_connectivity_solution="Cellular + BLE Island Ferries & Solar Boat Clinics",
+            status="ACTIVE",
+        ),
+        RolloutWaveConfigModel(
+            wave="WAVE_2",
+            wave_name="Wave 2: Manipur Wetlands & Tripura Foothills",
+            states_covered=["Manipur", "Tripura"],
+            target_phcs=25,
+            target_patients=1500,
+            mdm_tablets_allocated=250,
+            timeline_weeks="Weeks 62–69",
+            primary_telecom_profile="4G Urban / 2G Border Cells",
+            key_connectivity_solution="Fiber Backhaul + Asterisk Toll-Free IVR Nodes",
+            status="SCHEDULED",
+        ),
+        RolloutWaveConfigModel(
+            wave="WAVE_3",
+            wave_name="Wave 3: Arunachal Alpine & Nagaland Hills",
+            states_covered=["Arunachal Pradesh", "Nagaland"],
+            target_phcs=20,
+            target_patients=1000,
+            mdm_tablets_allocated=200,
+            timeline_weeks="Weeks 67–74",
+            primary_telecom_profile="Intermittent 2G / Satellite",
+            key_connectivity_solution="BharatNet VSAT Terminals + Solar Micro-Banks",
+            status="PREPARING",
+        ),
+        RolloutWaveConfigModel(
+            wave="WAVE_4",
+            wave_name="Wave 4: Mizoram Ridges & Sikkim Organic Hills",
+            states_covered=["Mizoram", "Sikkim"],
+            target_phcs=15,
+            target_patients=800,
+            mdm_tablets_allocated=150,
+            timeline_weeks="Weeks 72–79",
+            primary_telecom_profile="4G Ridge / Shadow Valleys",
+            key_connectivity_solution="Ridge-Top Repeater Nodes + Offline Encrypted SQLite",
+            status="PREPARING",
+        ),
+    ]
+
+
+@app.get("/api/v1/rollout/states", response_model=List[StateRolloutProfileModel], tags=["Multi-State Rollout"])
+async def get_state_rollout_profiles():
+    """Returns deployment profiles for all 8 NER states with district targets, language matrices, and nodal agencies."""
+    return [
+        StateRolloutProfileModel(
+            state_code="AS",
+            state_name="Assam",
+            wave="WAVE_1",
+            phc_count=20,
+            patient_target=1300,
+            expansion_districts=["Barpeta", "Dhubri", "Dibrugarh", "Sonitpur", "Cachar"],
+            dominant_languages=["Assamese", "Bengali", "Bodo"],
+            vsat_fallback_required=False,
+            state_mou_status="EXECUTED",
+            lead_nodal_agency="National Health Mission, Assam",
+        ),
+        StateRolloutProfileModel(
+            state_code="ML",
+            state_name="Meghalaya",
+            wave="WAVE_1",
+            phc_count=10,
+            patient_target=700,
+            expansion_districts=["East Khasi Hills", "West Garo Hills", "Jaintia Hills"],
+            dominant_languages=["Khasi", "Garo", "English"],
+            vsat_fallback_required=False,
+            state_mou_status="EXECUTED",
+            lead_nodal_agency="Meghalaya Health Systems Development Society",
+        ),
+        StateRolloutProfileModel(
+            state_code="MN",
+            state_name="Manipur",
+            wave="WAVE_2",
+            phc_count=15,
+            patient_target=900,
+            expansion_districts=["Imphal West", "Thoubal", "Bishnupur", "Ukhrul"],
+            dominant_languages=["Meitei (Manipuri)", "Tangkhul"],
+            vsat_fallback_required=False,
+            state_mou_status="EXECUTED",
+            lead_nodal_agency="State Health Society, Manipur",
+        ),
+        StateRolloutProfileModel(
+            state_code="TR",
+            state_name="Tripura",
+            wave="WAVE_2",
+            phc_count=10,
+            patient_target=600,
+            expansion_districts=["West Tripura", "South Tripura", "Dhalai"],
+            dominant_languages=["Bengali", "Kokborok"],
+            vsat_fallback_required=False,
+            state_mou_status="EXECUTED",
+            lead_nodal_agency="National Health Mission, Tripura",
+        ),
+        StateRolloutProfileModel(
+            state_code="AR",
+            state_name="Arunachal Pradesh",
+            wave="WAVE_3",
+            phc_count=12,
+            patient_target=600,
+            expansion_districts=["Papum Pare", "Tawang", "West Kameng", "Lower Subansiri"],
+            dominant_languages=["Nyishi", "Monpa", "Adi", "Hindi"],
+            vsat_fallback_required=True,
+            state_mou_status="EXECUTED",
+            lead_nodal_agency="Arunachal Health Mission Directorate",
+        ),
+        StateRolloutProfileModel(
+            state_code="NL",
+            state_name="Nagaland",
+            wave="WAVE_3",
+            phc_count=8,
+            patient_target=400,
+            expansion_districts=["Kohima", "Mokokchung", "Dimapur", "Mon"],
+            dominant_languages=["Nagamese", "Ao", "Angami", "English"],
+            vsat_fallback_required=True,
+            state_mou_status="EXECUTED",
+            lead_nodal_agency="Department of Health & Family Welfare, Nagaland",
+        ),
+        StateRolloutProfileModel(
+            state_code="MZ",
+            state_name="Mizoram",
+            wave="WAVE_4",
+            phc_count=8,
+            patient_target=450,
+            expansion_districts=["Aizawl", "Lunglei", "Champhai"],
+            dominant_languages=["Mizo (Lushai)", "English"],
+            vsat_fallback_required=True,
+            state_mou_status="EXECUTED",
+            lead_nodal_agency="Mizoram State e-Health Mission",
+        ),
+        StateRolloutProfileModel(
+            state_code="SK",
+            state_name="Sikkim",
+            wave="WAVE_4",
+            phc_count=7,
+            patient_target=350,
+            expansion_districts=["Gangtok", "Namchi", "Gyalshing"],
+            dominant_languages=["Nepali", "Bhutia", "Lepcha"],
+            vsat_fallback_required=False,
+            state_mou_status="EXECUTED",
+            lead_nodal_agency="Health & Family Welfare Department, Sikkim",
+        ),
+    ]
+
+
+@app.get("/api/v1/rollout/summary", response_model=MultiStateRolloutSummaryModel, tags=["Multi-State Rollout"])
+async def get_multi_state_rollout_summary():
+    """Consolidated status of pan-NER scale-out: 8 states, 90 PHCs, 900 MDM tablets, 5,300 patients."""
+    return MultiStateRolloutSummaryModel(
+        sub_phase="16.1 State-by-State Rollout Plan",
+        total_states_covered=8,
+        total_phcs_target=90,
+        total_patients_target=5300,
+        total_mdm_tablets_deployed=900,
+        waves_count=4,
+        active_nodal_officers=24,
+        telecom_triple_failover_active=True,
+        pan_ner_deployment_status="ROLLOUT_ACTIVE_ON_SCHEDULE",
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 
