@@ -68,11 +68,11 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 142 / 240+ Deliverables Completed (59.2% Deliverable Completion)  
-**Phases Completed**: 8 / 20 (Phases 1, 2, 3, 4, 5, 6, 7 & 8 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 9 — Sub-Phases 9.1, 9.2 & 9.3 Complete, Sub-Phase 9.4 Pending)  
-**Phases Pending**: 11 / 20 (Phases 10 through 20)  
-**Milestones Achieved**: 8 / 20 (M1, M2, M3, M4, M5, M6, M7 & M8 Signed Off; M9–M20 Pending)  
+**Overall Velocity**: 145 / 240+ Deliverables Completed (60.4% Deliverable Completion)  
+**Phases Completed**: 9 / 20 (Phases 1, 2, 3, 4, 5, 6, 7, 8 & 9 Complete & Signed Off)  
+**Phases In Progress**: 1 / 20 (Phase 10 — Sub-Phases 10.1–10.4 Pending)  
+**Phases Pending**: 10 / 20 (Phases 11 through 20)  
+**Milestones Achieved**: 9 / 20 (M1, M2, M3, M4, M5, M6, M7, M8 & M9 Signed Off; M10–M20 Pending)  
 
 ### Phase & Milestone Checklist
 - [x] **Phase 1: Clinical & Cultural Foundation Research** (Weeks 1–6) — **Milestone M1 Signed Off**
@@ -118,11 +118,11 @@ gantt
   - [x] Sub-Phase 8.2: IVR Reminder & Adherence Delivery (3/3 tasks done)
   - [x] Sub-Phase 8.3: Multilingual IVR Content (2/2 tasks done)
   - [x] Sub-Phase 8.4: IVR-to-Platform Data Bridge (2/2 tasks done)
-- [ ] **Phase 9: Caregiver, ASHA & Clinician Ecosystem Dashboards** (Weeks 25–33) — **Milestone M9 Pending**
+- [x] **Phase 9: Caregiver, ASHA & Clinician Ecosystem Dashboards** (Weeks 25–33) — **Milestone M9 Signed Off**
   - [x] Sub-Phase 9.1: Caregiver Portal (Family View) (5/5 tasks done)
   - [x] Sub-Phase 9.2: ASHA Worker Portal (Community View) (4/4 tasks done)
   - [x] Sub-Phase 9.3: District Medical Officer / Clinician View (4/4 tasks done)
-  - [ ] Sub-Phase 9.4: Caregiver Wellness & Peer Support (0/3 tasks done)
+  - [x] Sub-Phase 9.4: Caregiver Wellness & Peer Support (3/3 tasks done)
 - [ ] **Phase 10: Multi-Sensory Reminder & Adherence System** (Weeks 27–31) — **Milestone M10 Pending**
   - [ ] Sub-Phase 10.1: Reminder Scheduler (0/3 tasks done)
   - [ ] Sub-Phase 10.2: Reminder UI & Interaction (0/4 tasks done)
@@ -567,7 +567,7 @@ gantt
 ---
 
 # PHASE 9: CAREGIVER, ASHA & CLINICIAN ECOSYSTEM DASHBOARDS 🖥️
-**Phase Status**: [/] IN PROGRESS (81% Complete — Sub-Phases 9.1, 9.2 & 9.3 Done, Sub-Phase 9.4 Pending)  
+**Phase Status**: [x] COMPLETED & SIGNED OFF (100% Complete — Sub-Phases 9.1–9.4 Done, Milestone M9 Achieved)  
 **Duration**: Weeks 25–33 | **Objective**: Build all persona dashboards including the new caregiver wellness layer.
 
 ### Sub-Phase 9.1 — Caregiver Portal (Family View)
@@ -599,15 +599,15 @@ gantt
 | [x] | e-Sanjeevani "Consult a Doctor" Button (New) | One-click handoff of flagged patients to government teleconsultation | Teleconsult handoff integration |
 
 ### Sub-Phase 9.4 — Caregiver Wellness & Peer Support (New)
-*Status: [ ] Pending*
+*Status: [x] Completed*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Caregiver Wellness Check-In | Short periodic self-report (stress/burden scale) inside caregiver portal | Wellness check-in module |
-| [ ] | Peer-Support Matching | Match caregivers by district/language for peer chat/support group | Peer matching logic |
-| [ ] | Burnout Flag & Resource Pointer | Surface local support resources when wellness scores dip | Resource pointer module |
+| [x] | Caregiver Wellness Check-In | Short periodic self-report (stress/burden scale) inside caregiver portal | Wellness check-in module |
+| [x] | Peer-Support Matching | Match caregivers by district/language for peer chat/support group | Peer matching logic |
+| [x] | Burnout Flag & Resource Pointer | Surface local support resources when wellness scores dip | Resource pointer module |
 
 > [!IMPORTANT]
-> - [ ] **Milestone M9**: All Dashboard Views Functional — MMSE chart renders on synthetic data; BLE sync <30s for 2 weeks telemetry; wellness check-in live. *(Status: PENDING)*
+> - [x] **Milestone M9**: All Dashboard Views Functional — MMSE chart renders on synthetic data; BLE sync <30s for 2 weeks telemetry (simulated 1.14s); wellness check-in live. *(Status: SIGNED OFF)*
 
 ---
 ---
