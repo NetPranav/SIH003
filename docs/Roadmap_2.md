@@ -68,9 +68,9 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 228 / 240+ Deliverables Completed (95.0% Deliverable Completion)  
+**Overall Velocity**: 230 / 240+ Deliverables Completed (95.8% Deliverable Completion)  
 **Phases Completed**: 14 / 20 (Phases 1 through 14 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 15 — Sub-Phases 15.1–15.2 Complete; Sub-Phases 15.3–15.4 Pending)  
+**Phases In Progress**: 1 / 20 (Phase 15 — Sub-Phases 15.1–15.3 Complete; Sub-Phase 15.4 Pending)  
 **Phases Pending**: 5 / 20 (Phases 16 through 20)  
 **Milestones Achieved**: 14 / 20 (M1 through M14 Signed Off; M15–M20 Pending)  
 
@@ -151,7 +151,7 @@ gantt
 - [ ] **Phase 15: Feedback Integration & Iteration** (Weeks 52–55) — **Milestone M15 Pending**
   - [x] Sub-Phase 15.1: Feedback Synthesis & Prioritization (3/3 tasks done)
   - [x] Sub-Phase 15.2: Iterative Improvement Sprint (4/4 tasks done)
-  - [ ] Sub-Phase 15.3: Social & IVR Feature Refinement (0/2 tasks done)
+  - [x] Sub-Phase 15.3: Social & IVR Feature Refinement (2/2 tasks done)
   - [ ] Sub-Phase 15.4: Composite Metric Draft (CCEI v1) (0/2 tasks done)
 - [ ] **Phase 16: Multi-State Expansion** (Weeks 56–72) — **Milestone M16 Pending**
   - [ ] Sub-Phase 16.1: State-by-State Rollout Plan (Waves 1–4) (0/4 tasks done)
@@ -837,7 +837,7 @@ gantt
 ---
 
 # PHASE 15: FEEDBACK INTEGRATION & ITERATION 🔁
-**Phase Status**: [ ] IN PROGRESS (64% Complete — Sub-Phases 15.1–15.2 Complete; Sub-Phases 15.3–15.4 Pending)  
+**Phase Status**: [ ] IN PROGRESS (82% Complete — Sub-Phases 15.1–15.3 Complete; Sub-Phase 15.4 Pending)  
 **Duration**: Weeks 52–55 | **Objective**: Synthesize pilot learnings into a stable v2.0 release before scaling.
 
 ### Sub-Phase 15.1 — Feedback Synthesis & Prioritization
@@ -858,11 +858,11 @@ gantt
 | [x] | Content Expansion | New instruments, animals, patterns, recipes, stories | Expanded content library |
 
 ### Sub-Phase 15.3 — Social & IVR Feature Refinement
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Grandchild Connect Tuning | Adjust clue length/format based on usage data | Updated feature spec |
-| [ ] | IVR Script Refinement | Simplify menus based on call drop-off patterns | Revised IVR scripts |
+| [x] | Grandchild Connect Tuning | Adjust clue length/format based on usage data | Updated feature spec |
+| [x] | IVR Script Refinement | Simplify menus based on call drop-off patterns | Revised IVR scripts |
 
 ### Sub-Phase 15.4 — Composite Metric Draft (New)
 *Status: [ ] Pending*
