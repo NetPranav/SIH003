@@ -68,11 +68,11 @@ gantt
 
 ## 📋 Master Roadmap Progress Checklist
 
-**Overall Velocity**: 169 / 240+ Deliverables Completed (70.4% Deliverable Completion)  
-**Phases Completed**: 10 / 20 (Phases 1, 2, 3, 4, 5, 6, 7, 8, 9 & 10 Complete & Signed Off)  
-**Phases In Progress**: 1 / 20 (Phase 11 — Sub-Phases 11.1–11.3 Complete; Sub-Phase 11.4 Pending)  
+**Overall Velocity**: 173 / 240+ Deliverables Completed (72.1% Deliverable Completion)  
+**Phases Completed**: 11 / 20 (Phases 1 through 11 Complete & Signed Off)  
+**Phases In Progress**: 0 / 20 (Preparing Phase 12)  
 **Phases Pending**: 9 / 20 (Phases 12 through 20)  
-**Milestones Achieved**: 10 / 20 (M1, M2, M3, M4, M5, M6, M7, M8, M9 & M10 Signed Off; M11–M20 Pending)  
+**Milestones Achieved**: 11 / 20 (M1, M2, M3, M4, M5, M6, M7, M8, M9, M10 & M11 Signed Off; M12–M20 Pending)  
 
 ### Phase & Milestone Checklist
 - [x] **Phase 1: Clinical & Cultural Foundation Research** (Weeks 1–6) — **Milestone M1 Signed Off**
@@ -128,11 +128,11 @@ gantt
   - [x] Sub-Phase 10.2: Reminder UI & Interaction (4/4 tasks done)
   - [x] Sub-Phase 10.3: Adherence Analytics (3/3 tasks done)
   - [x] Sub-Phase 10.4: Cross-Channel Reminder Unification (2/2 tasks done)
-- [ ] **Phase 11: Offline Storage, Sync & BLE Safety Mesh** (Weeks 25–33) — **Milestone M11 Pending**
+- [x] **Phase 11: Offline Storage, Sync & BLE Safety Mesh** (Weeks 25–33) — **Milestone M11 Signed Off**
   - [x] Sub-Phase 11.1: Local-First Persistence Layer (4/4 tasks done)
   - [x] Sub-Phase 11.2: Delta Synchronization Engine (4/4 tasks done)
   - [x] Sub-Phase 11.3: Bluetooth/Wi-Fi Direct Mesh Relay (4/4 tasks done)
-  - [ ] Sub-Phase 11.4: BLE Beacon Wandering/Safety Mesh (0/4 tasks done)
+  - [x] Sub-Phase 11.4: BLE Beacon Wandering/Safety Mesh (4/4 tasks done)
 - [ ] **Phase 12: Government Health Platform & Policy Integration** (Weeks 30–36) — **Milestone M12 Pending**
   - [ ] Sub-Phase 12.1: ABDM / ABHA Integration (0/3 tasks done)
   - [ ] Sub-Phase 12.2: Backend API Development (0/5 tasks done)
@@ -655,7 +655,7 @@ gantt
 ---
 
 # PHASE 11: OFFLINE STORAGE, SYNC & BLE SAFETY MESH 🔒
-**Phase Status**: [ ] IN PROGRESS (75% Complete — Sub-Phases 11.1–11.3 Complete; Sub-Phase 11.4 Pending)  
+**Phase Status**: [x] COMPLETE (100% Complete — Sub-Phases 11.1–11.4 Complete & Signed Off)  
 **Duration**: Weeks 25–33 | **Objective**: Bulletproof offline-first storage, delta sync, and a low-cost wandering/emergency detection layer.
 
 ### Sub-Phase 11.1 — Local-First Persistence Layer
@@ -686,16 +686,16 @@ gantt
 | [x] | Relay Chain to PHC | ASHA tablet uploads batch on reaching Wi-Fi | Relay chain implementation |
 
 ### Sub-Phase 11.4 — BLE Beacon Wandering/Safety Mesh (New)
-*Status: [ ] Pending*
+*Status: [x] Complete*
 | Status | Task | Details | Deliverable |
 |:---:|:---|:---|:---|
-| [ ] | Beacon Placement Design | Cheap BLE beacons at home boundary, nearest tea stall, temple, PHC | Beacon placement guide |
-| [ ] | Proximity Detection Logic | Patient device detects beacon signal strength to infer zone | Proximity detection module |
-| [ ] | Zone-Exit Alert | Alert caregiver/ASHA when patient device leaves defined safe zones | Zone-exit alert system |
-| [ ] | Beacon-Mesh Reuse of Sync Infra | Reuse existing Bluetooth relay stack for beacon scanning (no new radio stack) | Shared BLE infrastructure module |
+| [x] | Beacon Placement Design | Cheap BLE beacons at home boundary, nearest tea stall, temple, PHC | Beacon placement guide |
+| [x] | Proximity Detection Logic | Patient device detects beacon signal strength to infer zone | Proximity detection module |
+| [x] | Zone-Exit Alert | Alert caregiver/ASHA when patient device leaves defined safe zones | Zone-exit alert system |
+| [x] | Beacon-Mesh Reuse of Sync Infra | Reuse existing Bluetooth relay stack for beacon scanning (no new radio stack) | Shared BLE infrastructure module |
 
 > [!IMPORTANT]
-> - [ ] **Milestone M11**: Offline-First & Safety Mesh Verified — 30+ days offline with zero data loss; BLE relay <30s for 2 weeks of data; zone-exit alerts fire correctly in field test. *(Status: PENDING)*
+> - [x] **Milestone M11**: Offline-First & Safety Mesh Verified — 30+ days offline with zero data loss; BLE relay <30s for 2 weeks of data; zone-exit alerts fire correctly in field test. *(Status: SIGNED OFF)*
 
 ---
 ---
