@@ -2,60 +2,64 @@
 
 import type { ScreenId } from "@/lib/types";
 import { playBeep } from "@/lib/audio";
+import { GAMES_SCREEN_LOCALES } from "@/lib/screenLocalizations";
 
 interface Props {
   navigate: (target: ScreenId) => void;
+  language?: string;
 }
 
-export default function GamesScreen({ navigate }: Props) {
+export default function GamesScreen({ navigate, language = "as" }: Props) {
+  const loc = GAMES_SCREEN_LOCALES[language] || GAMES_SCREEN_LOCALES.en;
+
   const games = [
     {
       id: "dhol-pepa" as ScreenId,
       emoji: "🥁",
-      name: "Dhol-Pepa Sur-Milon",
-      native: "ঢোল-পেঁপা সুৰ-মিলন",
+      name: loc.dhol.name,
+      native: loc.dhol.native,
       domain: "Auditory Memory & Rhythm",
       clinical: "Ribot's Law Auditory Priming",
       badge: "Sound & Memory",
       color: "#2563eb",
       bgColor: "#eff6ff",
-      desc: "Listen to traditional folk instruments and repeat the melodious pattern."
+      desc: loc.dhol.desc,
     },
     {
       id: "kaziranga" as ScreenId,
       emoji: "🦏",
-      name: "Kaziranga Safari",
-      native: "কাজিৰঙা চাফাৰী",
+      name: loc.kaziranga.name,
+      native: loc.kaziranga.native,
       domain: "Visual Attention & Category",
       clinical: "Semantic Association (MoCA)",
       badge: "Visual Search",
       color: "#059669",
       bgColor: "#f0fdf4",
-      desc: "Spot indigenous North-East wildlife and match traditional animal names."
+      desc: loc.kaziranga.desc,
     },
     {
       id: "weavers-loom" as ScreenId,
       emoji: "🧵",
-      name: "Weaver's Loom",
-      native: "তাঁত শালৰ ছন্দ",
+      name: loc.loom.name,
+      native: loc.loom.native,
       domain: "Visuospatial Sequencing",
       clinical: "Procedural Memory Recall",
       badge: "Sequencing",
       color: "#d97706",
       bgColor: "#fef3c7",
-      desc: "Recreate timeless Muga silk, Gamosa, and Mizo Puan textile patterns."
+      desc: loc.loom.desc,
     },
     {
       id: "daily-haat" as ScreenId,
       emoji: "🧺",
-      name: "Daily Haat Memory",
-      native: "দৈনিক বজাৰ স্মৃতি",
+      name: loc.haat.name,
+      native: loc.haat.native,
       domain: "Executive Function & Working Memory",
       clinical: "Delayed Recall & Planning",
       badge: "Daily Routine",
       color: "#9333ea",
       bgColor: "#faf5ff",
-      desc: "Remember authentic local ingredients to prepare beloved North-East recipes."
+      desc: loc.haat.desc,
     },
   ];
 
@@ -103,13 +107,13 @@ export default function GamesScreen({ navigate }: Props) {
               fontWeight: 800,
               color: "var(--gray-900)"
             }}>
-              Cognitive Games
+              {loc.headerTitle}
             </h1>
             <p style={{
               fontSize: "0.8rem",
               color: "var(--gray-500)"
             }}>
-              জ্ঞান উদ্দীপক খেলসমূহ
+              {loc.headerSubtitle}
             </p>
           </div>
         </div>

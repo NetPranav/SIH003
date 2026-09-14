@@ -5,12 +5,15 @@ import type { ScreenId } from "@/lib/types";
 import { playGentleChime, playTone, playSuccessChime } from "@/lib/audio";
 import { SEED_FOLKLORE_COLLECTION, type FolkStory } from "@/lib/seedFolklorePack";
 import { FOUR_STAGE_INTERVIEW_PROTOCOL } from "@/lib/elderInterviewGuide";
+import { CONNECT_SCREEN_LOCALES } from "@/lib/screenLocalizations";
 
 interface Props {
   navigate: (target: ScreenId) => void;
+  language?: string;
 }
 
-export default function ConnectScreen({ navigate }: Props) {
+export default function ConnectScreen({ navigate, language = "as" }: Props) {
+  const loc = CONNECT_SCREEN_LOCALES[language] || CONNECT_SCREEN_LOCALES.en;
   const [activeTab, setActiveTab] = useState<"family" | "circle" | "stories">("family");
 
   // Stories Sub-tab state
@@ -86,13 +89,13 @@ export default function ConnectScreen({ navigate }: Props) {
               fontWeight: 800,
               color: "var(--gray-900)"
             }}>
-              Social Connect
+              {loc.headerTitle}
             </h1>
             <p style={{
               fontSize: "0.8rem",
               color: "var(--gray-500)"
             }}>
-              পৰিয়াল আৰু সমাজ সংযোগ
+              {loc.headerSubtitle}
             </p>
           </div>
         </div>

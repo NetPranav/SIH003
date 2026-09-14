@@ -7,14 +7,52 @@ import { triggerHaptic } from "@/lib/accessibilityMiddleware";
 interface Props {
   active: ScreenId;
   navigate: (target: ScreenId) => void;
+  language?: string;
 }
 
-export default function BottomNav({ active, navigate }: Props) {
+const NAV_LOCALES: Record<
+  string,
+  { home: string; games: string; reminders: string; caregiver: string }
+> = {
+  as: { home: "ঘৰ", games: "খেল", reminders: "সোঁৱৰণী", caregiver: "তত্ত্বাৱধায়ক" },
+  bn: { home: "বাড়ি", games: "খেলা", reminders: "ওষুধ", caregiver: "তত্ত্বাবধায়ক" },
+  hi: { home: "घर", games: "खेल", reminders: "दवा-याद", caregiver: "देखभाल" },
+  mni: { home: "ꯌꯨꯝ", games: "ꯁꯥꯟꯅꯄꯣꯠ", reminders: "ꯅꯤꯡꯁꯤꯡꯕꯥ", caregiver: "ꯌꯦꯡꯁꯤꯅꯕꯥ" },
+  brx: { home: "नखर", games: "गेलेनाय", reminders: "गोसोखां", caregiver: "हेफाजाब" },
+  kha: { home: "Ïing", games: "Jingïalehkai", reminders: "Dawai", caregiver: "Nongsumar" },
+  lus: { home: "In", games: "Game", reminders: "Hriattirna", caregiver: "Enkawltu" },
+  en: { home: "Home", games: "Games", reminders: "Reminders", caregiver: "Caregiver" },
+};
+
+export default function BottomNav({ active, navigate, language = "en" }: Props) {
+  const t = NAV_LOCALES[language] || NAV_LOCALES.en;
+  const isEnglish = language === "en";
+
   const navItems = [
-    { id: "home" as ScreenId, label: "Home", native: "ঘৰ", icon: "🏠" },
-    { id: "games" as ScreenId, label: "Games", native: "খেল", icon: "🎮" },
-    { id: "reminders" as ScreenId, label: "Remind", native: "সোঁৱৰণী", icon: "⏰" },
-    { id: "caregiver" as ScreenId, label: "Caregiver", native: "তত্ত্বাৱধায়ক", icon: "🔒" },
+    {
+      id: "home" as ScreenId,
+      primary: t.home,
+      secondary: isEnglish ? "" : "Home",
+      icon: "🏠",
+    },
+    {
+      id: "games" as ScreenId,
+      primary: t.games,
+      secondary: isEnglish ? "" : "Games",
+      icon: "🎮",
+    },
+    {
+      id: "reminders" as ScreenId,
+      primary: t.reminders,
+      secondary: isEnglish ? "" : "Remind",
+      icon: "⏰",
+    },
+    {
+      id: "caregiver" as ScreenId,
+      primary: t.caregiver,
+      secondary: isEnglish ? "" : "Caregiver",
+      icon: "🔒",
+    },
   ];
 
   const handleNav = (target: ScreenId) => {
@@ -49,8 +87,10 @@ export default function BottomNav({ active, navigate }: Props) {
         return (
           <button
             key={item.id}
+            id={`nav-btn-${item.id}`}
+            data-testid={`nav-btn-${item.id}`}
             onClick={() => handleNav(item.id)}
-            aria-label={`${item.label} (${item.native})`}
+            aria-label={`${item.primary} ${item.secondary}`}
             aria-current={isActive ? "page" : undefined}
             style={{
               background: "none",
@@ -82,25 +122,35 @@ export default function BottomNav({ active, navigate }: Props) {
             >
               {item.icon}
             </span>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", lineHeight: 1.1 }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                lineHeight: 1.15,
+              }}
+            >
               <span
                 style={{
-                  fontSize: "0.78rem",
-                  fontWeight: isActive ? 800 : 600,
+                  fontSize: "0.82rem",
+                  fontWeight: isActive ? 800 : 700,
                   letterSpacing: "-0.01em",
+                  color: isActive ? "var(--primary)" : "var(--gray-800)",
                 }}
               >
-                {item.label}
+                {item.primary}
               </span>
-              <span
-                style={{
-                  fontSize: "0.65rem",
-                  fontWeight: isActive ? 700 : 500,
-                  color: isActive ? "var(--primary-dark)" : "var(--gray-400)",
-                }}
-              >
-                {item.native}
-              </span>
+              {item.secondary && (
+                <span
+                  style={{
+                    fontSize: "0.65rem",
+                    fontWeight: 600,
+                    color: isActive ? "var(--primary-dark)" : "var(--gray-400)",
+                  }}
+                >
+                  {item.secondary}
+                </span>
+              )}
             </div>
             {isActive && (
               <span
@@ -119,4 +169,3 @@ export default function BottomNav({ active, navigate }: Props) {
     </nav>
   );
 }
-

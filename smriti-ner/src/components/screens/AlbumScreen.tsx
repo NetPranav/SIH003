@@ -3,39 +3,42 @@
 import { useState } from "react";
 import type { ScreenId } from "@/lib/types";
 import { playBeep, playGentleChime } from "@/lib/audio";
+import { ALBUM_SCREEN_LOCALES } from "@/lib/screenLocalizations";
 
 interface Props {
   navigate: (target: ScreenId) => void;
+  language?: string;
 }
 
-export default function AlbumScreen({ navigate }: Props) {
+export default function AlbumScreen({ navigate, language = "as" }: Props) {
+  const loc = ALBUM_SCREEN_LOCALES[language] || ALBUM_SCREEN_LOCALES.en;
   const [playingStoryId, setPlayingStoryId] = useState<number | null>(null);
 
   const photos = [
     {
       id: 1,
       title: "Rongali Bihu in Jorhat",
-      native: "যোৰহাটৰ ৰঙালী বিহু",
+      native: loc.photos.bihu.native,
       year: "1982",
-      relation: "Family Festival",
+      relation: loc.photos.bihu.relation,
       caption: "You in your traditional Muga Kurta playing the Dhol with cousins by the tea garden.",
       emoji: "🌿"
     },
     {
       id: 2,
       title: "Priya’s Graduation Day",
-      native: "প্ৰিয়াৰ সমাৱৰ্তন",
+      native: loc.photos.graduation.native,
       year: "2018",
-      relation: "Granddaughter",
+      relation: loc.photos.graduation.relation,
       caption: "Gauhati University. You handed Priya her degree certificate with proud tears.",
       emoji: "🎓"
     },
     {
       id: 3,
       title: "Brahmaputra Ferry to Majuli",
-      native: "মাজুলীৰ ফেৰী ঘাট",
+      native: loc.photos.majuli.native,
       year: "1994",
-      relation: "Spiritual Journey",
+      relation: loc.photos.majuli.relation,
       caption: "Sunset over the mighty river heading to Kamalabari Satra for the Raas festival.",
       emoji: "⛵"
     }
@@ -86,13 +89,13 @@ export default function AlbumScreen({ navigate }: Props) {
               fontWeight: 800,
               color: "var(--gray-900)"
             }}>
-              Memory Album
+              {loc.headerTitle}
             </h1>
             <p style={{
               fontSize: "0.8rem",
               color: "var(--gray-500)"
             }}>
-              পুৰণি স্মৃতিৰ এলবাম
+              {loc.headerSubtitle}
             </p>
           </div>
         </div>
@@ -106,7 +109,7 @@ export default function AlbumScreen({ navigate }: Props) {
           fontWeight: 600,
           color: "var(--accent)"
         }}>
-          Reminiscence Therapy
+          {loc.reminiscenceBadge}
         </span>
       </div>
 
@@ -183,7 +186,7 @@ export default function AlbumScreen({ navigate }: Props) {
                     fontWeight: 600,
                     marginBottom: "0.85rem"
                   }}>
-                    🔊 Playing Reminiscence Audio in Assamese...
+                    {loc.playingAudioText}
                   </div>
                 )}
 
@@ -206,7 +209,7 @@ export default function AlbumScreen({ navigate }: Props) {
                   }}
                 >
                   <span>🎙️</span>
-                  <span>Listen to Family Story</span>
+                  <span>{loc.listenBtn}</span>
                 </button>
               </div>
             </div>

@@ -27,17 +27,62 @@ export default function LanguageSelectorModal({
     onClose();
   };
 
+  const modalLocales: Record<string, { nativeTitle: string; cancelLabel: string; prompt: string }> = {
+    as: {
+      nativeTitle: "ভাষা বাছনি",
+      cancelLabel: "বাতিল কৰক / Cancel",
+      prompt: "আপোনাৰ সহজলভ্য ভাষা বাছক • Tap your preferred language",
+    },
+    bn: {
+      nativeTitle: "ভাষা নির্বাচন",
+      cancelLabel: "বাতিল করুন / Cancel",
+      prompt: "আপনার পছন্দের ভাষা বেছে নিন • Tap your preferred language",
+    },
+    hi: {
+      nativeTitle: "भाषा चयन",
+      cancelLabel: "रद्द करें / Cancel",
+      prompt: "अपनी पसंदीदा भाषा चुनें • Tap your preferred language",
+    },
+    mni: {
+      nativeTitle: "ꯂꯣꯟ ꯈꯅꯕꯥ",
+      cancelLabel: "ꯀꯦꯟꯁꯦꯜ / Cancel",
+      prompt: "ꯅꯍꯥꯛꯀꯤ ꯂꯣꯟ ꯈꯅꯕꯤꯌꯨ • Tap your preferred language",
+    },
+    brx: {
+      nativeTitle: "राव सायखनाय",
+      cancelLabel: "नागार / Cancel",
+      prompt: "नोंथांनि राव सायख • Tap your preferred language",
+    },
+    kha: {
+      nativeTitle: "Jied Ktien",
+      cancelLabel: "Pynsangeh / Cancel",
+      prompt: "Jied ïa ka ktien ba sngewbha • Tap your preferred language",
+    },
+    lus: {
+      nativeTitle: "Ṭawng Thlanna",
+      cancelLabel: "Sutna / Cancel",
+      prompt: "I duhzawng ṭawng thlang rawh • Tap your preferred language",
+    },
+    en: {
+      nativeTitle: "Select Language",
+      cancelLabel: "Cancel",
+      prompt: "Tap your preferred language to continue",
+    },
+  };
+
+  const modalT = modalLocales[currentLanguage] || modalLocales.en;
+
   return (
     <ElderModal
       isOpen={isOpen}
       onClose={onClose}
       title="Choose Language"
-      nativeTitle="ভাষা বাছনি"
-      cancelLabel="বাতিল কৰক / Cancel"
+      nativeTitle={modalT.nativeTitle}
+      cancelLabel={modalT.cancelLabel}
     >
       <div style={{ padding: "0.5rem 0" }}>
         <p style={{ fontSize: "0.95rem", color: "var(--gray-600)", marginBottom: "1.25rem", textAlign: "center" }}>
-          আপোনাৰ সহজলভ্য ভাষা বাছক • Tap your preferred language
+          {modalT.prompt}
         </p>
 
         <div
@@ -54,6 +99,8 @@ export default function LanguageSelectorModal({
             return (
               <button
                 key={lang.code}
+                id={`lang-btn-${lang.code}`}
+                data-testid={`lang-btn-${lang.code}`}
                 type="button"
                 onClick={() => handleSelect(lang.code, lang.native)}
                 aria-pressed={isSelected}

@@ -12255,6 +12255,112 @@ async def get_community_sustainability_summary():
     )
 
 
+# =====================================================================
+# AI GEMINI COMPANION TEXT-TO-TEXT ENDPOINTS
+# =====================================================================
+
+class AICompanionRequest(BaseModel):
+    prompt: str
+    language: Optional[str] = "en"
+
+class AICompanionResponse(BaseModel):
+    reply_text: str
+    english_translation: str
+    language: str
+    emotion_tone: str
+    suggested_screen: Optional[str] = None
+
+class SamplePromptModel(BaseModel):
+    category: str
+    prompt: str
+    language: str
+
+
+AI_COMPANION_RESPONSES = {
+    "hi": {
+        "location": ("आप अपने परिवार के साथ घर पर पूरी तरह सुरक्षित और आराम से हैं।", "You are resting safely and comfortably at home with your family.", "home"),
+        "medicine": ("आपकी सुबह की दवा ली जा चुकी है। अब दोपहर १२:३० बजे गुनगुने पानी का समय है।", "Your morning medicine was taken. Next is lukewarm hydration at 12:30 PM.", "reminders"),
+        "story": ("काजीरंगा के हरे-भरे जंगलों और ब्रह्मपुत्र की शांत लहरों को याद कीजिए।", "Remember the lush greenery of Kaziranga and peaceful waves of Brahmaputra.", "album"),
+        "default": ("नमस्ते दादाजी! मैं आपकी क्या सेवा करूँ?", "Hello grandfather! How may I assist you today?", "home"),
+    },
+    "bn": {
+        "location": ("আপনি আপনার নিজের বাড়িতে পরিবারের সাথে নিরাপদে আছেন।", "You are resting safely at home with your loving family.", "home"),
+        "medicine": ("আপনার সকালের ওষুধ নেওয়া হয়েছে। পরবর্তী ওষুধ ও জল দুপুর ১২:৩০ মিনিটে।", "Your morning medicine is completed. Next water is at 12:30 PM.", "reminders"),
+        "story": ("সুন্দরবনের মিষ্টি হাওয়া এবং পাখিদের ডাক মন শান্ত রাখবে।", "The sweet breeze and singing birds of Sundarbans will bring peace.", "album"),
+        "default": ("নমস্কার দাদু! আমি স্মৃতি। আমি কীভাবে সাহায্য করতে পারি?", "Hello grandfather! I am Smriti. How can I help you?", "home"),
+    },
+    "as": {
+        "location": ("আপুনি নিজৰ ঘৰতেই সুৰক্ষিতভাৱে আছে বৰদেউতা। অলপো চিন্তা নকৰিব।", "You are resting safely in your home in Guwahati, grandfather.", "home"),
+        "medicine": ("আজি ৰাতিপুৱাৰ ঔষধ খোৱা হ'ল। দুপৰীয়া ১২:৩০ বজাত কুহুমীয়া পানী খাব লাগিব।", "Morning medicine was taken. Warm water at 12:30 PM.", "reminders"),
+        "story": ("যোৰহাটৰ ৰঙালী বিহুৰ পেঁপা আৰু ঢোলৰ মাত মনত পেলাওকচোন।", "Remember the joyful tunes of Pepa and Dhol during Rongali Bihu.", "album"),
+        "default": ("নমস্কাৰ বৰদেউতা! স্মৃতি সেৱালৈ স্বাগতম।", "Namaskar grandfather! Welcome to Smriti.", "home"),
+    },
+    "en": {
+        "location": ("You are resting safely in your warm home with family who love you.", "You are resting safely in your warm home with family who love you.", "home"),
+        "medicine": ("Your morning medication was taken. Next reminder is water at 12:30 PM.", "Your morning medication was taken. Next reminder is water at 12:30 PM.", "reminders"),
+        "story": ("Picture the golden Brahmaputra river and festive folk melodies in village courtyards.", "Picture the golden Brahmaputra river and festive folk melodies in village courtyards.", "album"),
+        "default": ("Hello Grandfather! I am Smriti, your AI memory companion.", "Hello Grandfather! I am Smriti, your AI memory companion.", "home"),
+    },
+}
+
+
+@app.post("/api/v1/ai/companion", response_model=AICompanionResponse, tags=["AI Voice Companion"])
+async def query_ai_companion(req: AICompanionRequest):
+    """Conversational text-to-text Gemini AI companion returning calming responses for speech synthesis."""
+    lang = req.language if req.language in AI_COMPANION_RESPONSES else "en"
+    p = req.prompt.lower()
+
+    cat = "default"
+    if any(w in p for w in ["where", "home", "house", "कहाँ", "घर", "ক'ত", "কোথায়", "বাড়ি"]):
+        cat = "location"
+    elif any(w in p for w in ["medicine", "pill", "water", "दवा", "पानी", "ঔষধ", "ওষুধ", "দৰব", "জল", "পানী"]):
+        cat = "medicine"
+    elif any(w in p for w in ["story", "memory", "song", "photo", "कहानी", "गीत", "সাধু", "গান"]):
+        cat = "story"
+
+    reply, eng, screen = AI_COMPANION_RESPONSES[lang].get(cat, AI_COMPANION_RESPONSES[lang]["default"])
+
+    return AICompanionResponse(
+        reply_text=reply,
+        english_translation=eng,
+        language=lang,
+        emotion_tone="CALMING",
+        suggested_screen=screen,
+    )
+
+
+@app.get("/api/v1/ai/companion/sample-prompts", response_model=List[SamplePromptModel], tags=["AI Voice Companion"])
+async def get_sample_companion_prompts(language: str = "en"):
+    """Returns sample voice and text prompts tailored to the elder's selected language."""
+    samples = {
+        "hi": [
+            SamplePromptModel(category="Location", prompt="मैं अभी कहाँ हूँ?", language="hi"),
+            SamplePromptModel(category="Medicine", prompt="मेरी अगली दवा का समय क्या है?", language="hi"),
+            SamplePromptModel(category="Story", prompt="मुझे कोई शांत लोककथा सुनाइए।", language="hi"),
+            SamplePromptModel(category="Comfort", prompt="मुझे थोड़ा घबराहट महसूस हो रही है।", language="hi"),
+        ],
+        "bn": [
+            SamplePromptModel(category="Location", prompt="আমি এখন কোথায় আছি?", language="bn"),
+            SamplePromptModel(category="Medicine", prompt="আমার পরের ওষুধের সময় কখন?", language="bn"),
+            SamplePromptModel(category="Story", prompt="আমাকে একটি সুন্দর গল্প বলুন।", language="bn"),
+            SamplePromptModel(category="Comfort", prompt="আমার একটু চিন্তা হচ্ছে।", language="bn"),
+        ],
+        "as": [
+            SamplePromptModel(category="Location", prompt="মই এতিয়া ক'ত আছোঁ?", language="as"),
+            SamplePromptModel(category="Medicine", prompt="মোৰ পিছৰ ঔষধ খোৱাৰ সময় কেতিয়া?", language="as"),
+            SamplePromptModel(category="Story", prompt="মোক এটি ধুনীয়া সাধু কওক।", language="as"),
+            SamplePromptModel(category="Comfort", prompt="মোৰ মনটো অলপ অস্থিৰ লাগিছে।", language="as"),
+        ],
+        "en": [
+            SamplePromptModel(category="Location", prompt="Where am I right now?", language="en"),
+            SamplePromptModel(category="Medicine", prompt="When is my next medicine?", language="en"),
+            SamplePromptModel(category="Story", prompt="Tell me a peaceful memory story.", language="en"),
+            SamplePromptModel(category="Comfort", prompt="I am feeling a little restless.", language="en"),
+        ],
+    }
+    return samples.get(language, samples["en"])
+
+
 if __name__ == "__main__":
     import uvicorn
 

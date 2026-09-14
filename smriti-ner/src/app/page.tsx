@@ -89,7 +89,9 @@ export default function App() {
           onSelectLanguage={handleSelectLanguage}
         />
       )}
-      {screen === "games" && <GamesScreen navigate={navigate} />}
+      {screen === "games" && (
+        <GamesScreen navigate={navigate} language={language || "as"} />
+      )}
       {screen === "dhol-pepa" && (
         <DholPepaGame navigate={navigate} showSuccess={showSuccess} />
       )}
@@ -102,16 +104,28 @@ export default function App() {
       {screen === "daily-haat" && (
         <DailyHaatGame navigate={navigate} showSuccess={showSuccess} />
       )}
-      {screen === "reminders" && <RemindersScreen navigate={navigate} />}
-      {screen === "album" && <AlbumScreen navigate={navigate} />}
-      {screen === "connect" && <ConnectScreen navigate={navigate} />}
+      {screen === "reminders" && (
+        <RemindersScreen navigate={navigate} language={language || "as"} />
+      )}
+      {screen === "album" && (
+        <AlbumScreen navigate={navigate} language={language || "as"} />
+      )}
+      {screen === "connect" && (
+        <ConnectScreen navigate={navigate} language={language || "as"} />
+      )}
       {screen === "caregiver-pin" && (
         <CaregiverPinScreen onSuccess={handlePinSuccess} onBack={() => setScreen("home")} />
       )}
       {screen === "caregiver" && <CaregiverDashboard navigate={navigate} />}
       {screen === "asha-worker" && <AshaWorkerScreen navigate={navigate} />}
 
-      {showBottomNav && <BottomNav active={screen} navigate={navigate} />}
+      {showBottomNav && (
+        <BottomNav
+          active={screen}
+          navigate={navigate}
+          language={language || "as"}
+        />
+      )}
 
       <CelebrationOverlay
         isOpen={successModal.open}

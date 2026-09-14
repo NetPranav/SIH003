@@ -6,12 +6,16 @@ import { DEFAULT_REMINDERS } from "@/lib/constants";
 import { playGentleChime, playBeep } from "@/lib/audio";
 import FullScreenReminderCard from "@/components/ui/FullScreenReminderCard";
 import { reminderSchedulerDaemon, type ReminderItem } from "@/lib/reminderSchedulerService";
+import { REMINDERS_SCREEN_LOCALES } from "@/lib/screenLocalizations";
 
 interface Props {
   navigate: (target: ScreenId) => void;
+  language?: string;
 }
 
-export default function RemindersScreen({ navigate }: Props) {
+export default function RemindersScreen({ navigate, language = "as" }: Props) {
+  const loc = REMINDERS_SCREEN_LOCALES[language] || REMINDERS_SCREEN_LOCALES.en;
+
   const [reminders, setReminders] = useState(
     DEFAULT_REMINDERS.map((r, i) => ({ ...r, completed: i === 0 }))
   );
@@ -49,7 +53,7 @@ export default function RemindersScreen({ navigate }: Props) {
         id,
         patientId: "p_anand_01",
         type: id.includes("water") ? "HYDRATION" : "MEDICATION",
-        title: item?.title || "পুৱাৰ ৰক্তচাপ আৰু স্মৃতিৰ ঔষধ",
+        title: item?.title || loc.morningMedTitle,
         dosage: item?.description || "1 Tablet (Donepezil 5mg)",
         mealRelation: "AFTER_MEAL",
         scheduledTime: item?.time || "08:30 AM",
@@ -57,7 +61,7 @@ export default function RemindersScreen({ navigate }: Props) {
         recurrence: "DAILY",
         voicePromptPath: "/audio/reminders/priyanka_morning_pill.mp3",
         voiceSpeakerName: "Priyanka",
-        voiceSpeakerRelation: "নাতিনী (Granddaughter)",
+        voiceSpeakerRelation: "Family Granddaughter",
         culturalIcon: id.includes("water") ? "brass_lota" : "traditional_mortar",
         snoozeCount: 0,
         status: "ACTIVE",
@@ -128,13 +132,13 @@ export default function RemindersScreen({ navigate }: Props) {
               fontWeight: 800,
               color: "var(--gray-900)"
             }}>
-              Daily Reminders
+              {loc.headerTitle}
             </h1>
             <p style={{
               fontSize: "0.8rem",
               color: "var(--gray-500)"
             }}>
-              দৰব আৰু পানী সোঁৱৰণী
+              {loc.headerSubtitle}
             </p>
           </div>
         </div>
@@ -148,7 +152,7 @@ export default function RemindersScreen({ navigate }: Props) {
           fontWeight: 600,
           color: "var(--primary)"
         }}>
-          Family Voice Sync
+          {loc.familyVoiceBadge}
         </span>
       </div>
 
@@ -166,10 +170,10 @@ export default function RemindersScreen({ navigate }: Props) {
         <div style={{ fontSize: "1.8rem" }}>🎙️</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "#1e40af" }}>
-            Familiar Family Voice Engine
+            {loc.voiceEngineTitle}
           </div>
           <div style={{ fontSize: "0.78rem", color: "#2563eb", marginTop: "0.15rem" }}>
-            All medicine reminders speak in your granddaughter Priya’s voice in Assamese.
+            {loc.voiceEngineDesc}
           </div>
         </div>
         <button
@@ -183,10 +187,10 @@ export default function RemindersScreen({ navigate }: Props) {
             fontSize: "0.75rem",
             fontWeight: 700,
             cursor: "pointer",
-            whiteSpace: "nowrap",
+            flexShrink: 0
           }}
         >
-          🔔 Full-Screen Alert
+          {loc.testAlertBtn}
         </button>
       </div>
 

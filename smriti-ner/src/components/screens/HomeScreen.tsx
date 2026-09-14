@@ -33,6 +33,12 @@ const LOCALIZED_HOME: Record<string, {
   connectSub: string;
   scheduleTitle: string;
   scheduleSub: string;
+  activitiesHeader: string;
+  gamesDoneBadge: string;
+  nextReminderBadge: string;
+  photosBadge: string;
+  connectBadge: string;
+  dateLabel: string;
   langLabel: string;
 }> = {
   as: {
@@ -50,6 +56,12 @@ const LOCALIZED_HOME: Record<string, {
     connectSub: "পৰিয়ালৰ সৈতে যোগাযোগ",
     scheduleTitle: "আজিৰ কাৰ্যসূচী",
     scheduleSub: "স্বয়ংক্ৰিয় কণ্ঠ সতৰ্কবাৰ্তা সক্ৰিয়",
+    activitiesHeader: "দৈনিক কাৰ্যসূচী • Daily Activities",
+    gamesDoneBadge: "২ সম্পন্ন • ২ বাকী",
+    nextReminderBadge: "পৰৱৰ্তী: ১২:৩০",
+    photosBadge: "৮ খন ফটো",
+    connectBadge: "১ টা নতুন সংকেত!",
+    dateLabel: "সোমবাৰ • ১৪ ছেপ্টেম্বৰ",
     langLabel: "অসমীয়া"
   },
   mni: {
@@ -61,12 +73,18 @@ const LOCALIZED_HOME: Record<string, {
     gamesSub: "ꯁꯥꯟꯅꯄꯣꯠ ꯴ ꯌꯥꯎꯔꯤ",
     remindersTitle: "ꯍꯤꯗꯥꯛ ꯑꯃꯁꯨꯡ ꯏꯁꯤꯡ",
     remindersSub: "ꯉꯁꯤꯒꯤ ꯅꯤꯡꯁꯤꯡꯕꯥ ꯳",
-    albumTitle: "ꯅꯤꯡꯁꯤꯡ ꯑꯦꯂꯕꯝ",
+    albumTitle: "ꯅꯤꯡꯁꯤꯡ ꯑꯦꂢꯕꯝ",
     albumSub: "ꯃꯃꯥꯡꯉꯩꯒꯤ ꯐꯣꯇꯣꯁꯤꯡ",
     connectTitle: "ꯅꯥꯄꯨ-ꯅꯥꯕꯦꯜ ꯁꯝꯅꯕꯥ",
     connectSub: "ꯏꯃꯨꯡ ꯃꯅꯨꯡꯒꯥ ꯋꯥꯔꯤ",
     scheduleTitle: "ꯉꯁꯤꯒꯤ ꯊꯧꯔꯥꯡ",
     scheduleSub: "ꯈꯣꯟꯊꯣꯛꯀꯤ ꯄꯥꯎꯇꯥꯛ ꯆꯠꯊꯔꯤ",
+    activitiesHeader: "ꯉꯁꯤꯒꯤ ꯊꯕꯛ • Daily Activities",
+    gamesDoneBadge: "২ ꯂꯣꯏꯔꯦ • ২ ꯂꯩꯔꯤ",
+    nextReminderBadge: "ꯃꯊꯪ: ১২:৩০",
+    photosBadge: "৮ ꯐꯣꯇꯣ",
+    connectBadge: "১ ꯑꯅꯧꯕꯥ ꯄꯥꯎ!",
+    dateLabel: "ꯅꯣꯡꯃꯥꯏꯖꯤꯡ • ১৪ ꯁꯦꯞꯇꯦꯝꯕꯔ",
     langLabel: "ꯃꯩꯇꯩꯂꯣꯟ"
   },
   bn: {
@@ -84,6 +102,12 @@ const LOCALIZED_HOME: Record<string, {
     connectSub: "পরিবারের সাথে যোগাযোগ",
     scheduleTitle: "আজকের সময়সূচী",
     scheduleSub: "ভয়েস অ্যালার্ট সক্রিয়",
+    activitiesHeader: "দৈনিক কাজকর্ম • Daily Activities",
+    gamesDoneBadge: "২ সম্পন্ন • ২ বাকি",
+    nextReminderBadge: "পরবর্তী: ১২:৩০",
+    photosBadge: "৮ টি ছবি",
+    connectBadge: "১ টি নতুন ক্লু!",
+    dateLabel: "সোমবার • ১৪ সেপ্টেম্বর",
     langLabel: "বাংলা"
   },
   brx: {
@@ -101,11 +125,17 @@ const LOCALIZED_HOME: Record<string, {
     connectSub: "नखरजों रायलायनाय",
     scheduleTitle: "दिनैनि हाबाफारि",
     scheduleSub: "गारांनि एलार्ट चालू दं",
+    activitiesHeader: "दिनैनि हाबाफारि • Daily Activities",
+    gamesDoneBadge: "२ जोबबाय • २ दंबावो",
+    nextReminderBadge: "उनाव: १२:३०",
+    photosBadge: "८ फोटोफोर",
+    connectBadge: "१ गोदान सुलु!",
+    dateLabel: "सोमबार • १४ सेप्टेम्बर",
     langLabel: "बड़ो"
   },
   kha: {
     greeting: "Khublei, Kpa 👋",
-    safeMessage: "Phi shngain ha iing ha Guwahati",
+    safeMessage: "Phi shngain ha iing",
     comfortTitle: "Ka Rukom Kiew Step Bymynsaw",
     comfortDesc: "2 na ki 5 ki jingtrei la pyndep mynta",
     gamesTitle: "Ki Jingialehkai Jingmut",
@@ -118,11 +148,17 @@ const LOCALIZED_HOME: Record<string, {
     connectSub: "Ka jingiakren bad kiba ha iing",
     scheduleTitle: "Ka Por Jingtrei Mynta",
     scheduleSub: "Ka jingpyntip da ka sur la treikam",
+    activitiesHeader: "Ki Jingtrei Mynta • Daily Activities",
+    gamesDoneBadge: "2 La Dep • 2 Dang Sah",
+    nextReminderBadge: "Kaba Bud: 12:30 PM",
+    photosBadge: "8 Ki Dur",
+    connectBadge: "1 Ka Dak Thymmai!",
+    dateLabel: "Monday • 14 September",
     langLabel: "Khasi"
   },
   lus: {
     greeting: "Chibai, Ka Pu 👋",
-    safeMessage: "In lamah Guwahati-ah i him e",
+    safeMessage: "In lamah i him e",
     comfortTitle: "Tukthuan Hauhuk Lo Tak",
     comfortDesc: "Vawiinah thiltih 5 atangin 2 i tlingtla tawh",
     gamesTitle: "Thluak Sawizawina Game",
@@ -135,11 +171,17 @@ const LOCALIZED_HOME: Record<string, {
     connectSub: "Chhungte nen inzawmna",
     scheduleTitle: "Vawiin Hun Duante",
     scheduleSub: "Aw hmanga hriattirna a nung e",
+    activitiesHeader: "Vawiin Thiltihte • Daily Activities",
+    gamesDoneBadge: "2 Zo Ta • 2 La Bawk",
+    nextReminderBadge: "A Dawttu: 12:30 PM",
+    photosBadge: "Thlalak 8",
+    connectBadge: "1 Hriattirna Thar!",
+    dateLabel: "Thawhtanni • 14 September",
     langLabel: "Mizo"
   },
   hi: {
     greeting: "नमस्ते, दादाजी 👋",
-    safeMessage: "आप गुवाहाटी में अपने घर पर पूरी तरह सुरक्षित हैं",
+    safeMessage: "आप अपने घर पर पूरी तरह सुरक्षित और आराम से हैं",
     comfortTitle: "शांत प्रभात दिनचर्या",
     comfortDesc: "आज ५ में से २ दैनिक गतिविधियां पूरी हुईं",
     gamesTitle: "स्मृति खेल",
@@ -152,11 +194,17 @@ const LOCALIZED_HOME: Record<string, {
     connectSub: "परिवार से आवाज साझा करें",
     scheduleTitle: "आज की समय-सारणी",
     scheduleSub: "ध्वनि संदेश सक्रिय",
+    activitiesHeader: "दैनिक गतिविधियां • Daily Activities",
+    gamesDoneBadge: "२ पूर्ण • २ शेष",
+    nextReminderBadge: "अगली: 12:30 PM",
+    photosBadge: "८ तस्वीरें",
+    connectBadge: "१ नया संकेत!",
+    dateLabel: "सोमवार • १४ सितम्बर",
     langLabel: "हिन्दी"
   },
   en: {
     greeting: "Namaskar, Grandfather 👋",
-    safeMessage: "You are safe at home in Guwahati",
+    safeMessage: "You are safe and resting comfortably at home",
     comfortTitle: "Peaceful Morning Routine",
     comfortDesc: "2 out of 5 daily wellness activities completed today",
     gamesTitle: "Cognitive Games",
@@ -169,11 +217,17 @@ const LOCALIZED_HOME: Record<string, {
     connectSub: "Co-play voice clues with family",
     scheduleTitle: "Today’s Schedule",
     scheduleSub: "Automated Voice Alerts Active",
+    activitiesHeader: "Daily Activities",
+    gamesDoneBadge: "2 Done • 2 Left",
+    nextReminderBadge: "Next: 12:30 PM",
+    photosBadge: "8 Photos",
+    connectBadge: "1 New Clue!",
+    dateLabel: "Monday • 14 September",
     langLabel: "English"
   }
 };
 
-export default function HomeScreen({ navigate, language = "as", onSelectLanguage }: Props) {
+export default function HomeScreen({ navigate, language = "en", onSelectLanguage }: Props) {
   const [isLangModalOpen, setIsLangModalOpen] = useState<boolean>(false);
   const [isPinModalOpen, setIsPinModalOpen] = useState<boolean>(false);
 
@@ -225,7 +279,7 @@ export default function HomeScreen({ navigate, language = "as", onSelectLanguage
                 color: "var(--accent)",
               }}
             >
-              Monday • 14 September
+              {loc.dateLabel}
             </span>
             <ConnectivityIndicator />
           </div>
@@ -258,6 +312,7 @@ export default function HomeScreen({ navigate, language = "as", onSelectLanguage
           <div style={{ display: "flex", gap: "0.35rem" }}>
             {/* 1-Tap Language Quick Switcher */}
             <button
+              id="lang-switcher-btn"
               type="button"
               onClick={() => setIsLangModalOpen(true)}
               aria-label={`Selected Language: ${loc.langLabel}. Tap to change language.`}
@@ -328,7 +383,7 @@ export default function HomeScreen({ navigate, language = "as", onSelectLanguage
         </div>
       </div>
 
-      {/* ── Dementia Comfort & Reassurance Card ── */}
+      {/* ── Dementia Comfort & Reassurance Card (Folder Container) ── */}
       <div
         style={{
           background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
@@ -339,11 +394,12 @@ export default function HomeScreen({ navigate, language = "as", onSelectLanguage
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          boxShadow: "var(--shadow-sm)"
+          boxShadow: "var(--shadow-sm)",
+          gap: "1rem"
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
-          <div style={{ fontSize: "2rem" }}>☀️</div>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.85rem", flex: 1 }}>
+          <div style={{ fontSize: "2rem", flexShrink: 0 }}>☀️</div>
           <div>
             <div style={{ fontSize: "1rem", fontWeight: 800, color: "#166534" }}>
               {loc.comfortTitle}
@@ -354,13 +410,14 @@ export default function HomeScreen({ navigate, language = "as", onSelectLanguage
           </div>
         </div>
 
-        {/* Cognitive Progress Ring */}
+        {/* Cognitive Progress Ring - Strictly and cleanly contained inside the card folder */}
         <CognitiveProgressRing
           percentage={50}
           size={56}
           strokeWidth={6}
           color="#16a34a"
           trackColor="#bbf7d0"
+          language={language}
           label="2/4"
         />
       </div>
@@ -378,7 +435,7 @@ export default function HomeScreen({ navigate, language = "as", onSelectLanguage
         }}
       >
         <span>🎯</span>
-        <span>Daily Activities • কাৰ্যসূচী</span>
+        <span>{loc.activitiesHeader}</span>
       </h2>
 
       <div
@@ -421,7 +478,7 @@ export default function HomeScreen({ navigate, language = "as", onSelectLanguage
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "0.35rem" }}>
               <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#2563eb", background: "#eff6ff", padding: "0.2rem 0.5rem", borderRadius: "999px" }}>
-                2 Done • 2 Left
+                {loc.gamesDoneBadge}
               </span>
               <span style={{ fontSize: "0.9rem", color: "#2563eb", fontWeight: 700 }}>→</span>
             </div>
@@ -460,7 +517,7 @@ export default function HomeScreen({ navigate, language = "as", onSelectLanguage
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "0.35rem" }}>
               <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#b45309", background: "#fef3c7", padding: "0.2rem 0.5rem", borderRadius: "999px" }}>
-                Next: 12:30 PM
+                {loc.nextReminderBadge}
               </span>
               <span style={{ fontSize: "0.9rem", color: "#d97706", fontWeight: 700 }}>→</span>
             </div>
@@ -499,7 +556,7 @@ export default function HomeScreen({ navigate, language = "as", onSelectLanguage
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "0.35rem" }}>
               <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a21caf", background: "#fae8ff", padding: "0.2rem 0.5rem", borderRadius: "999px" }}>
-                8 Photos
+                {loc.photosBadge}
               </span>
               <span style={{ fontSize: "0.9rem", color: "#c026d3", fontWeight: 700 }}>→</span>
             </div>
@@ -538,7 +595,7 @@ export default function HomeScreen({ navigate, language = "as", onSelectLanguage
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "0.35rem" }}>
               <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#15803d", background: "#dcfce7", padding: "0.2rem 0.5rem", borderRadius: "999px" }}>
-                1 New Clue!
+                {loc.connectBadge}
               </span>
               <span style={{ fontSize: "0.9rem", color: "#15803d", fontWeight: 700 }}>→</span>
             </div>
