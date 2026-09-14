@@ -11802,6 +11802,146 @@ async def get_sustainability_summary():
     )
 
 
+# =====================================================================
+# SUB-PHASE 20.3: CONTINUOUS IMPROVEMENT PIPELINE
+# =====================================================================
+
+class ReleaseCalendarItemModel(BaseModel):
+    release_month: str
+    version: str
+    focus_area: str
+    deployment_date: str
+    release_type: str
+
+class NewFeatureRoadmapItemModel(BaseModel):
+    feature_id: str
+    title: str
+    cultural_theme: str
+    cognitive_domain: str
+    target_quarter: str
+    mechanics_description: str
+    status: str
+
+class ModelRetrainingSOPModel(BaseModel):
+    sop_id: str
+    quarterly_schedule: List[str]
+    models_retrained: List[str]
+    psi_drift_threshold: float
+    bkt_reestimation_sample_min: int
+    mmse_proxy_validation_r2_target: float
+    fedprox_mu: float
+    status: str
+
+class ModerationTierModel(BaseModel):
+    tier_number: int
+    name: str
+    responsibility: str
+    sla_hours: int
+
+class CrowdsourcingPortalConfigModel(BaseModel):
+    portal_url: str
+    supported_languages: List[str]
+    supported_media_formats: List[str]
+    moderation_tiers: List[ModerationTierModel]
+    total_submissions_approved: int
+    status: str
+
+class ContinuousImprovementSummaryModel(BaseModel):
+    sub_phase: str
+    annual_releases_count: int
+    new_features_planned_count: int
+    model_retraining_quarterly_cadence: int
+    psi_drift_threshold: float
+    crowdsourced_assets_approved: int
+    pipeline_status: str
+
+
+RELEASE_CALENDAR_DATA = [
+    ReleaseCalendarItemModel(release_month="October 2026", version="v2.5.0", focus_area="Post-Rollout Hotfixes, Play Store Optimizations", deployment_date="2026-10-20", release_type="HOTFIX"),
+    ReleaseCalendarItemModel(release_month="November 2026", version="v2.6.0", focus_area="Winter Folklore Content Packs, Bodo Dialect Audio Patch", deployment_date="2026-11-17", release_type="CONTENT"),
+    ReleaseCalendarItemModel(release_month="December 2026", version="v2.7.0", focus_area="Q4 Model Retraining Release (BKT & FedProx Update)", deployment_date="2026-12-15", release_type="MODEL_RETRAIN"),
+    ReleaseCalendarItemModel(release_month="January 2027", version="v2.8.0", focus_area="Magh Bihu / Pous Sankranti Festive Reminiscence Update", deployment_date="2027-01-19", release_type="CONTENT"),
+    ReleaseCalendarItemModel(release_month="February 2027", version="v2.9.0", focus_area="Caregiver Telemetry Export v2, Battery Optimization", deployment_date="2027-02-16", release_type="FEATURE"),
+    ReleaseCalendarItemModel(release_month="March 2027", version="v3.0.0", focus_area="Major Milestone: Launch of Majuli River Crossing Game", deployment_date="2027-03-16", release_type="MAJOR"),
+    ReleaseCalendarItemModel(release_month="April 2027", version="v3.1.0", focus_area="Rongali Bihu & Regional New Year Content Packs", deployment_date="2027-04-20", release_type="CONTENT"),
+    ReleaseCalendarItemModel(release_month="May 2027", version="v3.2.0", focus_area="High-Altitude Offline BLE Safety Mesh Enhancements", deployment_date="2027-05-18", release_type="FEATURE"),
+    ReleaseCalendarItemModel(release_month="June 2027", version="v3.3.0", focus_area="Launch of Cheraw Bamboo Rhythm Tap Motor Game", deployment_date="2027-06-15", release_type="FEATURE"),
+    ReleaseCalendarItemModel(release_month="July 2027", version="v3.4.0", focus_area="Q2 Model Retraining Release, Monsoonal UI Theme", deployment_date="2027-07-20", release_type="MODEL_RETRAIN"),
+    ReleaseCalendarItemModel(release_month="August 2027", version="v3.5.0", focus_area="Multigenerational Family Tree Story Builder Launch", deployment_date="2027-08-17", release_type="FEATURE"),
+    ReleaseCalendarItemModel(release_month="September 2027", version="v4.0.0", focus_area="Annual Major Architecture Release (Annual Platform Audit)", deployment_date="2027-09-21", release_type="MAJOR"),
+]
+
+DEVELOPMENT_ROADMAP_DATA = [
+    NewFeatureRoadmapItemModel(feature_id="FEAT-GAME-MAJULI", title="Majuli River Crossing", cultural_theme="Brahmaputra Traditional Ferry Navigations", cognitive_domain="Visuospatial Planning & Mental Rotation", target_quarter="Q1 2027", mechanics_description="Interactive pathfinding ferry puzzle where elders avoid shifting sandbars and river currents to reach satra monasteries.", status="IN_DESIGN"),
+    NewFeatureRoadmapItemModel(feature_id="FEAT-GAME-CHERAW", title="Cheraw Bamboo Rhythm Tap", cultural_theme="Traditional Mizo Bamboo Dance Rhythms", cognitive_domain="Bimanual Motor Coordination & Auditory Reaction Time", target_quarter="Q2 2027", mechanics_description="Dual-touch rhythmic tapping game synchronizing finger taps with the rhythmic beats of crossing bamboo poles.", status="PROTOTYPING"),
+    NewFeatureRoadmapItemModel(feature_id="FEAT-SOCIAL-FAMILY", title="Family Tree Story Builder", cultural_theme="Ancestral Village Clan & Oral Genealogy", cognitive_domain="Episodic Memory Retrieval & Intergenerational Bonding", target_quarter="Q3 2027", mechanics_description="Collaborative genealogical photo album and oral story recorder connecting elders with grandchildren across distances.", status="PLANNED"),
+]
+
+MODERATION_TIERS_DATA = [
+    ModerationTierModel(tier_number=1, name="Automated AI Guardrail", responsibility="Toxicity, copyright, and dialect categorization filter", sla_hours=2),
+    ModerationTierModel(tier_number=2, name="ASHA & Community Facilitator Circle", responsibility="Cultural authenticity and local dialect verification", sla_hours=48),
+    ModerationTierModel(tier_number=3, name="Clinical Advisory Sign-Off", responsibility="Trauma screening and dementia suitability approval", sla_hours=72),
+]
+
+
+@app.get("/api/v1/improvement/release-calendar", response_model=List[ReleaseCalendarItemModel], tags=["Continuous Improvement"])
+async def get_release_calendar():
+    """Returns 12-month release engineering calendar (v2.5.0 through v4.0.0)."""
+    return RELEASE_CALENDAR_DATA
+
+
+@app.get("/api/v1/improvement/development-roadmap", response_model=List[NewFeatureRoadmapItemModel], tags=["Continuous Improvement"])
+async def get_development_roadmap():
+    """Returns novel cognitive games and social features development roadmap."""
+    return DEVELOPMENT_ROADMAP_DATA
+
+
+@app.get("/api/v1/improvement/retraining-sop", response_model=ModelRetrainingSOPModel, tags=["Continuous Improvement"])
+async def get_model_retraining_sop():
+    """Returns quarterly model retraining SOP, drift thresholds, and target metrics."""
+    return ModelRetrainingSOPModel(
+        sop_id="SOP-MODEL-RETRAIN-2026",
+        quarterly_schedule=["Q1: March 15", "Q2: June 15", "Q3: September 15", "Q4: December 15"],
+        models_retrained=[
+            "Bayesian Knowledge Tracing (BKT) Cognitive Slip/Guess Transitions",
+            "MMSE Proxy Random Forest Regressor on Ingested Clinical Pairs",
+            "FedProx Cross-District Population Weight Convergence Engine",
+        ],
+        psi_drift_threshold=0.10,
+        bkt_reestimation_sample_min=10000,
+        mmse_proxy_validation_r2_target=0.76,
+        fedprox_mu=0.01,
+        status="ACTIVE_SOP",
+    )
+
+
+@app.get("/api/v1/improvement/crowdsourcing-portal", response_model=CrowdsourcingPortalConfigModel, tags=["Continuous Improvement"])
+async def get_crowdsourcing_portal_config():
+    """Returns crowdsourcing cultural asset portal configuration and moderation tiers."""
+    return CrowdsourcingPortalConfigModel(
+        portal_url="https://crowd.smriti.ner.gov.in",
+        supported_languages=["Assamese", "Bengali", "Bodo", "Meitei", "Mizo", "Khasi", "Garo", "English"],
+        supported_media_formats=["MP3/WAV/AAC Audio", "WebP/JPEG Image", "Transcribed Text Story", "Heirloom Recipe Card"],
+        moderation_tiers=MODERATION_TIERS_DATA,
+        total_submissions_approved=1240,
+        status="PORTAL_ACTIVE",
+    )
+
+
+@app.get("/api/v1/improvement/summary", response_model=ContinuousImprovementSummaryModel, tags=["Continuous Improvement"])
+async def get_continuous_improvement_summary():
+    """Consolidated summary metrics for Sub-Phase 20.3 Continuous Improvement Pipeline."""
+    return ContinuousImprovementSummaryModel(
+        sub_phase="20.3 Continuous Improvement Pipeline",
+        annual_releases_count=len(RELEASE_CALENDAR_DATA),
+        new_features_planned_count=len(DEVELOPMENT_ROADMAP_DATA),
+        model_retraining_quarterly_cadence=4,
+        psi_drift_threshold=0.10,
+        crowdsourced_assets_approved=1240,
+        pipeline_status="CONTINUOUS_DELIVERY_ACTIVE",
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 
