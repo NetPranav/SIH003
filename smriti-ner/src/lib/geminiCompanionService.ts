@@ -633,14 +633,15 @@ export function classifyElderIntent(prompt: string): string {
 }
 
 // ── DYNAMIC GEMINI MODEL RESOLUTION & AUTO-DISCOVERY ─────────────────────────
-export let activeGeminiModelName: string = "gemini-2.5-flash";
+export let activeGeminiModelName: string = "gemini-3.6-flash";
 
 export const CANDIDATE_GEMINI_MODELS = [
+  "gemini-3.6-flash",
+  "gemini-3.8-flash",
+  "gemini-3.5-flash",
   "gemini-2.5-flash",
   "gemini-2.0-flash",
   "gemini-1.5-flash",
-  "gemini-1.5-flash-latest",
-  "gemini-1.5-flash-8b",
 ];
 
 /**
@@ -666,8 +667,9 @@ export async function resolveAvailableGeminiModel(apiKey: string): Promise<strin
           m.supportedGenerationMethods?.includes("generateContent")
         );
         const flashCandidate =
-          genModels.find((m) => m.name.includes("2.5-flash")) ||
-          genModels.find((m) => m.name.includes("flash") && (m.name.includes("2.0") || m.name.includes("1.5"))) ||
+          genModels.find((m) => m.name.includes("3.6-flash")) ||
+          genModels.find((m) => m.name.includes("3.8-flash")) ||
+          genModels.find((m) => m.name.includes("3.5-flash")) ||
           genModels.find((m) => m.name.includes("flash")) ||
           genModels.find((m) => m.name.includes("gemini")) ||
           genModels[0];
@@ -688,7 +690,7 @@ export async function resolveAvailableGeminiModel(apiKey: string): Promise<strin
 
 /**
  * Queries Gemini AI directly from the client (if API key present)
- * with gemini-2.5-flash as default, falling back cleanly to the On-Device Clinical Brain.
+ * with gemini-3.6-flash as default, falling back cleanly to the On-Device Clinical Brain.
  */
 export async function generateGeminiCompanionReply(
   prompt: string,
@@ -699,7 +701,7 @@ export async function generateGeminiCompanionReply(
   // 1. Direct Client-Side Gemini REST API (if key is configured and device is online)
   if (apiKey && typeof window !== "undefined" && navigator.onLine) {
     const modelsToTry = Array.from(
-      new Set(["gemini-2.5-flash", activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS])
+      new Set(["gemini-3.6-flash", activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS])
     );
     for (const rawModel of modelsToTry) {
       const model = rawModel.replace(/^models\//, "");
@@ -782,7 +784,7 @@ export async function generateGeminiCompanionAudioReply(
   // 1. Direct Multimodal Gemini API Call
   if (apiKey && typeof window !== "undefined" && navigator.onLine) {
     const modelsToTry = Array.from(
-      new Set(["gemini-2.5-flash", activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS])
+      new Set(["gemini-3.6-flash", activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS])
     );
     for (const rawModel of modelsToTry) {
       const model = rawModel.replace(/^models\//, "");
@@ -881,7 +883,7 @@ export function stopTTS(): void {
 }
 
 /**
- * Tests if a Gemini API key is valid and responsive, prioritizing gemini-2.5-flash.
+ * Tests if a Gemini API key is valid and responsive, prioritizing gemini-3.6-flash.
  */
 export async function testGeminiApiKey(
   apiKey: string
@@ -899,9 +901,9 @@ export async function testGeminiApiKey(
   }
 
   try {
-    // 1. Discover available models or prioritize gemini-2.5-flash
+    // 1. Discover available models or prioritize gemini-3.6-flash
     const modelsToTry = Array.from(
-      new Set(["gemini-2.5-flash", activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS])
+      new Set(["gemini-3.6-flash", activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS])
     );
 
     let primaryError = "";
@@ -940,7 +942,7 @@ export async function testGeminiApiKey(
         const errJson = await res.json().catch(() => null);
         const errMsg = errJson?.error?.message || `HTTP ${res.status}: ${res.statusText}`;
         lastError = errMsg;
-        if (model === "gemini-2.5-flash" || !primaryError) {
+        if (model === "gemini-3.6-flash" || !primaryError) {
           primaryError = errMsg;
         }
 
@@ -959,7 +961,7 @@ export async function testGeminiApiKey(
 
     return {
       success: false,
-      message: `Gemini 2.5 Flash error: ${primaryError || lastError}`,
+      message: `Gemini 3.6 Flash error: ${primaryError || lastError}`,
     };
   } catch (err: any) {
     return {
