@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { playBeep, playGentleChime } from "@/lib/audio";
 import { triggerHaptic, announceToScreenReader } from "@/lib/accessibilityMiddleware";
 import type { ScreenId } from "@/lib/types";
+import { offlineMobileStore } from "@/lib/offlineMobileStorage";
 import {
   generateGeminiCompanionReply,
   generateGeminiCompanionAudioReply,
@@ -51,6 +52,8 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     chips: [
       { label: "📍 मैं कहाँ हूँ?", query: "मैं अभी कहाँ हूँ?" },
       { label: "💊 दवा का समय?", query: "मेरी अगली दवा का समय क्या है?" },
+      { label: "👨‍👩‍👧 मेरा परिवार", query: "मेरे परिवार के लोग कहाँ हैं?" },
+      { label: "☕ चाय का समय", query: "क्या चाय का समय हो गया है?" },
       { label: "📖 शांत लोककथा", query: "मुझे कोई शांत लोककथा सुनाइए।" },
       { label: "🌸 मन शांत करें", query: "मुझे थोड़ा घबराहट महसूस हो रही है।" },
     ],
@@ -78,6 +81,8 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     chips: [
       { label: "📍 আমি কোথায় আছি?", query: "আমি এখন কোথায় আছি?" },
       { label: "💊 ওষুধের সময়?", query: "আমার পরের ওষুধের সময় কখন?" },
+      { label: "👨‍👩‍👧 আমার পরিবার", query: "আমার পরিবারের সবাই কোথায়?" },
+      { label: "☕ এক কাপ চা", query: "একটু চা খাওয়া যাবে কি?" },
       { label: "📖 সুন্দর গল্প", query: "আমাকে একটি সুন্দর গল্প বলুন।" },
       { label: "🌸 মন শান্ত করুন", query: "আমার একটু চিন্তা হচ্ছে।" },
     ],
@@ -105,6 +110,8 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     chips: [
       { label: "📍 মই ক'ত আছোঁ?", query: "মই এতিয়া ক'ত আছোঁ?" },
       { label: "💊 ঔষধৰ সময়?", query: "মোৰ পিছৰ ঔষধ খোৱাৰ সময় কেতিয়া?" },
+      { label: "👨‍👩‍👧 মোৰ পৰিয়াল", query: "মোৰ পৰিয়ালৰ মানুহবোৰ ক'ত?" },
+      { label: "☕ চাহ খোৱাৰ সময়", query: "এতিয়া চাহ খোৱাৰ সময় হ'ল নেকি?" },
       { label: "📖 এটি সাধু কওক", query: "মোক এটি ধুনীয়া সাধু কওক।" },
       { label: "🌸 মন শান্ত কৰক", query: "মোৰ মনটো অলপ অস্থিৰ লাগিছে।" },
     ],
@@ -132,6 +139,8 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     chips: [
       { label: "📍 ꯑꯩ ꯀꯗꯥꯌꯗꯥ ꯂꯩꯔꯤ?", query: "ꯑꯩ ꯍꯧꯖꯤꯛ ꯀꯗꯥꯌꯗꯥ ꯂꯩꯔꯤ?" },
       { label: "💊 ꯍꯤꯗꯥꯛ ꯃꯇꝝ?", query: "ꯍꯤꯗꯥꯛ ꯆꯥꯕꯒꯤ ꯃꯇꯝ ꯀꯗꯥꯏꯗꯅꯣ?" },
+      { label: "👨‍👩‍👧 ꯑꯩꯒꯤ ꯏꯃꯨꯡ", query: "ꯑꯩꯒꯤ ꯏꯃꯨꯡ ꯃꯅꯨꯡ ꯀꯗꯥꯏꯗꯥ ꯂꯩꯔꯤ?" },
+      { label: "☕ ꯆꯥ ꯊꯛꯅꯕꯥ", query: "ꯆꯥ ꯊꯛꯅꯕꯥ ꯃꯇꯝ ꯑꯣꯏꯔꯕ꯭ꯔꯥ?" },
       { label: "📖 ꯋꯥꯔꯤ ꯑꯃꯥ", query: "ꯅꯨꯡꯉꯥꯏꯔꯕꯥ ꯋꯥꯔꯤ ꯑꯃꯥ ꯍꯥꯌꯕꯤꯌꯨ꯫" },
       { label: "🌸 ꯋꯥꯈꯜ ꯅꯨꯡꯉꯥꯏꯍꯅꯕꯥ", query: "ꯋꯥꯈꯜ ꯅꯨꯡꯉꯥꯏꯇꯕꯥ ꯐꯥꯎꯋꯤ꯫" },
     ],
@@ -159,6 +168,8 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     chips: [
       { label: "📍 आं बबेयाव दं?", query: "आं दा बबेयाव दं?" },
       { label: "💊 मुलिनि सम?", query: "मुलि जानायनि सम जाबाय नामा?" },
+      { label: "👨‍👩‍👧 आंनि नखर", query: "आंनि नखरनि मानसिफोरा बबेयाव?" },
+      { label: "☕ साहा लोंनाय", query: "साहा लोंनायनि सम जाबाय नामा?" },
       { label: "📖 सल' खोनासं", query: "आंखौ मोनसे मोजां सल' खोनथा।" },
       { label: "🌸 गोसो शान्ति", query: "आंनि गोसोआ खायफा खायफा मोनदों।" },
     ],
@@ -186,6 +197,8 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     chips: [
       { label: "📍 Nga don haei?", query: "Nga don haei mynta?" },
       { label: "💊 Ka por dawai?", query: "Kano ka por dawai kaba bud?" },
+      { label: "👨‍👩‍👧 Ka ïing ka sem", query: "Haei kiba ha ïing jong nga?" },
+      { label: "☕ Ka por dih sha", query: "La dei ka por ban dih sha?" },
       { label: "📖 Ka puriskam", query: "Iathuh ïa kawei ka puriskam." },
       { label: "🌸 Pynjem jingmut", query: "Nga sngew diaw jingmut." },
     ],
@@ -213,6 +226,8 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     chips: [
       { label: "📍 Khawiah nge ka awm?", query: "Khawiah nge ka awm mek?" },
       { label: "💊 Damdawi ei hun?", query: "Engtikah nge damdawi ei leh hun?" },
+      { label: "👨‍👩‍👧 Ka chhungte", query: "Khawiah nge ka chhungte an awm?" },
+      { label: "☕ Thingpui in hun", query: "Thingpui in a hun tawh em?" },
       { label: "📖 Thawnthu min hrilh", query: "Thawnthu ngaihnawm tak min hrilh rawh." },
       { label: "🌸 Rilru hahdamna", query: "Ka rilru a hah deuh riau mai." },
     ],
@@ -240,6 +255,8 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     chips: [
       { label: "📍 Where am I?", query: "Where am I right now?" },
       { label: "💊 Next medicine?", query: "When is my next medicine?" },
+      { label: "👨‍👩‍👧 My family", query: "Where is my family right now?" },
+      { label: "☕ Tea time?", query: "Is it time for a cup of tea?" },
       { label: "📖 Tell a folk story", query: "Tell me a soothing folk story." },
       { label: "🌸 Help me relax", query: "I am feeling a little restless." },
     ],
@@ -274,6 +291,13 @@ export default function VoiceAssistantButton({
   const [micPermissionDenied, setMicPermissionDenied] = useState<boolean>(false);
   const [userSpokenQuery, setUserSpokenQuery] = useState<string>("");
 
+  // Caregiver AI & Natural Voice settings state
+  const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [apiKeyInput, setApiKeyInput] = useState<string>("");
+  const [hasApiKey, setHasApiKey] = useState<boolean>(false);
+  const [keySavedMessage, setKeySavedMessage] = useState<string>("");
+  const [isTestingVoice, setIsTestingVoice] = useState<boolean>(false);
+
   const loc = ASSISTANT_LOCALES[language] || ASSISTANT_LOCALES.en;
 
   const recognitionRef = useRef<any>(null);
@@ -285,6 +309,13 @@ export default function VoiceAssistantButton({
   const transcriptRef = useRef<string>("");
   const maxTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Sync stored Gemini API Key on open / mount
+  useEffect(() => {
+    const existingKey = offlineMobileStore.getGeminiApiKey();
+    setApiKeyInput(existingKey);
+    setHasApiKey(Boolean(existingKey && existingKey.trim().length > 0));
+  }, [isOpen]);
+
   // Clean up on unmount
   useEffect(() => {
     return () => {
@@ -292,6 +323,52 @@ export default function VoiceAssistantButton({
       cancelListening();
     };
   }, []);
+
+  const handleSaveApiKey = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    offlineMobileStore.setGeminiApiKey(apiKeyInput);
+    const hasKey = Boolean(apiKeyInput && apiKeyInput.trim().length > 0);
+    setHasApiKey(hasKey);
+    setKeySavedMessage(hasKey ? "✓ Gemini API Key saved! Live AI activated." : "✓ Offline clinical engine active.");
+    setTimeout(() => setKeySavedMessage(""), 3500);
+  };
+
+  const handleClearApiKey = () => {
+    setApiKeyInput("");
+    offlineMobileStore.setGeminiApiKey("");
+    setHasApiKey(false);
+    setKeySavedMessage("✓ Reverted to 100% Offline Clinical Engine.");
+    setTimeout(() => setKeySavedMessage(""), 3500);
+  };
+
+  const handleTestNaturalVoice = () => {
+    stopTTS();
+    setIsSpeaking(true);
+    setIsTestingVoice(true);
+    const testPhrases: Record<string, string> = {
+      hi: "नमस्ते दादाजी, मैं स्मृति हूँ। मेरी आवाज अब शांत, सहज और स्वाभाविक है।",
+      bn: "নমস্কার দাদু, আমি স্মৃতি। আমার কণ্ঠ এখন শান্ত এবং স্বাভাবিক।",
+      as: "নমস্কাৰ বৰদেউতা, মই স্মৃতি। মোৰ মাত এতিয়া শান্ত আৰু সহজ।",
+      mni: "ꯈꯨꯔꯨꯝꯖꯔꯤ ꯏꯄꯥ, ꯑꯩ ꯁ꯭ꯃ꯭ꯔꯤꯇꯤꯅꯤ꯫ ꯑꯩꯒꯤ ꯈꯣꯟꯊꯣꯛ ꯑꯁꯤ ꯅꯨꯡꯉꯥꯏꯔꯕꯥ ꯑꯣꯏꯔꯦ꯫",
+      brx: "खुलुमबाय आबौ, आं स्मृति। आंनि गाराङा दा गोजोन आरो मोजां जाबाय।",
+      kha: "Khublei Kpa, nga dei ka Smriti. Ka sur kren jong nga ka la wan jem mynta.",
+      lus: "Chibai Ka Pu, Smriti ka ni e. Ka aw hi a dam tawh hle mai.",
+      en: "Hello Grandfather, I am Smriti. My voice is now warm, gentle, and natural.",
+    };
+    const phrase = testPhrases[language] || testPhrases.en;
+    speakTextWithTTS(
+      phrase,
+      language,
+      () => {
+        setIsSpeaking(false);
+        setIsTestingVoice(false);
+      },
+      () => {
+        setIsSpeaking(false);
+        setIsTestingVoice(false);
+      }
+    );
+  };
 
   const getWebSpeechLang = (lang: string): string => {
     switch (lang) {
@@ -344,6 +421,7 @@ export default function VoiceAssistantButton({
     cancelListening();
     setIsSpeaking(false);
     setIsOpen(false);
+    setShowSettings(false);
     setUserSpokenQuery("");
   };
 
@@ -759,7 +837,7 @@ export default function VoiceAssistantButton({
               overflowY: "auto",
             }}
           >
-            {/* Header / Dismiss */}
+            {/* Header / Dismiss & Settings */}
             <div
               style={{
                 display: "flex",
@@ -770,37 +848,233 @@ export default function VoiceAssistantButton({
                 paddingBottom: "0.6rem",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.45rem", flexWrap: "wrap" }}>
                 <span style={{ fontSize: "1.4rem" }}>🤖</span>
-                <span
-                  id="voice-modal-title"
-                  style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--gray-900)" }}
-                >
-                  {loc.modalTitle}
-                </span>
+                <div>
+                  <span
+                    id="voice-modal-title"
+                    style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--gray-900)" }}
+                  >
+                    {loc.modalTitle}
+                  </span>
+                  {/* Engine Status Pill */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginTop: "2px" }}>
+                    <span
+                      id="ai-engine-status-pill"
+                      style={{
+                        fontSize: "0.7rem",
+                        fontWeight: 700,
+                        padding: "0.15rem 0.5rem",
+                        borderRadius: "999px",
+                        background: hasApiKey ? "#ecfdf5" : "#eff6ff",
+                        color: hasApiKey ? "#065f46" : "#1e40af",
+                        border: hasApiKey ? "1px solid #a7f3d0" : "1px solid #bfdbfe",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.25rem",
+                      }}
+                    >
+                      {hasApiKey ? "⚡ Gemini 1.5 Flash (Live AI)" : "🟢 Smriti Clinical AI (100% Offline)"}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <button
-                type="button"
-                id="voice-assistant-close-btn"
-                onClick={handleClose}
-                aria-label="Close voice assistant"
+
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                <button
+                  type="button"
+                  id="voice-settings-gear-btn"
+                  data-testid="voice-settings-gear-btn"
+                  onClick={() => setShowSettings(!showSettings)}
+                  aria-label="Caregiver AI and Voice Settings"
+                  title="Caregiver AI & Voice Settings"
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: "50%",
+                    border: showSettings ? "2px solid #0284c7" : "1px solid var(--gray-300)",
+                    background: showSettings ? "#e0f2fe" : "var(--gray-100)",
+                    cursor: "pointer",
+                    fontSize: "1.1rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  ⚙️
+                </button>
+                <button
+                  type="button"
+                  id="voice-assistant-close-btn"
+                  onClick={handleClose}
+                  aria-label="Close voice assistant"
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: "50%",
+                    border: "1px solid var(--gray-300)",
+                    background: "var(--gray-100)",
+                    cursor: "pointer",
+                    fontSize: "1.2rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--gray-700)",
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Caregiver AI & Natural Voice Configuration Card */}
+            {showSettings && (
+              <div
+                id="caregiver-voice-settings-card"
                 style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: "50%",
-                  border: "1px solid var(--gray-300)",
-                  background: "var(--gray-100)",
-                  cursor: "pointer",
-                  fontSize: "1.2rem",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "var(--gray-700)",
+                  background: "#f8fafc",
+                  border: "1.5px solid #cbd5e1",
+                  borderRadius: "16px",
+                  padding: "0.9rem",
+                  marginBottom: "1rem",
+                  textAlign: "left",
                 }}
               >
-                ✕
-              </button>
-            </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <div style={{ fontWeight: 800, fontSize: "0.85rem", color: "#0f172a" }}>
+                    🛠️ Caregiver AI & Natural Voice Setup
+                  </div>
+                  <span style={{ fontSize: "0.72rem", color: "#64748b" }}>On-Device Storage</span>
+                </div>
+
+                {/* Gemini API Key config */}
+                <div style={{ marginBottom: "0.75rem" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: "0.76rem",
+                      fontWeight: 700,
+                      color: "#334155",
+                      marginBottom: "0.25rem",
+                    }}
+                  >
+                    Google Gemini API Key (Optional for Cloud AI):
+                  </label>
+                  <div style={{ display: "flex", gap: "0.4rem" }}>
+                    <input
+                      type="password"
+                      value={apiKeyInput}
+                      onChange={(e) => setApiKeyInput(e.target.value)}
+                      placeholder="AIzaSy... (leave blank for offline NLU)"
+                      style={{
+                        flex: 1,
+                        padding: "0.45rem 0.6rem",
+                        borderRadius: "8px",
+                        border: "1px solid #94a3b8",
+                        fontSize: "0.8rem",
+                        fontFamily: "monospace",
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleSaveApiKey()}
+                      style={{
+                        padding: "0.45rem 0.75rem",
+                        background: "#0284c7",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "8px",
+                        fontSize: "0.78rem",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Save
+                    </button>
+                    {hasApiKey && (
+                      <button
+                        type="button"
+                        onClick={handleClearApiKey}
+                        style={{
+                          padding: "0.45rem 0.6rem",
+                          background: "#fee2e2",
+                          color: "#b91c1c",
+                          border: "1px solid #fca5a5",
+                          borderRadius: "8px",
+                          fontSize: "0.75rem",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  {keySavedMessage && (
+                    <div
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        color: "#059669",
+                        marginTop: "0.3rem",
+                      }}
+                    >
+                      {keySavedMessage}
+                    </div>
+                  )}
+                  <div style={{ fontSize: "0.72rem", color: "#64748b", marginTop: "0.3rem", lineHeight: 1.3 }}>
+                    💡 <em>100% Offline by default:</em> Smriti works everywhere without internet using its built-in 12-domain clinical brain. Add a Gemini API key anytime for live generative AI.
+                  </div>
+                </div>
+
+                {/* Natural Voice Test Button */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    paddingTop: "0.5rem",
+                    borderTop: "1px solid #e2e8f0",
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#1e293b" }}>
+                      🎙️ Neural / Natural Human Voice
+                    </div>
+                    <div style={{ fontSize: "0.7rem", color: "#64748b" }}>
+                      Calibrated 0.88x speed, soothing prosody
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleTestNaturalVoice}
+                    disabled={isTestingVoice}
+                    style={{
+                      padding: "0.4rem 0.75rem",
+                      background: isTestingVoice ? "#e2e8f0" : "#dbeafe",
+                      color: isTestingVoice ? "#64748b" : "#1d4ed8",
+                      border: "1px solid #93c5fd",
+                      borderRadius: "8px",
+                      fontSize: "0.76rem",
+                      fontWeight: 700,
+                      cursor: isTestingVoice ? "default" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.3rem",
+                    }}
+                  >
+                    <span>{isTestingVoice ? "🔊 Speaking..." : "🔊 Test Voice"}</span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* ── Prominent Elder Microphone Station ── */}
             <div
@@ -1083,30 +1357,48 @@ export default function VoiceAssistantButton({
                 style={{
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "space-between",
                   gap: "0.4rem",
                   marginBottom: "0.45rem",
                 }}
               >
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    background: isSpeaking ? "#16a34a" : isLoading ? "#f59e0b" : "#0284c7",
-                  }}
-                />
-                <span
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 800,
-                    color: isSpeaking ? "#15803d" : isLoading ? "#b45309" : "#0369a1",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.03em",
-                  }}
-                >
-                  {isSpeaking ? "Speaking 🔊" : isLoading ? "Thinking..." : "AI Companion Reply"}
-                </span>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      background: isSpeaking ? "#16a34a" : isLoading ? "#f59e0b" : "#0284c7",
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: "0.75rem",
+                      fontWeight: 800,
+                      color: isSpeaking ? "#15803d" : isLoading ? "#b45309" : "#0369a1",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.03em",
+                    }}
+                  >
+                    {isSpeaking ? "Speaking 🔊" : isLoading ? "Thinking..." : "AI Companion Reply"}
+                  </span>
+                </div>
+                {currentReply?.source && (
+                  <span
+                    style={{
+                      fontSize: "0.68rem",
+                      fontWeight: 700,
+                      color: currentReply.source === "gemini_online" ? "#065f46" : "#475569",
+                      background: currentReply.source === "gemini_online" ? "#ecfdf5" : "#f1f5f9",
+                      padding: "0.1rem 0.4rem",
+                      borderRadius: "6px",
+                      border: currentReply.source === "gemini_online" ? "1px solid #a7f3d0" : "1px solid #cbd5e1",
+                    }}
+                  >
+                    {currentReply.source === "gemini_online" ? "⚡ Live Gemini AI" : "🟢 Offline Clinical AI"}
+                  </span>
+                )}
               </div>
 
               {/* Main Response Message in Elder's Selected Language */}

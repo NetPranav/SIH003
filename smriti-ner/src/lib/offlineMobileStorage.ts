@@ -146,6 +146,7 @@ const KEYS = {
   CIRCLES: "smriti_offline_circles",
   REMINISCENCE: "smriti_offline_reminiscence",
   ALBUM_PHOTOS: "smriti_offline_album_photos",
+  GEMINI_API_KEY: "smriti_offline_gemini_api_key",
 } as const;
 
 // ── Default Seed Data ────────────────────────────────────────────
@@ -822,6 +823,22 @@ class OfflineMobileStore {
     this.write(KEYS.ASHA_VISITS, []);
     this.write(KEYS.CIRCLES, []);
     this.write(KEYS.REMINISCENCE, []);
+    this.notify();
+  }
+
+  public getGeminiApiKey(): string {
+    if (!this.isClient()) return "";
+    const stored = this.read<string>(KEYS.GEMINI_API_KEY, "");
+    if (stored && stored.trim()) return stored.trim();
+    if (typeof process !== "undefined" && process.env) {
+      return (process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY || "").trim();
+    }
+    return "";
+  }
+
+  public setGeminiApiKey(key: string): void {
+    if (!this.isClient()) return;
+    this.write(KEYS.GEMINI_API_KEY, key.trim());
     this.notify();
   }
 }

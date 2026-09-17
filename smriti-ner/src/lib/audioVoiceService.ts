@@ -109,19 +109,104 @@ export interface SpeakOptions {
 }
 
 /**
- * Strips markdown and emojis so speech synthesis pronounces natural words cleanly.
+ * Selects the highest quality, most natural, human-sounding voice available on the device.
+ * Actively demotes and penalizes mechanical, robotic system voices (like eSpeak or default monotone synthesizers).
+ */
+export function selectBestNaturalVoice(
+  voices: SpeechSynthesisVoice[],
+  targetLang: string
+): SpeechSynthesisVoice | null {
+  if (!voices || voices.length === 0) return null;
+
+  const targetClean = targetLang.toLowerCase().replace("_", "-");
+  const targetPrefix = targetClean.split("-")[0];
+
+  let bestVoice: SpeechSynthesisVoice | null = null;
+  let bestScore = -9999;
+
+  for (const v of voices) {
+    let score = 0;
+    const name = v.name.toLowerCase();
+    const lang = v.lang.toLowerCase().replace("_", "-");
+
+    // 1. Language Match Quality
+    if (lang === targetClean) {
+      score += 200; // Exact dialect (e.g. hi-IN, bn-IN, as-IN, en-IN)
+    } else if (lang.startsWith(targetPrefix)) {
+      score += 120; // Same language root
+    } else if (lang.includes("in") || name.includes("india")) {
+      score += 60; // Familiar Indian accent & cadence for NER elders
+    } else if (lang.startsWith("en")) {
+      score += 30; // English fallback
+    }
+
+    // 2. High-Definition & Natural Speech Engine Bonuses (avoids system voice)
+    if (name.includes("natural")) score += 100;
+    if (name.includes("neural")) score += 100;
+    if (name.includes("google")) score += 80; // Google Cloud/Wavenet voices on Android & Chrome sound remarkably human
+    if (name.includes("premium")) score += 70;
+    if (name.includes("enhanced")) score += 70;
+    if (name.includes("siri")) score += 60;
+    if (name.includes("online")) score += 50;
+
+    // 3. Warm, Soothing, Motherly Timbre (psychiatrically proven to soothe dementia restlessness)
+    if (
+      name.includes("swara") ||
+      name.includes("neerja") ||
+      name.includes("priya") ||
+      name.includes("zira") ||
+      name.includes("samantha") ||
+      name.includes("veena") ||
+      name.includes("kavya") ||
+      name.includes("ananya") ||
+      name.includes("female")
+    ) {
+      score += 45;
+    }
+
+    // 4. Heavy Penalty for Mechanical / Robotic / Flat System Voices
+    if (
+      name.includes("espeak") ||
+      name.includes("desktop") ||
+      name.includes("compact") ||
+      name.includes("robotic") ||
+      name.includes("sampler") ||
+      name.includes("system")
+    ) {
+      score -= 120;
+    }
+
+    // Remote voices on Chrome/Android often have higher acoustic fidelity
+    if (v.localService === false) {
+      score += 30;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestVoice = v;
+    }
+  }
+
+  return bestVoice || voices[0] || null;
+}
+
+/**
+ * Strips markdown, emojis, and formats text for natural, prosodic human speech.
+ * Inserts breath pauses at punctuation so the synthesizer sounds like a compassionate person.
  */
 function cleanTextForSpeech(text: string): string {
   return text
     .replace(/[#*_~`>]/g, "") // markdown symbols
+    .replace(/\(.*?\)/g, "") // parenthetical clinical notes
     .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, "") // emojis
+    .replace(/([।!?\.])\s*/g, "$1 ... ") // add natural breath pause after sentences
     .replace(/\s+/g, " ")
     .trim();
 }
 
 /**
- * Speaks text using the device speech synthesis engine with elderly calibration (0.82x rate).
- * Features automatic fallback for languages missing native voice packs on mobile devices.
+ * Speaks text using the device speech synthesis engine with elderly calibration.
+ * Features natural voice selection, warm pitch (1.04), and conversational pacing (0.88x).
  */
 export function speakSpokenVoice(
   text: string,
@@ -170,9 +255,9 @@ export function speakSpokenVoice(
     const targetLang = (langMap[language] || "en-IN").toLowerCase();
     utterance.lang = targetLang;
 
-    // Geriatric pacing: 0.82x speed for clear auditory processing
-    utterance.rate = options.rate ?? 0.82;
-    utterance.pitch = options.pitch ?? 1.0;
+    // Geriatric prosody: 0.88x speed and 1.04 warm pitch for compassionate tone
+    utterance.rate = options.rate ?? 0.88;
+    utterance.pitch = options.pitch ?? 1.04;
     utterance.volume = 1.0;
 
     // Get fresh voices if cached is empty
@@ -183,34 +268,11 @@ export function speakSpokenVoice(
     }
 
     if (voices && voices.length > 0) {
-      // 1. Exact match (e.g. bn-IN, hi-IN, en-IN)
-      let matched = voices.find(
-        (v) => v.lang.toLowerCase() === targetLang || v.lang.toLowerCase().replace("_", "-") === targetLang
-      );
-
-      // 2. Language prefix match (e.g. "bn" or "hi" or "en")
-      if (!matched) {
-        const langPrefix = targetLang.split("-")[0];
-        matched = voices.find((v) => v.lang.toLowerCase().startsWith(langPrefix));
-      }
-
-      // 3. Indian English / Indian voice fallback (preserves familiar cadence for NER elders)
-      if (!matched) {
-        matched = voices.find(
-          (v) => v.lang.toLowerCase().includes("in") || v.name.toLowerCase().includes("india")
-        );
-      }
-
-      // 4. Any default voice
-      if (!matched) {
-        matched = voices.find((v) => v.default) || voices[0];
-      }
-
-      if (matched) {
-        utterance.voice = matched;
-        // If the device voice doesn't speak the regional language, ensure lang is compatible
-        if (!matched.lang.toLowerCase().startsWith(targetLang.split("-")[0])) {
-          utterance.lang = matched.lang;
+      const bestVoice = selectBestNaturalVoice(voices, targetLang);
+      if (bestVoice) {
+        utterance.voice = bestVoice;
+        if (!bestVoice.lang.toLowerCase().startsWith(targetLang.split("-")[0])) {
+          utterance.lang = bestVoice.lang;
         }
       }
     }
