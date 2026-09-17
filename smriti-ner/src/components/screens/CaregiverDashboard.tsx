@@ -11,6 +11,7 @@ import {
   type PatientProfile,
 } from "@/lib/offlineMobileStorage";
 import { speakSpokenVoice } from "@/lib/audioVoiceService";
+import { testGeminiApiKey } from "@/lib/geminiCompanionService";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -58,6 +59,15 @@ export default function CaregiverDashboard({ navigate }: Props) {
     profile.emergencyContact?.phone || "+91 94350 12345"
   );
 
+  // Gemini API Key & Companion Intelligence Config
+  const [geminiKey, setGeminiKey] = useState<string>(() =>
+    offlineMobileStore.getGeminiApiKey()
+  );
+  const [isTestingKey, setIsTestingKey] = useState<boolean>(false);
+  const [keyFeedback, setKeyFeedback] = useState<{ success: boolean; text: string } | null>(null);
+  const [keySavedMessage, setKeySavedMessage] = useState<string>("");
+  const [showKeyMask, setShowKeyMask] = useState<boolean>(false);
+
   // Subscribe to offline mobile storage updates
   useEffect(() => {
     return offlineMobileStore.subscribe(() => {
@@ -65,10 +75,53 @@ export default function CaregiverDashboard({ navigate }: Props) {
       setReminders(offlineMobileStore.getReminders());
       setPhotos(offlineMobileStore.getAlbumPhotos());
       setAdherenceRate(offlineMobileStore.getAdherenceRate());
+      setGeminiKey(offlineMobileStore.getGeminiApiKey());
     });
   }, []);
 
   // Handlers
+  const handleTestApiKey = async () => {
+    if (!geminiKey.trim()) {
+      setKeyFeedback({ success: false, text: "Please enter an API key to test." });
+      return;
+    }
+    setIsTestingKey(true);
+    setKeyFeedback(null);
+    try {
+      const res = await testGeminiApiKey(geminiKey.trim());
+      setIsTestingKey(false);
+      setKeyFeedback({ success: res.success, text: res.message });
+      if (res.success) {
+        offlineMobileStore.setGeminiApiKey(geminiKey.trim());
+        setKeySavedMessage("✓ Key verified and active across all users and features!");
+        setTimeout(() => setKeySavedMessage(""), 4500);
+      }
+    } catch {
+      setIsTestingKey(false);
+      setKeyFeedback({ success: false, text: "Connection test failed. Check internet." });
+    }
+  };
+
+  const handleSaveApiKey = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    offlineMobileStore.setGeminiApiKey(geminiKey);
+    const hasKey = Boolean(geminiKey && geminiKey.trim().length > 0);
+    setKeySavedMessage(
+      hasKey
+        ? "✓ Custom Gemini API Key saved. Live Cloud AI Companion active."
+        : "✓ Offline Clinical Engine active."
+    );
+    setTimeout(() => setKeySavedMessage(""), 3500);
+  };
+
+  const handleClearApiKey = () => {
+    setGeminiKey("");
+    offlineMobileStore.setGeminiApiKey("");
+    setKeyFeedback(null);
+    setKeySavedMessage("✓ Reverted to 100% On-Device Clinical Rule Engine.");
+    setTimeout(() => setKeySavedMessage(""), 3500);
+  };
+
   const handleToggleMed = (id: string) => {
     triggerHaptic("tap");
     playGentleChime();
@@ -728,6 +781,232 @@ export default function CaregiverDashboard({ navigate }: Props) {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* ── Card 5: AI Companion & Gemini API Configuration ── */}
+      <div
+        style={{
+          background: "#ffffff",
+          border: "1.5px solid #e2e8f0",
+          borderRadius: "16px",
+          padding: "1.25rem",
+          marginBottom: "1.25rem",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: "0.75rem",
+            gap: "0.5rem",
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <h2
+              style={{
+                fontSize: "1rem",
+                fontWeight: 800,
+                margin: 0,
+                color: "#0f172a",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.4rem",
+              }}
+            >
+              <span>AI Companion & Gemini Intelligence</span>
+            </h2>
+            <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "2px" }}>
+              Multi-user Gemini API Key or 100% on-device Clinical AI
+            </div>
+          </div>
+
+          <span
+            style={{
+              fontSize: "0.72rem",
+              fontWeight: 700,
+              padding: "0.2rem 0.6rem",
+              borderRadius: "999px",
+              background: geminiKey.trim() ? "#ecfdf5" : "#eff6ff",
+              color: geminiKey.trim() ? "#065f46" : "#1e40af",
+              border: `1px solid ${geminiKey.trim() ? "#a7f3d0" : "#bfdbfe"}`,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.3rem",
+            }}
+          >
+            <span
+              style={{
+                width: "7px",
+                height: "7px",
+                borderRadius: "50%",
+                background: geminiKey.trim() ? "#10b981" : "#3b82f6",
+              }}
+            />
+            {geminiKey.trim() ? "Live Gemini AI Active" : "Clinical AI (100% On-Device)"}
+          </span>
+        </div>
+
+        <p style={{ fontSize: "0.8rem", color: "#475569", lineHeight: 1.45, margin: "0 0 0.85rem" }}>
+          Evaluators and caregivers can use their own Google Gemini API key. The key is securely saved on-device and will power real-time conversational intelligence for all users. If left blank or offline, Smriti-NER automatically utilizes its internal clinical brain across all 8 Northeast Indian languages.
+        </p>
+
+        <form onSubmit={handleSaveApiKey} style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+          <div style={{ position: "relative" }}>
+            <label
+              htmlFor="gemini-key-input"
+              style={{
+                display: "block",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                color: "#334155",
+                marginBottom: "0.3rem",
+              }}
+            >
+              Gemini API Key
+            </label>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <input
+                id="gemini-key-input"
+                type={showKeyMask ? "text" : "password"}
+                value={geminiKey}
+                onChange={(e) => {
+                  setGeminiKey(e.target.value);
+                  setKeyFeedback(null);
+                }}
+                placeholder="AIzaSy... (Paste Gemini API Key)"
+                autoComplete="off"
+                spellCheck={false}
+                style={{
+                  flex: 1,
+                  padding: "0.6rem 0.85rem",
+                  fontSize: "0.82rem",
+                  fontFamily: "monospace",
+                  border: "1.5px solid #cbd5e1",
+                  borderRadius: "10px",
+                  background: "#f8fafc",
+                  color: "#0f172a",
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowKeyMask((prev) => !prev)}
+                style={{
+                  padding: "0.6rem 0.75rem",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  border: "1.5px solid #cbd5e1",
+                  borderRadius: "10px",
+                  background: "#ffffff",
+                  color: "#475569",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {showKeyMask ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+
+          {/* Test & Save & Clear Action Buttons */}
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.25rem" }}>
+            <button
+              type="button"
+              disabled={isTestingKey || !geminiKey.trim()}
+              onClick={handleTestApiKey}
+              style={{
+                flex: "1 1 auto",
+                padding: "0.6rem 0.9rem",
+                fontSize: "0.78rem",
+                fontWeight: 700,
+                border: "1.5px solid #3b82f6",
+                borderRadius: "10px",
+                background: "#eff6ff",
+                color: "#1d4ed8",
+                cursor: isTestingKey || !geminiKey.trim() ? "not-allowed" : "pointer",
+                opacity: isTestingKey || !geminiKey.trim() ? 0.6 : 1,
+              }}
+            >
+              {isTestingKey ? "Testing Connection..." : "⚡ Test Key"}
+            </button>
+
+            <button
+              type="submit"
+              style={{
+                flex: "1 1 auto",
+                padding: "0.6rem 1rem",
+                fontSize: "0.78rem",
+                fontWeight: 700,
+                border: "none",
+                borderRadius: "10px",
+                background: "#0f172a",
+                color: "#ffffff",
+                cursor: "pointer",
+              }}
+            >
+              Save Configuration
+            </button>
+
+            {geminiKey.trim() && (
+              <button
+                type="button"
+                onClick={handleClearApiKey}
+                style={{
+                  padding: "0.6rem 0.75rem",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  border: "1.5px solid #e2e8f0",
+                  borderRadius: "10px",
+                  background: "#ffffff",
+                  color: "#ef4444",
+                  cursor: "pointer",
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          {/* Key Test Feedback */}
+          {keyFeedback && (
+            <div
+              style={{
+                padding: "0.55rem 0.75rem",
+                borderRadius: "8px",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                marginTop: "0.3rem",
+                background: keyFeedback.success ? "#ecfdf5" : "#fef2f2",
+                color: keyFeedback.success ? "#065f46" : "#b91c1c",
+                border: `1px solid ${keyFeedback.success ? "#a7f3d0" : "#fecaca"}`,
+              }}
+            >
+              {keyFeedback.text}
+            </div>
+          )}
+
+          {/* Key Saved Message */}
+          {keySavedMessage && (
+            <div
+              style={{
+                padding: "0.55rem 0.75rem",
+                borderRadius: "8px",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                marginTop: "0.3rem",
+                background: "#f0fdf4",
+                color: "#15803d",
+                border: "1px solid #bbf7d0",
+              }}
+            >
+              {keySavedMessage}
+            </div>
+          )}
+        </form>
       </div>
 
       {/* ── MODAL: Add Medication / Care Item ── */}

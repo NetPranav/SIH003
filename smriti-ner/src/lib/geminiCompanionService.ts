@@ -126,6 +126,12 @@ const OFFLINE_CLINICAL_BRAIN: Record<string, Record<string, CompanionResponse>> 
       language: "hi",
       emotionTone: "REASSURING",
     },
+    wellbeing_positive: {
+      replyText: "यह सुनकर मन बहुत प्रसन्न हुआ दादाजी! यह जानकर बहुत सुकून मिला कि आप अच्छा और सहज महसूस कर रहे हैं। हम सब आपके साथ हैं, आराम से बैठिए।",
+      englishTranslation: "That brings such warmth to hear, grandfather! It is a relief to know you feel good and at ease today. We are always by your side.",
+      language: "hi",
+      emotionTone: "VALIDATING",
+    },
     default: {
       replyText: "हाँ दादाजी, मैं आपकी बात सुन रही हूँ। आप बहुत अच्छे हैं और हम सब आपके साथ हैं। चिंता बिल्कुल मत कीजिए।",
       englishTranslation: "Yes grandfather, I am listening to you. You are doing wonderfully and we are right beside you.",
@@ -202,6 +208,12 @@ const OFFLINE_CLINICAL_BRAIN: Record<string, Record<string, CompanionResponse>> 
       englishTranslation: "Namaskar grandfather! How is your health and mood today? How may I assist you?",
       language: "as",
       emotionTone: "REASSURING",
+    },
+    wellbeing_positive: {
+      replyText: "শুনি বৰ আনন্দ লাগিল বৰদেউতা! আজি আপোনাৰ গা-মন ভালে আছে আৰু মনটো শান্ত হৈ আছে বুলি জানি বৰ সকাহ পালোঁ। চিন্তাৰ কোনো কাৰণ নাই, আমি আছোঁ।",
+      englishTranslation: "That brings great joy to hear, grandfather! So comforting to know you are feeling well and peaceful today.",
+      language: "as",
+      emotionTone: "VALIDATING",
     },
     default: {
       replyText: "হয় বৰদেউতা, মই আপোনাৰ কথা শুনি আছোঁ। আপুনি বৰ মৰমৰ মানুহ। অলপো চিন্তা নকৰিব, আমি আছোঁ।",
@@ -280,6 +292,12 @@ const OFFLINE_CLINICAL_BRAIN: Record<string, Record<string, CompanionResponse>> 
       language: "bn",
       emotionTone: "REASSURING",
     },
+    wellbeing_positive: {
+      replyText: "শুনে মনটা খুব শান্ত হলো দাদু! আপনি আজ ভালো বোধ করছেন এবং আরাম পাচ্ছেন জেনে খুব খুশি হলাম। আমরা সবসময় আপনার পাশে আছি।",
+      englishTranslation: "Hearing that brings great peace, grandfather! Truly glad you are feeling well and comfortable today.",
+      language: "bn",
+      emotionTone: "VALIDATING",
+    },
     default: {
       replyText: "হ্যাঁ দাদু, আমি আপনার কথা শুনছি। আপনি নিশ্চিন্ত থাকুন, আমরা সবাই আপনার সাথে আছি।",
       englishTranslation: "Yes grandfather, I am listening to you. Rest assured, we are all here with you.",
@@ -356,6 +374,12 @@ const OFFLINE_CLINICAL_BRAIN: Record<string, Record<string, CompanionResponse>> 
       englishTranslation: "Warm greetings grandfather! How are you feeling today?",
       language: "en",
       emotionTone: "REASSURING",
+    },
+    wellbeing_positive: {
+      replyText: "That is truly wonderful to hear, grandfather! I am so glad your heart and mind feel peaceful and comfortable today. You are safe, cherished, and we are right here with you.",
+      englishTranslation: "That is truly wonderful to hear, grandfather! I am so glad your heart and mind feel peaceful and comfortable today.",
+      language: "en",
+      emotionTone: "VALIDATING",
     },
     default: {
       replyText: "Yes grandfather, I am listening to you. You are doing wonderfully and we are right here beside you.",
@@ -574,6 +598,37 @@ export function classifyElderIntent(prompt: string): string {
     return "greetings";
   }
 
+  // 12. Well-being, Mood & Emotional State
+  if (
+    p.includes("feeling ok") ||
+    p.includes("feeling good") ||
+    p.includes("feeling well") ||
+    p.includes("feeling fine") ||
+    p.includes("feeling better") ||
+    p.includes("i am ok") ||
+    p.includes("i am fine") ||
+    p.includes("i am feeling ok") ||
+    p.includes("i am feeling good") ||
+    p.includes("i'm ok") ||
+    p.includes("i'm fine") ||
+    p.includes("i'm feeling ok") ||
+    p.includes("doing ok") ||
+    p.includes("doing fine") ||
+    p.includes("doing well") ||
+    p.includes("all right") ||
+    p.includes("alright") ||
+    p.includes("अच्छा लग रहा") ||
+    p.includes("मैं ठीक हूँ") ||
+    p.includes("सब ठीक है") ||
+    p.includes("ভাল লাগিছে") ||
+    p.includes("ভালে আছোঁ") ||
+    p.includes("ভালো আছি") ||
+    p.includes("ভালো লাগছে") ||
+    p.includes("নুংঙাইরে")
+  ) {
+    return "wellbeing_positive";
+  }
+
   return "default";
 }
 
@@ -748,3 +803,42 @@ export function speakTextWithTTS(
 export function stopTTS(): void {
   stopAllSpeech();
 }
+
+/**
+ * Tests if a Gemini API key is valid and responsive
+ */
+export async function testGeminiApiKey(
+  apiKey: string
+): Promise<{ success: boolean; message: string }> {
+  const cleanKey = apiKey.trim();
+  if (!cleanKey) {
+    return { success: false, message: "Please enter an API key to test." };
+  }
+
+  if (typeof window !== "undefined" && !navigator.onLine) {
+    return { success: false, message: "Device is currently offline. Key will be saved for when connectivity returns." };
+  }
+
+  try {
+    const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanKey}`;
+    const res = await fetch(testUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: "ping" }] }],
+        generationConfig: { maxOutputTokens: 5 },
+      }),
+    });
+
+    if (res.ok) {
+      return { success: true, message: "Connected successfully to Google Gemini 1.5 Flash!" };
+    }
+
+    const errJson = await res.json().catch(() => null);
+    const errMsg = errJson?.error?.message || `HTTP ${res.status}: ${res.statusText}`;
+    return { success: false, message: `Key error: ${errMsg}` };
+  } catch (err: any) {
+    return { success: false, message: `Network request error: ${err?.message || "Check connection"}` };
+  }
+}
+

@@ -10,6 +10,7 @@ import {
   generateGeminiCompanionAudioReply,
   speakTextWithTTS,
   stopTTS,
+  testGeminiApiKey,
   type CompanionResponse,
 } from "@/lib/geminiCompanionService";
 
@@ -276,6 +277,47 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
   },
 };
 
+/**
+ * Deduplicates repeated tokens and repeated phrases caused by Android WebSpeech interim accumulation
+ */
+function cleanDuplicateSpeechWords(raw: string): string {
+  if (!raw) return "";
+  const words = raw.replace(/\s+/g, " ").trim().split(" ");
+  const out: string[] = [];
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i];
+    const prev = out[out.length - 1];
+    if (!prev || w.toLowerCase() !== prev.toLowerCase()) {
+      out.push(w);
+    }
+  }
+  let result = out.join(" ");
+
+  // Clean repeated phrase chunks (e.g. "I am feeling I am feeling ok")
+  for (let len = 2; len <= 4; len++) {
+    const tokens = result.split(" ");
+    if (tokens.length >= len * 2) {
+      const cleaned: string[] = [];
+      let j = 0;
+      while (j < tokens.length) {
+        if (j + len * 2 <= tokens.length) {
+          const p1 = tokens.slice(j, j + len).join(" ").toLowerCase();
+          const p2 = tokens.slice(j + len, j + len * 2).join(" ").toLowerCase();
+          if (p1 === p2) {
+            cleaned.push(...tokens.slice(j, j + len));
+            j += len * 2;
+            continue;
+          }
+        }
+        cleaned.push(tokens[j]);
+        j++;
+      }
+      result = cleaned.join(" ");
+    }
+  }
+  return result.trim();
+}
+
 export default function VoiceAssistantButton({
   language = "en",
   navigate,
@@ -297,6 +339,8 @@ export default function VoiceAssistantButton({
   const [hasApiKey, setHasApiKey] = useState<boolean>(false);
   const [keySavedMessage, setKeySavedMessage] = useState<string>("");
   const [isTestingVoice, setIsTestingVoice] = useState<boolean>(false);
+  const [isTestingKey, setIsTestingKey] = useState<boolean>(false);
+  const [keyTestFeedback, setKeyTestFeedback] = useState<{ success: boolean; text: string } | null>(null);
 
   const loc = ASSISTANT_LOCALES[language] || ASSISTANT_LOCALES.en;
 
@@ -323,6 +367,29 @@ export default function VoiceAssistantButton({
     };
   }, []);
 
+  const handleTestApiKey = async () => {
+    if (!apiKeyInput.trim()) {
+      setKeyTestFeedback({ success: false, text: "Please enter an API key to test." });
+      return;
+    }
+    setIsTestingKey(true);
+    setKeyTestFeedback(null);
+    try {
+      const res = await testGeminiApiKey(apiKeyInput.trim());
+      setIsTestingKey(false);
+      setKeyTestFeedback({ success: res.success, text: res.message });
+      if (res.success) {
+        offlineMobileStore.setGeminiApiKey(apiKeyInput.trim());
+        setHasApiKey(true);
+        setKeySavedMessage("✓ Key verified and active for all users!");
+        setTimeout(() => setKeySavedMessage(""), 4000);
+      }
+    } catch {
+      setIsTestingKey(false);
+      setKeyTestFeedback({ success: false, text: "Connection test failed. Check internet." });
+    }
+  };
+
   const handleSaveApiKey = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     offlineMobileStore.setGeminiApiKey(apiKeyInput);
@@ -336,12 +403,12 @@ export default function VoiceAssistantButton({
     setApiKeyInput("");
     offlineMobileStore.setGeminiApiKey("");
     setHasApiKey(false);
+    setKeyTestFeedback(null);
     setKeySavedMessage("✓ Reverted to 100% Offline Clinical Engine.");
     setTimeout(() => setKeySavedMessage(""), 3500);
   };
 
   const handleTestNaturalVoice = () => {
-    stopTTS();
     setIsSpeaking(true);
     setIsTestingVoice(true);
     const testPhrases: Record<string, string> = {
@@ -430,6 +497,13 @@ export default function VoiceAssistantButton({
    */
   const startListening = () => {
     try {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+        recognitionRef.current = null;
+      }
+
       stopTTS();
       setIsSpeaking(false);
       setLiveTranscript("");
@@ -459,24 +533,19 @@ export default function VoiceAssistantButton({
       if (SpeechRecognition) {
         try {
           const recognition = new SpeechRecognition();
-          recognition.continuous = true;
+          recognition.continuous = false; // Single query utterance to prevent duplicate phrase accumulation
           recognition.interimResults = true;
           recognition.lang = getWebSpeechLang(language);
 
           recognition.onresult = (event: any) => {
-            let interim = "";
-            let final = "";
-            for (let i = 0; i < event.results.length; ++i) {
-              if (event.results[i].isFinal) {
-                final += event.results[i][0].transcript + " ";
-              } else {
-                interim += event.results[i][0].transcript;
-              }
+            let currentStr = "";
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              currentStr += event.results[i][0].transcript;
             }
-            const currentCombined = (final + interim).trim();
-            if (currentCombined) {
-              setLiveTranscript(currentCombined);
-              transcriptRef.current = currentCombined;
+            const cleaned = cleanDuplicateSpeechWords(currentStr);
+            if (cleaned) {
+              setLiveTranscript(cleaned);
+              transcriptRef.current = cleaned;
             }
           };
 
@@ -488,7 +557,12 @@ export default function VoiceAssistantButton({
           };
 
           recognition.onend = () => {
-            // Speech engine stopped
+            // If user finished speaking their sentence, auto-submit
+            if (transcriptRef.current && transcriptRef.current.trim().length > 1) {
+              stopListeningAndSubmit();
+            } else {
+              setIsListeningMic(false);
+            }
           };
 
           recognition.start();
@@ -578,10 +652,12 @@ export default function VoiceAssistantButton({
         streamRef.current = null;
       }
 
-      const recognizedText = (transcriptRef.current || liveTranscript).trim();
+      const rawText = (transcriptRef.current || liveTranscript).trim();
+      const recognizedText = cleanDuplicateSpeechWords(rawText);
       if (recognizedText) {
         setUserSpokenQuery(recognizedText);
         setLiveTranscript("");
+        transcriptRef.current = "";
         handleSendQuery(recognizedText);
         return;
       }
@@ -679,7 +755,6 @@ export default function VoiceAssistantButton({
     setUserSpokenQuery(queryText.trim());
     setInputText("");
     setIsLoading(true);
-    stopTTS();
     setIsSpeaking(false);
 
     try {
@@ -703,7 +778,6 @@ export default function VoiceAssistantButton({
 
   const handleReplay = () => {
     if (!currentReply) return;
-    stopTTS();
     setIsSpeaking(true);
     speakTextWithTTS(
       currentReply.replyText,
@@ -814,20 +888,28 @@ export default function VoiceAssistantButton({
                   {loc.modalTitle}
                 </span>
                 <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginTop: "2px" }}>
-                  <span
+                  <button
+                    type="button"
+                    onClick={() => setShowSettings(!showSettings)}
                     id="ai-engine-status-pill"
                     style={{
                       fontSize: "0.7rem",
                       fontWeight: 700,
-                      padding: "0.15rem 0.5rem",
+                      padding: "0.15rem 0.55rem",
                       borderRadius: "999px",
-                      background: hasApiKey ? "#ecfdf5" : "#eff6ff",
-                      color: hasApiKey ? "#065f46" : "#1e40af",
-                      border: hasApiKey ? "1px solid #a7f3d0" : "1px solid #bfdbfe",
+                      background: hasApiKey ? "#ecfdf5" : "#f1f5f9",
+                      color: hasApiKey ? "#065f46" : "#475569",
+                      border: hasApiKey ? "1px solid #a7f3d0" : "1px solid #cbd5e1",
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.3rem",
                     }}
                   >
-                    {hasApiKey ? "Live AI (Gemini 1.5)" : "Clinical AI (Offline)"}
-                  </span>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: hasApiKey ? "#10b981" : "#0284c7" }} />
+                    <span>{hasApiKey ? "Live Gemini AI (Active)" : "Clinical AI (On-Device)"}</span>
+                    <span style={{ fontSize: "0.65rem", opacity: 0.8 }}>• Setup</span>
+                  </button>
                 </div>
               </div>
 
@@ -900,7 +982,7 @@ export default function VoiceAssistantButton({
                       type="password"
                       value={apiKeyInput}
                       onChange={(e) => setApiKeyInput(e.target.value)}
-                      placeholder="Leave blank for offline engine"
+                      placeholder="Paste Gemini API Key (AIza...)"
                       style={{
                         flex: 1,
                         padding: "0.45rem 0.6rem",
@@ -911,14 +993,31 @@ export default function VoiceAssistantButton({
                     />
                     <button
                       type="button"
+                      disabled={isTestingKey}
+                      onClick={handleTestApiKey}
+                      style={{
+                        padding: "0.45rem 0.65rem",
+                        background: "#059669",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "8px",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        cursor: isTestingKey ? "wait" : "pointer",
+                      }}
+                    >
+                      {isTestingKey ? "Testing..." : "Test Key"}
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleSaveApiKey()}
                       style={{
-                        padding: "0.45rem 0.75rem",
+                        padding: "0.45rem 0.65rem",
                         background: "#0284c7",
                         color: "#ffffff",
                         border: "none",
                         borderRadius: "8px",
-                        fontSize: "0.76rem",
+                        fontSize: "0.75rem",
                         fontWeight: 700,
                         cursor: "pointer",
                       }}
@@ -930,7 +1029,7 @@ export default function VoiceAssistantButton({
                         type="button"
                         onClick={handleClearApiKey}
                         style={{
-                          padding: "0.45rem 0.6rem",
+                          padding: "0.45rem 0.55rem",
                           background: "#fee2e2",
                           color: "#b91c1c",
                           border: "1px solid #fca5a5",
@@ -944,11 +1043,31 @@ export default function VoiceAssistantButton({
                       </button>
                     )}
                   </div>
+
+                  {keyTestFeedback && (
+                    <div style={{
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      marginTop: "0.35rem",
+                      padding: "0.35rem 0.6rem",
+                      borderRadius: "6px",
+                      background: keyTestFeedback.success ? "#d1fae5" : "#fee2e2",
+                      color: keyTestFeedback.success ? "#065f46" : "#991b1b",
+                      border: keyTestFeedback.success ? "1px solid #6ee7b7" : "1px solid #fca5a5",
+                    }}>
+                      {keyTestFeedback.success ? "✓ " : "✕ "}{keyTestFeedback.text}
+                    </div>
+                  )}
+
                   {keySavedMessage && (
                     <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#059669", marginTop: "0.25rem" }}>
                       {keySavedMessage}
                     </div>
                   )}
+
+                  <div style={{ fontSize: "0.68rem", color: "#64748b", marginTop: "0.35rem" }}>
+                    Works 100% offline or with your custom Gemini API key. Each caregiver or user can enter their personal key here.
+                  </div>
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "0.5rem", borderTop: "1px solid #e2e8f0" }}>

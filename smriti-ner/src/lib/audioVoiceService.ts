@@ -1,15 +1,18 @@
 // ── SMRITI-NER AUDIO & RESILIENT GERIATRIC SPEECH ENGINE ────────────────────
-// Sub-Phase 21.1, 21.2, 21.3: WebAudio context unlocking, dual-engine voice
-// synthesis, geriatric calming cadence (0.82x), and kinship reminder prompts.
+// Fixed: Android V8 garbage collection prevention, cancel-before-speak race condition,
+// removal of queue-blocking silent space utterance, and intelligent Indic dialect resolution.
 
 "use client";
 
-import { playGentleChime, playTone } from "./audio";
+import { playTone } from "./audio";
 
-// ── 1. User-Gesture Audio Context & WebSpeech Unlocker ───────────────
+// ── 1. Global User-Gesture Audio Context & WebSpeech Unlocker ─────────
 let isAudioUnlocked = false;
 let unlockedAudioContext: AudioContext | null = null;
 let cachedVoices: SpeechSynthesisVoice[] = [];
+let activeUtterance: SpeechSynthesisUtterance | null = null;
+let keepAliveTimer: number | null = null;
+let pendingSpeechTimeout: number | null = null;
 
 /**
  * Initializes global user-gesture listeners to unlock WebAudio & WebSpeech
@@ -39,14 +42,11 @@ export function initAudioContextUnlocker(): void {
       // ignore
     }
 
-    // 2. Unlock WebSpeech Synthesis with a silent warm-up utterance
+    // 2. Unpause WebSpeech Synthesis safely
+    // (Note: Do NOT speak an empty space " ", which stalls Android TTS queues indefinitely)
     try {
       if ("speechSynthesis" in window && window.speechSynthesis) {
         window.speechSynthesis.resume();
-        const silentUtterance = new SpeechSynthesisUtterance(" ");
-        silentUtterance.volume = 0.01;
-        silentUtterance.rate = 1.0;
-        window.speechSynthesis.speak(silentUtterance);
         cachedVoices = window.speechSynthesis.getVoices() || [];
       }
     } catch {
@@ -109,94 +109,77 @@ export interface SpeakOptions {
 }
 
 /**
- * Selects the highest quality, most natural, human-sounding voice available on the device.
- * Actively demotes and penalizes mechanical, robotic system voices (like eSpeak or default monotone synthesizers).
- */
-/**
- * Selects the highest quality, most natural, human-sounding voice available on the device.
- * Guarantees language compatibility: never assigns an English voice to Hindi/Bengali/Assamese text.
+ * Intelligent voice & dialect resolver.
+ * Ensures an active voice is always paired with a valid, supported BCP-47 locale tag,
+ * avoiding silent failure on Android when regional voice packs are absent.
  */
 export function selectBestNaturalVoice(
   voices: SpeechSynthesisVoice[],
   targetLang: string
-): SpeechSynthesisVoice | null {
-  if (!voices || voices.length === 0) return null;
+): { voice: SpeechSynthesisVoice | null; actualLang: string } {
+  if (!voices || voices.length === 0) {
+    return { voice: null, actualLang: "en-IN" };
+  }
 
-  const targetClean = targetLang.toLowerCase().replace("_", "-");
-  const targetPrefix = targetClean.split("-")[0];
-  const isTargetEnglish = targetPrefix === "en";
+  const targetPrefix = targetLang.toLowerCase().split("-")[0];
 
-  let bestVoice: SpeechSynthesisVoice | null = null;
-  let bestScore = -9999;
+  // Language fallback hierarchy for Northeast regional scripts
+  const searchPrefixes: string[] = [];
+  if (targetPrefix === "as") {
+    searchPrefixes.push("as", "bn", "hi", "en");
+  } else if (targetPrefix === "bn") {
+    searchPrefixes.push("bn", "as", "hi", "en");
+  } else if (targetPrefix === "hi" || targetPrefix === "brx") {
+    searchPrefixes.push("hi", "en");
+  } else if (targetPrefix === "mni") {
+    searchPrefixes.push("mni", "bn", "hi", "en");
+  } else if (targetPrefix === "kha" || targetPrefix === "lus") {
+    searchPrefixes.push("en", "hi");
+  } else {
+    searchPrefixes.push("en", "hi");
+  }
 
-  for (const v of voices) {
-    let score = 0;
-    const name = v.name.toLowerCase();
-    const lang = v.lang.toLowerCase().replace("_", "-");
-    const voicePrefix = lang.split("-")[0];
+  for (const prefix of searchPrefixes) {
+    let bestCandidate: SpeechSynthesisVoice | null = null;
+    let bestScore = -9999;
 
-    // Language Compatibility Guard:
-    // If target is non-English (e.g. Hindi, Bengali, Assamese), REJECT foreign language voices
-    if (!isTargetEnglish && voicePrefix !== targetPrefix) {
-      continue; // Never match an English or Spanish voice to Hindi/Bengali/Assamese script!
+    for (const v of voices) {
+      const vLang = v.lang.toLowerCase().replace("_", "-");
+      const vPrefix = vLang.split("-")[0];
+      const name = v.name.toLowerCase();
+
+      if (vPrefix !== prefix) continue;
+
+      let score = 0;
+      if (vLang.includes("in") || name.includes("india")) score += 80;
+      if (name.includes("natural")) score += 100;
+      if (name.includes("neural")) score += 100;
+      if (name.includes("google")) score += 80;
+      if (name.includes("female") || name.includes("neerja") || name.includes("swara") || name.includes("priya")) score += 40;
+
+      // Penalize robotic voices
+      if (name.includes("espeak") || name.includes("sampler") || name.includes("compact")) score -= 100;
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestCandidate = v;
+      }
     }
 
-    // 1. Language Match Quality
-    if (lang === targetClean) {
-      score += 250; // Exact dialect match (e.g. hi-IN, bn-IN, as-IN, en-IN)
-    } else if (voicePrefix === targetPrefix) {
-      score += 180; // Same language root
-    } else if (isTargetEnglish && (lang.includes("in") || name.includes("india"))) {
-      score += 60; // Indian English accent for elders
-    }
-
-    // 2. High-Definition & Natural Speech Engine Bonuses
-    if (name.includes("natural")) score += 100;
-    if (name.includes("neural")) score += 100;
-    if (name.includes("google")) score += 80;
-    if (name.includes("premium")) score += 70;
-    if (name.includes("enhanced")) score += 70;
-    if (name.includes("siri")) score += 60;
-    if (name.includes("online")) score += 50;
-
-    // 3. Warm, Soothing, Motherly Timbre
-    if (
-      name.includes("swara") ||
-      name.includes("neerja") ||
-      name.includes("priya") ||
-      name.includes("zira") ||
-      name.includes("samantha") ||
-      name.includes("veena") ||
-      name.includes("kavya") ||
-      name.includes("ananya") ||
-      name.includes("female")
-    ) {
-      score += 45;
-    }
-
-    // 4. Heavy Penalty for Mechanical / Robotic / Flat System Voices
-    if (
-      name.includes("espeak") ||
-      name.includes("desktop") ||
-      name.includes("compact") ||
-      name.includes("robotic") ||
-      name.includes("sampler") ||
-      name.includes("system")
-    ) {
-      score -= 150;
-    }
-
-    if (v.localService === false) {
-      score += 25;
-    }
-
-    if (score > bestScore) {
-      bestScore = score;
-      bestVoice = v;
+    if (bestCandidate) {
+      return {
+        voice: bestCandidate,
+        actualLang: bestCandidate.lang || (prefix === "en" ? "en-IN" : `${prefix}-IN`),
+      };
     }
   }
 
-  return bestVoice;
+  // Final fallback: use the first available voice on the device
+  const defaultVoice = voices.find((v) => v.default) || voices[0];
+  return {
+    voice: defaultVoice,
+    actualLang: defaultVoice?.lang || "en-US",
+  };
 }
 
 /**
@@ -215,7 +198,8 @@ function cleanTextForSpeech(text: string): string {
 
 /**
  * Speaks text using the device speech synthesis engine with elderly calibration.
- * Features natural voice selection, warm pitch (1.04), and conversational pacing (0.88x).
+ * Features natural voice selection, warm pitch (1.0), conversational pacing (0.88x),
+ * and persistent memory protection against Android V8 garbage collection.
  */
 export function speakSpokenVoice(
   text: string,
@@ -234,39 +218,61 @@ export function speakSpokenVoice(
   }
 
   if (!("speechSynthesis" in window) || !window.speechSynthesis) {
-    console.debug("WebSpeech not supported, playing parametric harmonic cadence");
     playParametricFormantCadence(cleanText.length);
-    setTimeout(() => options.onEnd?.(), 1500);
+    setTimeout(() => options.onEnd?.(), 1200);
     return true;
   }
 
   try {
-    // Unpause speech engine if suspended
+    // 1. Cancel previous pending speech and cancel any stuck speech
+    if (pendingSpeechTimeout) {
+      clearTimeout(pendingSpeechTimeout);
+      pendingSpeechTimeout = null;
+    }
+    if (keepAliveTimer) {
+      clearInterval(keepAliveTimer);
+      keepAliveTimer = null;
+    }
+
+    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch {}
+    }
+    if (window.speechSynthesis.paused) {
+      try {
+        window.speechSynthesis.resume();
+      } catch {}
+    }
+
+    // 2. Wait 70ms before speaking to let Android native TextToSpeech binder reset
+    pendingSpeechTimeout = window.setTimeout(() => {
+      executeSpeechSynthesis(cleanText, language, options);
+    }, 70);
+
+    return true;
+  } catch (err) {
+    console.warn("speakSpokenVoice error:", err);
+    playParametricFormantCadence(cleanText.length);
+    options.onError?.();
+    return false;
+  }
+}
+
+/**
+ * Internal execution with persistent utterance reference
+ */
+function executeSpeechSynthesis(
+  cleanText: string,
+  language: string,
+  options: SpeakOptions
+): void {
+  try {
     if (window.speechSynthesis.paused) {
       window.speechSynthesis.resume();
     }
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
-
-    // Map language to BCP-47 tag
-    const langMap: Record<string, string> = {
-      as: "as-IN",
-      bn: "bn-IN",
-      hi: "hi-IN",
-      mni: "mni-IN",
-      brx: "hi-IN",
-      kha: "en-IN",
-      lus: "en-IN",
-      en: "en-IN",
-    };
-    const targetLang = (langMap[language] || "en-IN").toLowerCase();
-    const targetPrefix = targetLang.split("-")[0];
-    utterance.lang = targetLang;
-
-    // Geriatric prosody: 0.88x speed and 1.04 warm pitch for compassionate tone
-    utterance.rate = options.rate ?? 0.88;
-    utterance.pitch = options.pitch ?? 1.04;
-    utterance.volume = 1.0;
 
     // Retrieve fresh voices
     let voices = window.speechSynthesis.getVoices();
@@ -274,18 +280,31 @@ export function speakSpokenVoice(
       voices = cachedVoices || [];
     }
 
-    if (voices && voices.length > 0) {
-      const bestVoice = selectBestNaturalVoice(voices, targetLang);
-      if (bestVoice) {
-        utterance.voice = bestVoice;
-        utterance.lang = bestVoice.lang;
-      }
+    const { voice, actualLang } = selectBestNaturalVoice(voices, language);
+    if (voice) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang || actualLang;
+    } else {
+      utterance.lang = actualLang;
     }
+
+    // Geriatric prosody: 0.88x speed and 1.0 pitch for compassionate, clear tone
+    utterance.rate = options.rate ?? 0.88;
+    utterance.pitch = options.pitch ?? 1.0;
+    utterance.volume = 1.0;
 
     let hasEnded = false;
     const safeComplete = () => {
       if (!hasEnded) {
         hasEnded = true;
+        if (keepAliveTimer) {
+          clearInterval(keepAliveTimer);
+          keepAliveTimer = null;
+        }
+        activeUtterance = null;
+        if (typeof window !== "undefined") {
+          (window as unknown as { __smritiSpeechActiveUtterance: unknown }).__smritiSpeechActiveUtterance = null;
+        }
         options.onEnd?.();
       }
     };
@@ -299,27 +318,39 @@ export function speakSpokenVoice(
     };
 
     utterance.onerror = (e) => {
-      console.debug("Speech synthesis notice:", e);
-      playParametricFormantCadence(cleanText.length);
+      console.debug("Speech synthesis notice:", e?.error);
+      if (e?.error !== "canceled" && e?.error !== "interrupted") {
+        playParametricFormantCadence(cleanText.length);
+      }
       safeComplete();
     };
 
-    // Safety timeout: prevent UI being permanently stuck in "speaking" state
-    const expectedDurationMs = Math.max(2500, (cleanText.length / 10) * 1000);
-    setTimeout(() => {
-      if (!hasEnded && window.speechSynthesis && window.speechSynthesis.speaking) {
+    // Store in module variable AND window global to completely prevent V8 GC collection
+    activeUtterance = utterance;
+    if (typeof window !== "undefined") {
+      (window as unknown as { __smritiSpeechActiveUtterance: unknown }).__smritiSpeechActiveUtterance = utterance;
+    }
+
+    // Keep-alive ping for Android Chrome WebView (prevents pausing on long utterances)
+    keepAliveTimer = window.setInterval(() => {
+      if (typeof window !== "undefined" && window.speechSynthesis && window.speechSynthesis.speaking) {
         window.speechSynthesis.resume();
       }
-      setTimeout(safeComplete, 2000);
-    }, expectedDurationMs);
+    }, 2500);
+
+    // Safety timeout: prevent UI being permanently stuck in "speaking" state
+    const expectedDurationMs = Math.max(3000, (cleanText.length / 8) * 1000);
+    setTimeout(() => {
+      if (!hasEnded && window.speechSynthesis && !window.speechSynthesis.speaking) {
+        safeComplete();
+      }
+    }, expectedDurationMs + 2000);
 
     window.speechSynthesis.speak(utterance);
-    return true;
   } catch (err) {
-    console.debug("Speech execution notice, using fallback chime:", err);
+    console.warn("executeSpeechSynthesis failure, playing chime fallback:", err);
     playParametricFormantCadence(cleanText.length);
-    options.onEnd?.();
-    return false;
+    options.onError?.();
   }
 }
 
@@ -340,8 +371,22 @@ export function speakReminderVoice(
  * Stops any currently active speech synthesis immediately.
  */
 export function stopAllSpeech(): void {
+  if (pendingSpeechTimeout) {
+    clearTimeout(pendingSpeechTimeout);
+    pendingSpeechTimeout = null;
+  }
+  if (keepAliveTimer) {
+    clearInterval(keepAliveTimer);
+    keepAliveTimer = null;
+  }
   if (typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis) {
-    window.speechSynthesis.cancel();
+    try {
+      window.speechSynthesis.cancel();
+    } catch {}
+  }
+  activeUtterance = null;
+  if (typeof window !== "undefined") {
+    (window as unknown as { __smritiSpeechActiveUtterance: unknown }).__smritiSpeechActiveUtterance = null;
   }
 }
 
@@ -351,7 +396,7 @@ export function stopAllSpeech(): void {
  */
 function playParametricFormantCadence(charLength: number): void {
   const notes = [392.0, 440.0, 523.25, 659.25]; // G4, A4, C5, E5
-  const count = Math.min(6, Math.max(3, Math.floor(charLength / 25)));
+  const count = Math.min(5, Math.max(2, Math.floor(charLength / 30)));
   for (let i = 0; i < count; i++) {
     const note = notes[i % notes.length];
     setTimeout(() => {
