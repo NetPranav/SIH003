@@ -638,14 +638,14 @@ export let activeGeminiModelName: string = "gemini-2.5-flash";
 export const CANDIDATE_GEMINI_MODELS = [
   "gemini-2.5-flash",
   "gemini-2.0-flash",
-  "gemini-1.5-flash-latest",
   "gemini-1.5-flash",
-  "gemini-pro",
+  "gemini-1.5-flash-latest",
+  "gemini-1.5-flash-8b",
 ];
 
 /**
  * Discovers which Gemini model is active and accessible for the user's specific API key.
- * Queries Google's /models endpoint and picks the best available flash/pro model.
+ * Queries Google's /models endpoint and picks the best available flash model.
  */
 export async function resolveAvailableGeminiModel(apiKey: string): Promise<string> {
   const cleanKey = apiKey.trim();
@@ -655,7 +655,9 @@ export async function resolveAvailableGeminiModel(apiKey: string): Promise<strin
 
   try {
     const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${cleanKey}`;
-    const res = await fetch(listUrl);
+    const res = await fetch(listUrl, {
+      headers: { "x-goog-api-key": cleanKey },
+    });
     if (res.ok) {
       const data = await res.json();
       const models = data?.models as Array<{ name: string; supportedGenerationMethods?: string[] }> | undefined;
@@ -664,7 +666,8 @@ export async function resolveAvailableGeminiModel(apiKey: string): Promise<strin
           m.supportedGenerationMethods?.includes("generateContent")
         );
         const flashCandidate =
-          genModels.find((m) => m.name.includes("flash") && (m.name.includes("2.5") || m.name.includes("2.0") || m.name.includes("1.5"))) ||
+          genModels.find((m) => m.name.includes("2.5-flash")) ||
+          genModels.find((m) => m.name.includes("flash") && (m.name.includes("2.0") || m.name.includes("1.5"))) ||
           genModels.find((m) => m.name.includes("flash")) ||
           genModels.find((m) => m.name.includes("gemini")) ||
           genModels[0];
@@ -677,7 +680,7 @@ export async function resolveAvailableGeminiModel(apiKey: string): Promise<strin
       }
     }
   } catch (e) {
-    console.warn("Could not list Google models, fallback cascade will be used:", e);
+    console.warn("Could not list Google models, candidate cascade will be used:", e);
   }
 
   return activeGeminiModelName;
@@ -685,7 +688,7 @@ export async function resolveAvailableGeminiModel(apiKey: string): Promise<strin
 
 /**
  * Queries Gemini AI directly from the client (if API key present)
- * or seamlessly runs the Clinical Geriatric NLU Brain on-device.
+ * with gemini-2.5-flash as default, falling back cleanly to the On-Device Clinical Brain.
  */
 export async function generateGeminiCompanionReply(
   prompt: string,
@@ -695,19 +698,26 @@ export async function generateGeminiCompanionReply(
 
   // 1. Direct Client-Side Gemini REST API (if key is configured and device is online)
   if (apiKey && typeof window !== "undefined" && navigator.onLine) {
-    const modelsToTry = Array.from(new Set([activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS]));
-    for (const model of modelsToTry) {
+    const modelsToTry = Array.from(
+      new Set(["gemini-2.5-flash", activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS])
+    );
+    for (const rawModel of modelsToTry) {
+      const model = rawModel.replace(/^models\//, "");
       try {
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const response = await fetch(geminiUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
+          },
           body: JSON.stringify({
             system_instruction: {
               parts: [{ text: GEMINI_SYSTEM_INSTRUCTION }],
             },
             contents: [
               {
+                role: "user",
                 parts: [
                   {
                     text: `Target Language: ${language}. The elder spoke/typed: "${prompt}". Provide compassionate, soothing JSON response.`,
@@ -771,19 +781,26 @@ export async function generateGeminiCompanionAudioReply(
 
   // 1. Direct Multimodal Gemini API Call
   if (apiKey && typeof window !== "undefined" && navigator.onLine) {
-    const modelsToTry = Array.from(new Set([activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS]));
-    for (const model of modelsToTry) {
+    const modelsToTry = Array.from(
+      new Set(["gemini-2.5-flash", activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS])
+    );
+    for (const rawModel of modelsToTry) {
+      const model = rawModel.replace(/^models\//, "");
       try {
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const response = await fetch(geminiUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
+          },
           body: JSON.stringify({
             system_instruction: {
               parts: [{ text: GEMINI_SYSTEM_INSTRUCTION }],
             },
             contents: [
               {
+                role: "user",
                 parts: [
                   {
                     inlineData: {
@@ -864,7 +881,7 @@ export function stopTTS(): void {
 }
 
 /**
- * Tests if a Gemini API key is valid and responsive, discovering the working model automatically.
+ * Tests if a Gemini API key is valid and responsive, prioritizing gemini-2.5-flash.
  */
 export async function testGeminiApiKey(
   apiKey: string
@@ -882,20 +899,31 @@ export async function testGeminiApiKey(
   }
 
   try {
-    // 1. Discover available models for this specific user key
-    const discoveredModel = await resolveAvailableGeminiModel(cleanKey);
-    const modelsToTry = Array.from(new Set([discoveredModel, ...CANDIDATE_GEMINI_MODELS]));
+    // 1. Discover available models or prioritize gemini-2.5-flash
+    const modelsToTry = Array.from(
+      new Set(["gemini-2.5-flash", activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS])
+    );
 
+    let primaryError = "";
     let lastError = "";
 
-    for (const model of modelsToTry) {
+    for (const rawModel of modelsToTry) {
+      const model = rawModel.replace(/^models\//, "");
       try {
         const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${cleanKey}`;
         const res = await fetch(testUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": cleanKey,
+          },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: "ping" }] }],
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: "Hello" }],
+              },
+            ],
             generationConfig: { maxOutputTokens: 5 },
           }),
         });
@@ -910,10 +938,14 @@ export async function testGeminiApiKey(
         }
 
         const errJson = await res.json().catch(() => null);
-        lastError = errJson?.error?.message || `HTTP ${res.status}: ${res.statusText}`;
+        const errMsg = errJson?.error?.message || `HTTP ${res.status}: ${res.statusText}`;
+        lastError = errMsg;
+        if (model === "gemini-2.5-flash" || !primaryError) {
+          primaryError = errMsg;
+        }
 
         // Stop immediately if key itself is invalid
-        if (res.status === 400 && lastError.toLowerCase().includes("api_key_invalid")) {
+        if (res.status === 400 && errMsg.toLowerCase().includes("api_key_invalid")) {
           return {
             success: false,
             message: "Google Gemini API Key is invalid. Please check your key from Google AI Studio.",
@@ -921,12 +953,13 @@ export async function testGeminiApiKey(
         }
       } catch (err: any) {
         lastError = err?.message || "Network request failed";
+        if (!primaryError) primaryError = lastError;
       }
     }
 
     return {
       success: false,
-      message: `Key error: ${lastError}`,
+      message: `Gemini 2.5 Flash error: ${primaryError || lastError}`,
     };
   } catch (err: any) {
     return {
