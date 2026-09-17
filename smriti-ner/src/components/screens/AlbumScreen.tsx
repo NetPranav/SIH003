@@ -5,7 +5,8 @@ import type { ScreenId } from "@/lib/types";
 import { playGentleChime } from "@/lib/audio";
 import { ALBUM_SCREEN_LOCALES } from "@/lib/screenLocalizations";
 import { offlineMobileStore, type OfflineAlbumPhoto } from "@/lib/offlineMobileStorage";
-import { speakSpokenVoice } from "@/lib/audioVoiceService";
+import { speakSpokenVoice, stopAllSpeech } from "@/lib/audioVoiceService";
+import { getPhotoReminiscenceStory } from "@/lib/reminiscenceStories";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -24,14 +25,25 @@ export default function AlbumScreen({ navigate, language = "en" }: Props) {
   }, []);
 
   const handlePlayStory = (id: string) => {
+    if (playingStoryId === id) {
+      stopAllSpeech();
+      setPlayingStoryId(null);
+      return;
+    }
+
     playGentleChime();
     setPlayingStoryId(id);
     const photo = photos.find((p) => p.id === id);
     if (photo) {
       offlineMobileStore.recordReminiscence(photo.id, photo.title);
-      speakSpokenVoice(photo.caption, language);
+      const nativeStory = getPhotoReminiscenceStory(photo, language);
+      speakSpokenVoice(nativeStory, language, {
+        rate: 0.86,
+        pitch: 1.02,
+        onEnd: () => setPlayingStoryId(null),
+        onError: () => setPlayingStoryId(null),
+      });
     }
-    setTimeout(() => setPlayingStoryId(null), 4500);
   };
 
   return (
@@ -167,22 +179,66 @@ export default function AlbumScreen({ navigate, language = "en" }: Props) {
                     {p.title}
                   </div>
                 )}
-                <p style={{ fontSize: "0.85rem", color: "var(--gray-600)", lineHeight: 1.45, marginBottom: "0.85rem" }}>
-                  {p.caption}
+                {/* Native Language Story */}
+                <p style={{
+                  fontSize: "0.92rem",
+                  color: "#1e293b",
+                  lineHeight: 1.5,
+                  marginBottom: "0.65rem",
+                  fontWeight: 600,
+                  backgroundColor: "#f8fafc",
+                  padding: "0.65rem 0.85rem",
+                  borderRadius: "10px",
+                  borderLeft: "3px solid #0284c7"
+                }}>
+                  {getPhotoReminiscenceStory(p, language)}
                 </p>
+
+                {language !== "en" && p.caption && (
+                  <p style={{ fontSize: "0.78rem", color: "#64748b", lineHeight: 1.4, marginBottom: "0.85rem", fontStyle: "italic" }}>
+                    Original: {p.caption}
+                  </p>
+                )}
 
                 {isPlaying && (
                   <div style={{
                     padding: "0.6rem 0.85rem",
                     background: "#f0fdf4",
-                    border: "1px solid #bbf7d0",
-                    borderRadius: "var(--radius)",
+                    border: "1.5px solid #86efac",
+                    borderRadius: "10px",
                     color: "#166534",
-                    fontSize: "0.8rem",
-                    fontWeight: 600,
-                    marginBottom: "0.85rem"
+                    fontSize: "0.82rem",
+                    fontWeight: 700,
+                    marginBottom: "0.85rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    boxShadow: "0 2px 4px rgba(22, 101, 52, 0.08)"
                   }}>
-                    {loc.playingAudioText}
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <span>🔊</span>
+                      <span>{loc.playingAudioText}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        stopAllSpeech();
+                        setPlayingStoryId(null);
+                      }}
+                      style={{
+                        padding: "2px 8px",
+                        background: "#dc2626",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "6px",
+                        fontSize: "0.72rem",
+                        fontWeight: 800,
+                        cursor: "pointer"
+                      }}
+                    >
+                      {language === "as" ? "বন্ধ কৰক" : language === "bn" ? "থামুন" : language === "hi" ? "रोकें" : "Stop"}
+                    </button>
                   </div>
                 )}
 
@@ -190,22 +246,23 @@ export default function AlbumScreen({ navigate, language = "en" }: Props) {
                   onClick={() => handlePlayStory(p.id)}
                   style={{
                     width: "100%",
-                    padding: "0.65rem",
-                    background: "var(--gray-50)",
-                    border: "1px solid var(--gray-200)",
-                    borderRadius: "var(--radius)",
-                    fontSize: "0.85rem",
-                    fontWeight: 700,
-                    color: "var(--primary)",
+                    padding: "0.7rem",
+                    background: isPlaying ? "#fef2f2" : "#f0f9ff",
+                    border: isPlaying ? "1.5px solid #fca5a5" : "1.5px solid #bae6fd",
+                    borderRadius: "12px",
+                    fontSize: "0.88rem",
+                    fontWeight: 800,
+                    color: isPlaying ? "#b91c1c" : "#0369a1",
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: "0.5rem"
+                    gap: "0.5rem",
+                    transition: "all 0.15s ease"
                   }}
                 >
-                  <span>🎙️</span>
-                  <span>{loc.listenBtn}</span>
+                  <span>{isPlaying ? "⏹️" : "🎙️"}</span>
+                  <span>{isPlaying ? (language === "as" ? "কণ্ঠ বন্ধ কৰক" : language === "bn" ? "পড়া বন্ধ করুন" : language === "hi" ? "बोलना बंद करें" : "Stop Story") : loc.listenBtn}</span>
                 </button>
               </div>
             </div>

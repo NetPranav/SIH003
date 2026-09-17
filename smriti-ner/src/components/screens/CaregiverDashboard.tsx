@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { ScreenId } from "@/lib/types";
 import { playAudioFeedback, playGentleChime } from "@/lib/audio";
 import { triggerHaptic } from "@/lib/accessibilityMiddleware";
@@ -15,6 +15,41 @@ import { testGeminiApiKey } from "@/lib/geminiCompanionService";
 
 interface Props {
   navigate: (target: ScreenId) => void;
+}
+
+/**
+ * Compresses an image file client-side using an offscreen canvas
+ * to preserve localStorage quota and ensure lightning-fast rendering.
+ */
+function compressImageFile(file: File, maxWidth = 800, quality = 0.78): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(event.target?.result as string);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = () => resolve(event.target?.result as string);
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 export default function CaregiverDashboard({ navigate }: Props) {
@@ -47,6 +82,11 @@ export default function CaregiverDashboard({ navigate }: Props) {
   const [photoTitle, setPhotoTitle] = useState<string>("");
   const [photoRelation, setPhotoRelation] = useState<string>("Family");
   const [photoCaption, setPhotoCaption] = useState<string>("");
+  const [photoYear, setPhotoYear] = useState<string>(new Date().getFullYear().toString());
+  const [photoImage, setPhotoImage] = useState<string>("");
+  const [photoPreview, setPhotoPreview] = useState<string>("");
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [isEditProfileOpen, setIsEditProfileOpen] = useState<boolean>(false);
   const [editName, setEditName] = useState<string>(profile.name);
@@ -177,6 +217,28 @@ export default function CaregiverDashboard({ navigate }: Props) {
     setTimeout(() => setMoodSavedToast(false), 3000);
   };
 
+  const handlePhotoFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingPhoto(true);
+    try {
+      const compressed = await compressImageFile(file, 800, 0.78);
+      setPhotoImage(compressed);
+      setPhotoPreview(compressed);
+    } catch (err) {
+      console.warn("Photo compression notice:", err);
+      const reader = new FileReader();
+      reader.onload = () => {
+        const res = reader.result as string;
+        setPhotoImage(res);
+        setPhotoPreview(res);
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
   const handleAddPhoto = (e: React.FormEvent) => {
     e.preventDefault();
     if (!photoTitle.trim()) return;
@@ -184,11 +246,15 @@ export default function CaregiverDashboard({ navigate }: Props) {
       title: photoTitle.trim(),
       relation: photoRelation.trim() || "Family",
       caption: photoCaption.trim(),
-      year: new Date().getFullYear().toString(),
-      image: "/photos/festival.jpg",
+      year: photoYear.trim() || new Date().getFullYear().toString(),
+      image: photoImage || photoPreview || "/photos/festival.jpg",
     });
     setPhotoTitle("");
     setPhotoCaption("");
+    setPhotoRelation("Family");
+    setPhotoImage("");
+    setPhotoPreview("");
+    setPhotoYear(new Date().getFullYear().toString());
     setIsAddPhotoOpen(false);
     triggerHaptic("success");
     playGentleChime();
@@ -747,17 +813,41 @@ export default function CaregiverDashboard({ navigate }: Props) {
             >
               <div
                 style={{
-                  height: "80px",
-                  background: "linear-gradient(135deg, #e2e8f0, #cbd5e1)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "0.75rem",
-                  color: "#64748b",
-                  fontWeight: 700,
+                  height: "95px",
+                  backgroundColor: "#0f172a",
+                  position: "relative",
+                  overflow: "hidden",
                 }}
               >
-                Photo
+                <img
+                  src={p.image}
+                  alt={p.title}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = "none";
+                  }}
+                />
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: "4px",
+                    right: "5px",
+                    background: "rgba(0, 0, 0, 0.72)",
+                    backdropFilter: "blur(4px)",
+                    color: "#ffffff",
+                    fontSize: "0.66rem",
+                    padding: "1px 5px",
+                    borderRadius: "4px",
+                    fontWeight: 700,
+                  }}
+                >
+                  {p.year || "Memory"}
+                </span>
               </div>
               <div style={{ padding: "0.5rem" }}>
                 <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#0f172a", lineHeight: 1.2 }}>
@@ -1212,6 +1302,112 @@ export default function CaregiverDashboard({ navigate }: Props) {
             <div style={{ fontSize: "1rem", fontWeight: 800, color: "#0f172a", marginBottom: "0.85rem" }}>
               Add Family Memory Photo
             </div>
+
+            {/* Hidden File Input & Live Photo Attachment */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handlePhotoFileChange}
+            />
+
+            <div style={{ marginBottom: "0.85rem" }}>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#475569", marginBottom: "0.3rem" }}>
+                Photograph:
+              </label>
+              {photoPreview ? (
+                <div style={{ position: "relative", borderRadius: "10px", overflow: "hidden", border: "1.5px solid #0284c7", marginBottom: "0.4rem" }}>
+                  <img
+                    src={photoPreview}
+                    alt="Preview"
+                    style={{ width: "100%", height: "130px", objectFit: "cover", display: "block" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{
+                      position: "absolute",
+                      bottom: "6px",
+                      right: "6px",
+                      background: "rgba(15, 23, 42, 0.8)",
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "3px 8px",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Change Photo
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploadingPhoto}
+                  style={{
+                    width: "100%",
+                    padding: "0.85rem",
+                    background: "#f0f9ff",
+                    border: "2px dashed #0284c7",
+                    borderRadius: "10px",
+                    color: "#0369a1",
+                    fontSize: "0.82rem",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                  }}
+                >
+                  <span style={{ fontSize: "1.2rem" }}>📷</span>
+                  <span>{isUploadingPhoto ? "Processing photo..." : "+ Attach Photo from Device / Gallery"}</span>
+                </button>
+              )}
+
+              {/* Quick Preset Memories */}
+              <div style={{ marginTop: "0.4rem" }}>
+                <div style={{ fontSize: "0.68rem", color: "#64748b", marginBottom: "0.2rem" }}>
+                  Or select a cultural memory preset:
+                </div>
+                <div style={{ display: "flex", gap: "0.3rem", flexWrap: "wrap" }}>
+                  {[
+                    { label: "Bihu Festival", url: "/photos/festival.jpg", year: "1982", title: "Rongali Bihu", rel: "Family & Cousins" },
+                    { label: "Graduation Day", url: "/photos/graduation.jpg", year: "2018", title: "Priya's Graduation", rel: "Granddaughter Priya" },
+                    { label: "Brahmaputra Ferry", url: "/photos/ferry.jpg", year: "1994", title: "Majuli Pilgrimage", rel: "Pilgrimage" },
+                  ].map((preset) => (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => {
+                        setPhotoImage(preset.url);
+                        setPhotoPreview(preset.url);
+                        if (!photoTitle) setPhotoTitle(preset.title);
+                        if (!photoRelation || photoRelation === "Family") setPhotoRelation(preset.rel);
+                        setPhotoYear(preset.year);
+                      }}
+                      style={{
+                        padding: "2px 8px",
+                        background: photoPreview === preset.url ? "#e0f2fe" : "#f1f5f9",
+                        border: photoPreview === preset.url ? "1px solid #0284c7" : "1px solid #cbd5e1",
+                        borderRadius: "6px",
+                        fontSize: "0.7rem",
+                        fontWeight: 600,
+                        color: photoPreview === preset.url ? "#0369a1" : "#475569",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             <div style={{ marginBottom: "0.75rem" }}>
               <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#475569", marginBottom: "0.2rem" }}>
                 Person or Memory Name:
@@ -1232,34 +1428,57 @@ export default function CaregiverDashboard({ navigate }: Props) {
                 }}
               />
             </div>
-            <div style={{ marginBottom: "0.75rem" }}>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#475569", marginBottom: "0.2rem" }}>
-                Kinship Relation:
-              </label>
-              <input
-                type="text"
-                value={photoRelation}
-                onChange={(e) => setPhotoRelation(e.target.value)}
-                placeholder="e.g. Granddaughter / Daughter / Home"
-                style={{
-                  width: "100%",
-                  padding: "0.55rem",
-                  borderRadius: "8px",
-                  border: "1.5px solid #cbd5e1",
-                  boxSizing: "border-box",
-                  fontSize: "0.85rem",
-                }}
-              />
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", marginBottom: "0.75rem" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#475569", marginBottom: "0.2rem" }}>
+                  Kinship Relation:
+                </label>
+                <input
+                  type="text"
+                  value={photoRelation}
+                  onChange={(e) => setPhotoRelation(e.target.value)}
+                  placeholder="e.g. Granddaughter"
+                  style={{
+                    width: "100%",
+                    padding: "0.55rem",
+                    borderRadius: "8px",
+                    border: "1.5px solid #cbd5e1",
+                    boxSizing: "border-box",
+                    fontSize: "0.85rem",
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#475569", marginBottom: "0.2rem" }}>
+                  Year / Era:
+                </label>
+                <input
+                  type="text"
+                  value={photoYear}
+                  onChange={(e) => setPhotoYear(e.target.value)}
+                  placeholder="e.g. 1985 / 2018"
+                  style={{
+                    width: "100%",
+                    padding: "0.55rem",
+                    borderRadius: "8px",
+                    border: "1.5px solid #cbd5e1",
+                    boxSizing: "border-box",
+                    fontSize: "0.85rem",
+                  }}
+                />
+              </div>
             </div>
+
             <div style={{ marginBottom: "1rem" }}>
               <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#475569", marginBottom: "0.2rem" }}>
-                Short Reassuring Story:
+                Short Reassuring Story / Notes:
               </label>
               <input
                 type="text"
                 value={photoCaption}
                 onChange={(e) => setPhotoCaption(e.target.value)}
-                placeholder="e.g. Taken during Guwahati college visit"
+                placeholder="e.g. Taken during Guwahati college visit with family"
                 style={{
                   width: "100%",
                   padding: "0.55rem",
@@ -1273,7 +1492,11 @@ export default function CaregiverDashboard({ navigate }: Props) {
             <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
               <button
                 type="button"
-                onClick={() => setIsAddPhotoOpen(false)}
+                onClick={() => {
+                  setPhotoImage("");
+                  setPhotoPreview("");
+                  setIsAddPhotoOpen(false);
+                }}
                 style={{
                   padding: "0.55rem 0.9rem",
                   background: "#f1f5f9",
