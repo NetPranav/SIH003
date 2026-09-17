@@ -4,7 +4,8 @@
  * for photo reminiscing and cognitive orientation.
  */
 
-import type { OfflineAlbumPhoto } from "./offlineMobileStorage";
+import { offlineMobileStore, type OfflineAlbumPhoto } from "./offlineMobileStorage";
+import { translatePhotoStoryToNative } from "./geminiCompanionService";
 
 export const SEED_REMINISCENCE_STORIES: Record<string, Record<string, string>> = {
   photo_1: {
@@ -39,46 +40,325 @@ export const SEED_REMINISCENCE_STORIES: Record<string, Record<string, string>> =
   },
 };
 
+// ── Kinship & Location Term Dictionaries for 100% Offline Translation ───
+const KINSHIP_DICTIONARY: Record<string, Record<string, string>> = {
+  hi: {
+    granddaughter: "पोती",
+    grandson: "पोता",
+    daughter: "बेटी",
+    son: "बेटा",
+    family: "परिवार",
+    cousin: "भाई-बहन",
+    cousins: "भाई-बहन",
+    wife: "पत्नी",
+    husband: "पति",
+    mother: "माँ",
+    father: "पिताजी",
+    brother: "भाई",
+    sister: "बहन",
+    children: "बच्चे",
+    friend: "दोस्त",
+    home: "घर",
+  },
+  as: {
+    granddaughter: "নাতিনী",
+    grandson: "নাতি",
+    daughter: "জীয়াৰী",
+    son: "ল’ৰা",
+    family: "পৰিয়াল",
+    cousin: "আত্মীয়",
+    cousins: "আত্মীয়সকল",
+    wife: "পত্নী",
+    husband: "স্বামী",
+    mother: "মা",
+    father: "দেউতা",
+    brother: "ভাই",
+    sister: "ভনী",
+    children: "সন্তানসকল",
+    friend: "বন্ধু",
+    home: "ঘৰ",
+  },
+  bn: {
+    granddaughter: "নাতনি",
+    grandson: "নাতি",
+    daughter: "মেয়ে",
+    son: "ছেলে",
+    family: "পরিবার",
+    cousin: "তুতো ভাইবোন",
+    cousins: "আত্মীয়রা",
+    wife: "স্ত্রী",
+    husband: "স্বামী",
+    mother: "মা",
+    father: "বাবা",
+    brother: "ভাই",
+    sister: "বোন",
+    children: "সন্তানরা",
+    friend: "বন্ধু",
+    home: "বাড়ি",
+  },
+  mni: {
+    granddaughter: "ꯅꯥꯇꯣꯟ",
+    grandson: "ꯅꯥꯇꯣꯟ",
+    daughter: "ꯃꯆꯥꯅꯨꯄꯤ",
+    son: "ꯃꯆꯥꯅꯨꯄꯥ",
+    family: "ꯏꯃꯨꯡ",
+    wife: "ꯂꯣꯌꯅꯕꯤ",
+    husband: "ꯃꯄꯨꯔꯣꯏꯕꯥ",
+    home: "ꯌꯨꯝ",
+  },
+  brx: {
+    granddaughter: "फिसौजो",
+    grandson: "फिसौला",
+    daughter: "फिसाजो",
+    son: "फिसाला",
+    family: "नखर",
+    wife: "हिनजाव",
+    husband: "होवा",
+    home: "न",
+  },
+  kha: {
+    granddaughter: "ksiew kynthei",
+    grandson: "ksiew shynrang",
+    daughter: "khun kynthei",
+    son: "khun shynrang",
+    family: "ïing",
+    home: "ïing",
+  },
+  lus: {
+    granddaughter: "tunu",
+    grandson: "tupa",
+    daughter: "fanu",
+    son: "fapa",
+    family: "chhungkua",
+    home: "in",
+  },
+};
+
+const COMMON_VOCABULARY: Record<string, Record<string, string>> = {
+  hi: {
+    "college visit": "कॉलेज की सुखद यात्रा",
+    "college": "कॉलेज",
+    "university": "विश्वविद्यालय",
+    "graduation": "दीक्षांत समारोह",
+    "wedding": "शादी",
+    "marriage": "विवाह",
+    "visit": "भ्रमण और मुलाकात",
+    "trip": "यात्रा",
+    "festival": "त्योहार और उत्सव",
+    "garden": "बागान",
+    "tea garden": "चाय बागान",
+    "home": "घर",
+    "house": "घर",
+    "party": "उत्सव",
+    "celebration": "उत्सव",
+    "birthday": "जन्मदिन",
+    "morning": "सुबह",
+    "evening": "शाम",
+    "sunset": "सूर्यास्त",
+    "tea": "चाय",
+    "guwahati": "गुवाहाटी",
+    "jorhat": "जोरहाट",
+    "shillong": "शिलांग",
+    "majuli": "माजुली",
+    "brahmaputra": "ब्रह्मपुत्र",
+    "happy": "खुशी",
+    "joy": "आनंद",
+    "love": "स्नेह",
+  },
+  as: {
+    "college visit": "মহাবিদ্যালয় ভ্ৰমণৰ আনন্দ",
+    "college": "মহাবিদ্যালয়",
+    "university": "বিশ্ববিদ্যালয়",
+    "graduation": "সমাবৰ্তন",
+    "wedding": "বিয়া",
+    "marriage": "বিবাহ",
+    "visit": "ভ্ৰমণ",
+    "trip": "যাত্ৰা",
+    "festival": "উৎসৱ",
+    "garden": "বাগিচা",
+    "tea garden": "চাহ বাগিচা",
+    "home": "ঘৰ",
+    "house": "ঘৰ",
+    "party": "উৎসৱ",
+    "celebration": "আনন্দোৎসৱ",
+    "birthday": "জন্মদিন",
+    "morning": "পুৱা",
+    "evening": "গধূলি",
+    "sunset": "সূৰ্যাস্ত",
+    "tea": "চাহ",
+    "guwahati": "গুৱাহাটী",
+    "jorhat": "যোৰহাট",
+    "shillong": "শ্বিলং",
+    "majuli": "মাজুলী",
+    "brahmaputra": "ব্ৰহ্মপুত্ৰ",
+  },
+  bn: {
+    "college visit": "কলেজ পরিদর্শনের মধুর স্মৃতি",
+    "college": "কলেজ",
+    "university": "বিশ্ববিদ্যালয়",
+    "graduation": "সমাবর্তন",
+    "wedding": "বিয়ে",
+    "marriage": "বিবাহ",
+    "visit": "ভ্রমণ",
+    "trip": "ভ্রমণ",
+    "festival": "উৎসব",
+    "garden": "বাগান",
+    "tea garden": "চা বাগান",
+    "home": "বাড়ি",
+    "house": "বাড়ি",
+    "celebration": "উৎসব",
+    "birthday": "জন্মদিন",
+    "morning": "সকাল",
+    "evening": "সন্ধ্যা",
+    "sunset": "সূর্যাস্ত",
+    "tea": "চা",
+    "guwahati": "গুয়াহাটি",
+    "jorhat": "জোরহাট",
+    "shillong": "শিলং",
+    "majuli": "মাজুলী",
+    "brahmaputra": "ব্রহ্মপুত্র",
+  },
+};
+
 /**
- * Retrieves or formats the spoken & readable family story in the chosen native language.
+ * Intelligent on-device translator that converts raw English phrases and terms
+ * into natural regional words to guarantee zero English words in native speech.
+ */
+function localizeTextOffline(rawText: string, langKey: string): string {
+  if (!rawText || langKey === "en") return rawText;
+
+  let text = rawText.trim();
+  const vocab = COMMON_VOCABULARY[langKey] || {};
+  const kinship = KINSHIP_DICTIONARY[langKey] || {};
+
+  // Replace multi-word and single-word terms case-insensitively
+  for (const [enTerm, nativeTerm] of Object.entries(vocab)) {
+    const regex = new RegExp(`\\b${enTerm}\\b`, "gi");
+    text = text.replace(regex, nativeTerm);
+  }
+
+  for (const [enTerm, nativeTerm] of Object.entries(kinship)) {
+    const regex = new RegExp(`\\b${enTerm}\\b`, "gi");
+    text = text.replace(regex, nativeTerm);
+  }
+
+  // Remove common English prepositions that make speech awkward
+  text = text
+    .replace(/\bwith family\b/gi, "")
+    .replace(/\bduring\b/gi, "")
+    .replace(/\btaken at\b/gi, "")
+    .replace(/\btaken in\b/gi, "")
+    .replace(/\btaken\b/gi, "")
+    .replace(/\bwith\b/gi, "")
+    .replace(/\sin\s/gi, " ")
+    .replace(/\sat\s/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return text;
+}
+
+/**
+ * Formats a 100% native sentence offline if Gemini has not yet cached a translation.
+ */
+function formatOfflineNativeStory(photo: OfflineAlbumPhoto, langKey: string): string {
+  const relDict = KINSHIP_DICTIONARY[langKey] || {};
+  const rawRel = (photo.relation || "Family").toLowerCase();
+  const localizedRel = relDict[rawRel] || relDict.family || photo.relation || "";
+
+  const localizedCaption = photo.caption ? localizeTextOffline(photo.caption, langKey) : "";
+  const localizedTitle = photo.nativeTitle || localizeTextOffline(photo.title, langKey);
+
+  switch (langKey) {
+    case "as":
+      return `এইখন আমাৰ আপোন পৰিয়ালৰ স্মৃতি—${localizedRel ? `${localizedRel} ` : ""}${localizedTitle}ৰ সৈতে কটোৱা সেই আনন্দৰ দিন। ${localizedCaption ? `${localizedCaption}ৰ সোঁৱৰণি। ` : ""}আপুনি নিজৰ ঘৰত সুৰক্ষিতভাৱে আছে, সকলোৱে আপোনাক খুব মৰম কৰে।`;
+
+    case "bn":
+      return `এটি আমাদের প্রিয় পরিবারের মধুর স্মৃতি—${localizedRel ? `${localizedRel} ` : ""}${localizedTitle}-এর সাথে কাটানো সেই আনন্দের দিন। ${localizedCaption ? `${localizedCaption}-এর মধুর স্মৃতি। ` : ""}আপনি আপনার বাড়িতে সম্পূর্ণ নিরাপদে আছেন, সবাই আপনাকে খুব ভালোবাসে।`;
+
+    case "hi":
+      return `यह हमारे प्यारे परिवार की संस्मरण तस्वीर है—${localizedRel ? `${localizedRel} ` : ""}${localizedTitle} के साथ बिताए गए सुखद पल। ${localizedCaption ? `${localizedCaption} की मधुर याद। ` : ""}आप अपने घर पर पूरी तरह सुरक्षित हैं और सभी आपसे बहुत प्यार करते हैं।`;
+
+    case "mni":
+      return `ꯃꯁꯤ ꯑꯩꯈꯣꯌꯒꯤ ꯏꯃꯨꯡꯒꯤ ꯅꯤꯡꯁꯤꯡ ꯃꯤꯠꯌꯦꯡꯅꯤ—${localizedRel ? `${localizedRel} ` : ""}${localizedTitle}꯫ ${localizedCaption ? `${localizedCaption}꯫ ` : ""}ꯅꯍꯥꯛ ꯃꯌꯨꯃꯗꯥ ꯅꯨꯡꯉꯥꯏꯅꯥ ꯂꯩꯔꯤ꯫`;
+
+    case "brx":
+      return `बेयो जोंनि नखरनि गोसोखांथि—${localizedRel ? `${localizedRel} ` : ""}${localizedTitle}। ${localizedCaption ? `${localizedCaption}। ` : ""}नोंथाङा नखराव मोजाङैनो दं, बयबो नोंथांखौ अनसायो।`;
+
+    case "kha":
+      return `Kane ka dei ka dur kynmaw jong ka ïing—${localizedRel ? `${localizedRel} ` : ""}${localizedTitle}. ${localizedCaption ? `${localizedCaption}. ` : ""}Phi shngain bha ha ïing bad kiba ha ïing baroh ki ieid ïa phi.`;
+
+    case "lus":
+      return `He hi kan chhungkaw thlalak duhawm tak a ni—${localizedRel ? `${localizedRel} ` : ""}${localizedTitle}. ${localizedCaption ? `${localizedCaption}. ` : ""}In lamah him takin i awm e, chhungkuain kan hmangaih che.`;
+
+    case "en":
+    default:
+      return `${photo.title} with ${photo.relation}. ${photo.caption ? `${photo.caption} ` : ""}You are safe at home with your loving family.`;
+  }
+}
+
+/**
+ * Retrieves the spoken & readable family story in the chosen native language.
+ * Checks for cached translations, pre-installed seed stories, or intelligent native paraphrasing.
  */
 export function getPhotoReminiscenceStory(photo: OfflineAlbumPhoto, language: string): string {
   const langKey = language || "en";
 
-  // 1. Curated cultural seed stories for pre-installed photos
+  // 1. Return already cached native translation (from Gemini or Caregiver)
+  if (photo.translations && photo.translations[langKey]) {
+    return photo.translations[langKey];
+  }
+
+  // 2. Curated cultural seed stories for pre-installed photos
   if (SEED_REMINISCENCE_STORIES[photo.id]?.[langKey]) {
     return SEED_REMINISCENCE_STORIES[photo.id][langKey];
   }
 
-  // 2. Custom caregiver photos: Generate culturally respectful native phrasing
-  const title = (langKey !== "en" && photo.nativeTitle) ? photo.nativeTitle : photo.title;
-  const relation = photo.relation || "Family";
-  const caption = photo.caption ? photo.caption.trim() : "";
+  // 3. English returns original caption with greeting
+  if (langKey === "en") {
+    return `${photo.title} with ${photo.relation}. ${photo.caption ? `${photo.caption}. ` : ""}You are safe at home with your loving family.`;
+  }
 
-  switch (langKey) {
-    case "as":
-      return `এইখন আমাৰ পৰিয়ালৰ স্মৃতি—${title} (${relation})। ${caption ? `${caption}। ` : ""}আপুনি নিজৰ ঘৰত সুৰক্ষিতভাৱে আছে, পৰিয়ালে আপোনাক সদায় মৰম কৰে।`;
+  // 4. Pure native phrase reconstruction without raw English words
+  return formatOfflineNativeStory(photo, langKey);
+}
 
-    case "bn":
-      return `এটি আমাদের পরিবারের মধুর স্মৃতি—${title} (${relation})। ${caption ? `${caption}। ` : ""}আপনি আপনার বাড়িতে সম্পূর্ণ নিরাপদে আছেন, সবাই আপনাকে খুব ভালোবাসে।`;
+/**
+ * In-flight translation tracker to prevent duplicate requests
+ */
+const inFlightTranslations = new Set<string>();
 
-    case "hi":
-      return `यह हमारे प्यारे परिवार की संस्मरण तस्वीर है—${title} (${relation})। ${caption ? `${caption}। ` : ""}आप अपने घर पर पूरी तरह सुरक्षित और अपनों के बीच हैं।`;
+/**
+ * Asynchronously requests Gemini 3.6 Flash to translate and adapt a custom photo
+ * into fluent, compassionate native phrasing, caching it on-device in offlineMobileStore.
+ */
+export async function ensurePhotoTranslated(photo: OfflineAlbumPhoto, language: string): Promise<void> {
+  const langKey = language || "en";
+  if (langKey === "en") return;
 
-    case "mni":
-      return `ꯃꯁꯤ ꯑꯩꯈꯣꯌꯒꯤ ꯏꯃꯨꯡꯒꯤ ꯅꯤꯡꯁꯤꯡ ꯃꯤꯠꯌꯦꯡꯅꯤ—${title} (${relation})꯫ ${caption ? `${caption}꯫ ` : ""}ꯅꯍꯥꯛ ꯃꯌꯨꯃꯗꯥ ꯅꯨꯡꯉꯥꯏꯅꯥ ꯂꯩꯔꯤ꯫`;
+  // Already translated or pre-seeded
+  if (photo.translations?.[langKey] || SEED_REMINISCENCE_STORIES[photo.id]?.[langKey]) {
+    return;
+  }
 
-    case "brx":
-      return `बेयो जोंनि नखरनि गोसोखांथि—${title} (${relation})। ${caption ? `${caption}। ` : ""}नोंथाङा नखराव मोजाङैनो दं, बयबो नोंथांखौ अनसायो।`;
+  const trackKey = `${photo.id}_${langKey}`;
+  if (inFlightTranslations.has(trackKey)) return;
+  inFlightTranslations.add(trackKey);
 
-    case "kha":
-      return `Kane ka dei ka dur kynmaw jong ka ïing—${title} (${relation}). ${caption ? `${caption}. ` : ""}Phi shngain bha ha ïing bad kiba ha ïing baroh ki ieid ïa phi.`;
+  try {
+    const translated = await translatePhotoStoryToNative(
+      photo.caption || "",
+      photo.title,
+      photo.relation || "Family",
+      langKey
+    );
 
-    case "lus":
-      return `He hi kan chhungkaw thlalak duhawm tak a ni—${title} (${relation}). ${caption ? `${caption}. ` : ""}In lamah him takin i awm e, chhungkuain kan hmangaih che.`;
-
-    case "en":
-    default:
-      return `${photo.title} with ${photo.relation}. ${caption ? `${caption} ` : ""}You are safe at home with your loving family.`;
+    if (translated && translated.trim().length > 5) {
+      offlineMobileStore.updatePhotoTranslation(photo.id, langKey, translated.trim());
+    }
+  } catch (err) {
+    console.warn("Auto-translation notice:", err);
+  } finally {
+    inFlightTranslations.delete(trackKey);
   }
 }

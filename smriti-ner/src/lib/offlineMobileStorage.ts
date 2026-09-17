@@ -51,6 +51,7 @@ export interface OfflineAlbumPhoto {
   caption: string;
   image: string;
   audioStory?: string;
+  translations?: Record<string, string>;
   createdAt: string;
 }
 
@@ -752,6 +753,27 @@ class OfflineMobileStore {
       return true;
     }
     return false;
+  }
+
+  public updatePhotoTranslation(id: string, language: string, translatedText: string): void {
+    const current = this.getAlbumPhotos();
+    let changed = false;
+    const updated = current.map((p) => {
+      if (p.id === id) {
+        changed = true;
+        return {
+          ...p,
+          translations: {
+            ...(p.translations || {}),
+            [language]: translatedText,
+          },
+        };
+      }
+      return p;
+    });
+    if (changed) {
+      this.write(KEYS.ALBUM_PHOTOS, updated);
+    }
   }
 
   // ── Storage Quota & Diagnostics ─────────────────────────────────

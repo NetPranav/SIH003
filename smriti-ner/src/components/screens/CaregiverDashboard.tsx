@@ -12,6 +12,7 @@ import {
 } from "@/lib/offlineMobileStorage";
 import { speakSpokenVoice } from "@/lib/audioVoiceService";
 import { testGeminiApiKey } from "@/lib/geminiCompanionService";
+import { ensurePhotoTranslated } from "@/lib/reminiscenceStories";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -242,13 +243,19 @@ export default function CaregiverDashboard({ navigate }: Props) {
   const handleAddPhoto = (e: React.FormEvent) => {
     e.preventDefault();
     if (!photoTitle.trim()) return;
-    offlineMobileStore.addAlbumPhoto({
+    const newPhoto = offlineMobileStore.addAlbumPhoto({
       title: photoTitle.trim(),
       relation: photoRelation.trim() || "Family",
       caption: photoCaption.trim(),
       year: photoYear.trim() || new Date().getFullYear().toString(),
       image: photoImage || photoPreview || "/photos/festival.jpg",
     });
+
+    // Asynchronously pre-cache translations for regional languages
+    ["hi", "as", "bn"].forEach((lang) => {
+      ensurePhotoTranslated(newPhoto, lang);
+    });
+
     setPhotoTitle("");
     setPhotoCaption("");
     setPhotoRelation("Family");

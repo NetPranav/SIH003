@@ -981,6 +981,101 @@ export function speakTextWithTTS(
 }
 
 /**
+ * Translates a family memory story / photo caption into a soothing, culturally
+ * reverent sentence in the elder's native Northeast Indian language.
+ * Powered by Gemini 3.6 Flash.
+ */
+export async function translatePhotoStoryToNative(
+  caption: string,
+  title: string,
+  relation: string,
+  targetLang: string
+): Promise<string | null> {
+  const apiKey = offlineMobileStore.getGeminiApiKey();
+  if (!apiKey || typeof window === "undefined" || targetLang === "en") {
+    return null;
+  }
+
+  const langNames: Record<string, string> = {
+    as: "Assamese (অসমীয়া)",
+    bn: "Bengali (বাংলা)",
+    hi: "Hindi (हिन्दी)",
+    mni: "Meitei (Manipuri ꯃꯩꯇꯩ)",
+    brx: "Bodo (बर')",
+    kha: "Khasi",
+    lus: "Mizo",
+  };
+
+  const targetLangDesc = langNames[targetLang] || "Hindi";
+
+  const prompt = `You are Smriti, a soothing geriatric AI companion for an elder in Northeast India who has dementia.
+The family caregiver added a photo memory:
+- Title: "${title}"
+- Kinship / Relation: "${relation}"
+- Story / Description: "${caption || title}"
+
+TASK:
+Translate and adapt this memory into a gentle, culturally reverent 2-sentence reminiscence story in ${targetLangDesc}.
+CRITICAL RULES:
+1. Speak directly to the elder with deep familial warmth (e.g. addressing as "दादाजी / बाबाजी" or "বৰদেউতা" or "দাদু").
+2. Translate ALL English words (names of events, relations, places, activities, etc.) into natural ${targetLangDesc}. Do NOT leave English words untranslated.
+3. Reassure the elder that they are safe at home and loved by their family.
+4. Return ONLY the plain translated sentence. No quotes, no markdown, no explanation.`;
+
+  const modelsToTry = Array.from(
+    new Set(["gemini-3.6-flash", activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS])
+  );
+
+  for (const rawModel of modelsToTry) {
+    const model = rawModel.replace(/^models\//, "");
+    try {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      const response = await fetch(geminiUrl, {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            maxOutputTokens: 350,
+            temperature: 0.3,
+          },
+        }),
+      });
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const result = await response.json();
+        const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (rawText && rawText.trim().length > 3) {
+          const clean = rawText
+            .trim()
+            .replace(/^["']|["']$/g, "")
+            .replace(/```[\s\S]*?```/g, "")
+            .trim();
+          return clean;
+        }
+      }
+    } catch (err) {
+      console.warn(`Translation call to ${model} failed:`, err);
+    }
+  }
+
+  return null;
+}
+
+/**
  * Stops any ongoing TTS playback immediately
  */
 export function stopTTS(): void {

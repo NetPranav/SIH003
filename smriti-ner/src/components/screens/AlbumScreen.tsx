@@ -6,7 +6,12 @@ import { playGentleChime } from "@/lib/audio";
 import { ALBUM_SCREEN_LOCALES } from "@/lib/screenLocalizations";
 import { offlineMobileStore, type OfflineAlbumPhoto } from "@/lib/offlineMobileStorage";
 import { speakSpokenVoice, stopAllSpeech } from "@/lib/audioVoiceService";
-import { getPhotoReminiscenceStory } from "@/lib/reminiscenceStories";
+import {
+  getPhotoReminiscenceStory,
+  ensurePhotoTranslated,
+  SEED_REMINISCENCE_STORIES,
+} from "@/lib/reminiscenceStories";
+import { translatePhotoStoryToNative } from "@/lib/geminiCompanionService";
 
 interface Props {
   navigate: (target: ScreenId) => void;
@@ -24,7 +29,18 @@ export default function AlbumScreen({ navigate, language = "en" }: Props) {
     });
   }, []);
 
-  const handlePlayStory = (id: string) => {
+  // Auto-translate any custom photos that don't have native translations yet
+  useEffect(() => {
+    if (language !== "en" && photos && photos.length > 0) {
+      photos.forEach((p) => {
+        if (!p.translations?.[language] && !SEED_REMINISCENCE_STORIES[p.id]) {
+          ensurePhotoTranslated(p, language);
+        }
+      });
+    }
+  }, [language, photos]);
+
+  const handlePlayStory = async (id: string) => {
     if (playingStoryId === id) {
       stopAllSpeech();
       setPlayingStoryId(null);
@@ -36,7 +52,24 @@ export default function AlbumScreen({ navigate, language = "en" }: Props) {
     const photo = photos.find((p) => p.id === id);
     if (photo) {
       offlineMobileStore.recordReminiscence(photo.id, photo.title);
-      const nativeStory = getPhotoReminiscenceStory(photo, language);
+      let nativeStory = getPhotoReminiscenceStory(photo, language);
+
+      // If translation not cached yet and online, attempt quick translation
+      if (language !== "en" && !photo.translations?.[language] && !SEED_REMINISCENCE_STORIES[photo.id]) {
+        try {
+          const aiStory = await translatePhotoStoryToNative(
+            photo.caption || "",
+            photo.title,
+            photo.relation || "Family",
+            language
+          );
+          if (aiStory) {
+            nativeStory = aiStory;
+            offlineMobileStore.updatePhotoTranslation(photo.id, language, aiStory);
+          }
+        } catch {}
+      }
+
       speakSpokenVoice(nativeStory, language, {
         rate: 0.86,
         pitch: 1.02,
