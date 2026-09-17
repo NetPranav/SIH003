@@ -43,19 +43,19 @@ interface LocalizedAssistantLabels {
 
 const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
   hi: {
-    trigger: "स्मृति AI आवाज",
-    modalTitle: "स्मृति AI साथी • Smriti Voice",
-    greeting: "नमस्ते दादाजी 👋",
+    trigger: "स्मृति वॉइस",
+    modalTitle: "स्मृति वॉइस साथी",
+    greeting: "नमस्ते दादाजी",
     defaultPrompt: "आप अपने परिवार के साथ घर पर सुरक्षित हैं। मुझसे कुछ भी पूछिए।",
     englishPrompt: "You are safe at home with your family. Ask me anything.",
-    chipsHeader: "Quick Prompts • तुरंत पूछें",
+    chipsHeader: "तुरंत पूछें",
     chips: [
-      { label: "📍 मैं कहाँ हूँ?", query: "मैं अभी कहाँ हूँ?" },
-      { label: "💊 दवा का समय?", query: "मेरी अगली दवा का समय क्या है?" },
-      { label: "👨‍👩‍👧 मेरा परिवार", query: "मेरे परिवार के लोग कहाँ हैं?" },
-      { label: "☕ चाय का समय", query: "क्या चाय का समय हो गया है?" },
-      { label: "📖 शांत लोककथा", query: "मुझे कोई शांत लोककथा सुनाइए।" },
-      { label: "🌸 मन शांत करें", query: "मुझे थोड़ा घबराहट महसूस हो रही है।" },
+      { label: "मैं कहाँ हूँ?", query: "मैं अभी कहाँ हूँ?" },
+      { label: "दवा का समय?", query: "मेरी अगली दवा का समय क्या है?" },
+      { label: "मेरा परिवार", query: "मेरे परिवार के लोग कहाँ हैं?" },
+      { label: "चाय का समय", query: "क्या चाय का समय हो गया है?" },
+      { label: "शांत लोककथा", query: "मुझे कोई शांत लोककथा सुनाइए।" },
+      { label: "मन शांत करें", query: "मुझे थोड़ा घबराहट महसूस हो रही है।" },
     ],
     inputPlaceholder: "यहाँ अपनी बात लिखें या पूछें...",
     sendBtn: "पूछें",
@@ -63,28 +63,28 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     replayBtn: "पुनः सुनें",
     stopBtn: "रोकें",
     tapToSpeak: "बोलने के लिए दबाएं",
-    listening: "🎙️ सुन रहा हूँ... अब बोलिए",
+    listening: "सुन रहा हूँ... अब बोलिए",
     youAreSpeaking: "आप बोल रहे हैं:",
-    doneSpeaking: "✓ हो गया • पूछें",
+    doneSpeaking: "हो गया • पूछें",
     cancelSpeaking: "रद्द करें",
-    micPermissionNeeded: "माइक्रोफ़ोन की अनुमति चाहिए। कृपया ब्राउज़र में Allow करें।",
+    micPermissionNeeded: "माइक्रोफ़ोन की अनुमति चाहिए। कृपया Allow करें।",
     speakNaturally: "साफ़ और आराम से बोलिए",
     youAsked: "आपने पूछा:",
   },
   bn: {
-    trigger: "স্মৃতি AI ভয়েস",
-    modalTitle: "স্মৃতি AI সঙ্গী • Smriti Voice",
-    greeting: "নমস্কার দাদু 👋",
+    trigger: "স্মৃতি ভয়েস",
+    modalTitle: "স্মৃতি ভয়েস সঙ্গী",
+    greeting: "নমস্কার দাদু",
     defaultPrompt: "আপনি নিজের বাড়িতে পরিবারের সাথে নিরাপদে আছেন। কিছু জানতে চান?",
     englishPrompt: "You are safe at home with your family. What would you like to know?",
-    chipsHeader: "Quick Prompts • সহজে জিজ্ঞাসা করুন",
+    chipsHeader: "সহজে জিজ্ঞাসা করুন",
     chips: [
-      { label: "📍 আমি কোথায় আছি?", query: "আমি এখন কোথায় আছি?" },
-      { label: "💊 ওষুধের সময়?", query: "আমার পরের ওষুধের সময় কখন?" },
-      { label: "👨‍👩‍👧 আমার পরিবার", query: "আমার পরিবারের সবাই কোথায়?" },
-      { label: "☕ এক কাপ চা", query: "একটু চা খাওয়া যাবে কি?" },
-      { label: "📖 সুন্দর গল্প", query: "আমাকে একটি সুন্দর গল্প বলুন।" },
-      { label: "🌸 মন শান্ত করুন", query: "আমার একটু চিন্তা হচ্ছে।" },
+      { label: "আমি কোথায় আছি?", query: "আমি এখন কোথায় আছি?" },
+      { label: "ওষুধের সময়?", query: "আমার পরের ওষুধের সময় কখন?" },
+      { label: "আমার পরিবার", query: "আমার পরিবারের সবাই কোথায়?" },
+      { label: "এক কাপ চা", query: "একটু চা খাওয়া যাবে কি?" },
+      { label: "সুন্দর গল্প", query: "আমাকে একটি সুন্দর গল্প বলুন।" },
+      { label: "মন শান্ত করুন", query: "আমার একটু চিন্তা হচ্ছে।" },
     ],
     inputPlaceholder: "এখানে আপনার কথা লিখুন...",
     sendBtn: "জিজ্ঞেস করুন",
@@ -92,28 +92,28 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     replayBtn: "আবার শুনুন",
     stopBtn: "থামুন",
     tapToSpeak: "কথা বলতে চাপুন",
-    listening: "🎙️ শুনছি... এবার বলুন",
+    listening: "শুনছি... এবার বলুন",
     youAreSpeaking: "আপনি বলছেন:",
-    doneSpeaking: "✓ হয়ে গেছে • পাঠান",
+    doneSpeaking: "হয়ে গেছে • পাঠান",
     cancelSpeaking: "বাতিল",
-    micPermissionNeeded: "মাইক্রোফোনের অনুমতি দিন (ব্রাউজারে Allow করুন)",
+    micPermissionNeeded: "মাইক্রোফোনের অনুমতি দিন (Allow করুন)",
     speakNaturally: "ধীরে ধীরে স্পষ্ট করে বলুন",
     youAsked: "আপনি জিজ্ঞেস করেছেন:",
   },
   as: {
-    trigger: "স্মৃতি AI কণ্ঠ",
-    modalTitle: "স্মৃতি AI কণ্ঠ সংগী • Smriti Voice",
-    greeting: "নমস্কাৰ বৰদেউতা 👋",
+    trigger: "স্মৃতি কণ্ঠ",
+    modalTitle: "স্মৃতি কণ্ঠ সংগী",
+    greeting: "নমস্কাৰ বৰদেউতা",
     defaultPrompt: "আপুনি নিজৰ ঘৰতেই সুৰক্ষিতভাৱে আছে। মই আপোনাক কিদৰে সহায় কৰিব পাৰোঁ?",
     englishPrompt: "You are safe at home. How may I help you today?",
-    chipsHeader: "Quick Prompts • সহজে সোধক",
+    chipsHeader: "সহজে সোধক",
     chips: [
-      { label: "📍 মই ক'ত আছোঁ?", query: "মই এতিয়া ক'ত আছোঁ?" },
-      { label: "💊 ঔষধৰ সময়?", query: "মোৰ পিছৰ ঔষধ খোৱাৰ সময় কেতিয়া?" },
-      { label: "👨‍👩‍👧 মোৰ পৰিয়াল", query: "মোৰ পৰিয়ালৰ মানুহবোৰ ক'ত?" },
-      { label: "☕ চাহ খোৱাৰ সময়", query: "এতিয়া চাহ খোৱাৰ সময় হ'ল নেকি?" },
-      { label: "📖 এটি সাধু কওক", query: "মোক এটি ধুনীয়া সাধু কওক।" },
-      { label: "🌸 মন শান্ত কৰক", query: "মোৰ মনটো অলপ অস্থিৰ লাগিছে।" },
+      { label: "মই ক'ত আছোঁ?", query: "মই এতিয়া ক'ত আছোঁ?" },
+      { label: "ঔষধৰ সময়?", query: "মোৰ পিছৰ ঔষধ খোৱাৰ সময় কেতিয়া?" },
+      { label: "মোৰ পৰিয়াল", query: "মোৰ পৰিয়ালৰ মানুহবোৰ ক'ত?" },
+      { label: "চাহ খোৱাৰ সময়", query: "এতিয়া চাহ খোৱাৰ সময় হ'ল নেকি?" },
+      { label: "এটি সাধু কওক", query: "মোক এটি ধুনীয়া সাধু কওক।" },
+      { label: "মন শান্ত কৰক", query: "মোৰ মনটো অলপ অস্থিৰ লাগিছে।" },
     ],
     inputPlaceholder: "ইয়াত কিবা সোধক বা লিখক...",
     sendBtn: "পঠিয়াওক",
@@ -121,28 +121,28 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     replayBtn: "পুনৰ শুনক",
     stopBtn: "বন্ধ কৰক",
     tapToSpeak: "কথা ক'বলৈ টিপক",
-    listening: "🎙️ শুনি আছোঁ... এতিয়া কওক",
+    listening: "শুনি আছোঁ... এতিয়া কওক",
     youAreSpeaking: "আপুনি কৈছে:",
-    doneSpeaking: "✓ হৈ গ'ল • সোধক",
+    doneSpeaking: "হৈ গ'ল • সোধক",
     cancelSpeaking: "বাতিল কৰক",
     micPermissionNeeded: "মাইক্ৰ'ফ'নৰ অনুমতি দিয়ক (Allow কৰক)",
     speakNaturally: "ধীৰে ধীৰে স্পষ্টকৈ কওক",
     youAsked: "আপুনি সুধিছে:",
   },
   mni: {
-    trigger: "ꯁ꯭ꯃ꯭ꯔꯤꯇꯤ AI ꯈꯣꯟꯊꯣꯛ",
-    modalTitle: "ꯁ꯭ꯃ꯭ꯔꯤꯇꯤ AI ꯈꯣꯟꯊꯣꯛ • Smriti Voice",
-    greeting: "ꯈꯨꯔꯨꯝꯖꯔꯤ ꯏꯄꯥ 👋",
+    trigger: "ꯁ꯭ꯃ꯭ꯔꯤꯇꯤ ꯈꯣꯟꯊꯣꯛ",
+    modalTitle: "ꯁ꯭ꯃ꯭ꯔꯤꯇꯤ ꯈꯣꯟꯊꯣꯛ",
+    greeting: "ꯈꯨꯔꯨꯝꯖꯔꯤ ꯏꯄꯥ",
     defaultPrompt: "ꯅꯍꯥꯛ ꯃꯌꯨꯃꯗꯥ ꯅꯨꯡꯉꯥꯏꯅꯥ ꯂꯩꯔꯤ꯫ ꯑꯩꯅꯥ ꯀꯔꯤ ꯃꯇꯦꯡ ꯄꯥꯡꯒꯗꯒꯦ?",
     englishPrompt: "You are resting safely at home. How can I help you?",
-    chipsHeader: "Quick Prompts • ꯌꯥꯝꯅꯥ ꯊꯨꯅꯥ ꯍꯪꯕꯤꯌꯨ",
+    chipsHeader: "ꯌꯥꯝꯅꯥ ꯊꯨꯅꯥ ꯍꯪꯕꯤꯌꯨ",
     chips: [
-      { label: "📍 ꯑꯩ ꯀꯗꯥꯌꯗꯥ ꯂꯩꯔꯤ?", query: "ꯑꯩ ꯍꯧꯖꯤꯛ ꯀꯗꯥꯌꯗꯥ ꯂꯩꯔꯤ?" },
-      { label: "💊 ꯍꯤꯗꯥꯛ ꯃꯇꝝ?", query: "ꯍꯤꯗꯥꯛ ꯆꯥꯕꯒꯤ ꯃꯇꯝ ꯀꯗꯥꯏꯗꯅꯣ?" },
-      { label: "👨‍👩‍👧 ꯑꯩꯒꯤ ꯏꯃꯨꯡ", query: "ꯑꯩꯒꯤ ꯏꯃꯨꯡ ꯃꯅꯨꯡ ꯀꯗꯥꯏꯗꯥ ꯂꯩꯔꯤ?" },
-      { label: "☕ ꯆꯥ ꯊꯛꯅꯕꯥ", query: "ꯆꯥ ꯊꯛꯅꯕꯥ ꯃꯇꯝ ꯑꯣꯏꯔꯕ꯭ꯔꯥ?" },
-      { label: "📖 ꯋꯥꯔꯤ ꯑꯃꯥ", query: "ꯅꯨꯡꯉꯥꯏꯔꯕꯥ ꯋꯥꯔꯤ ꯑꯃꯥ ꯍꯥꯌꯕꯤꯌꯨ꯫" },
-      { label: "🌸 ꯋꯥꯈꯜ ꯅꯨꯡꯉꯥꯏꯍꯅꯕꯥ", query: "ꯋꯥꯈꯜ ꯅꯨꯡꯉꯥꯏꯇꯕꯥ ꯐꯥꯎꯋꯤ꯫" },
+      { label: "ꯑꯩ ꯀꯗꯥꯌꯗꯥ ꯂꯩꯔꯤ?", query: "ꯑꯩ ꯍꯧꯖꯤꯛ ꯀꯗꯥꯌꯗꯥ ꯂꯩꯔꯤ?" },
+      { label: "ꯍꯤꯗꯥꯛ ꯃꯇꝝ?", query: "ꯍꯤꯗꯥꯛ ꯆꯥꯕꯒꯤ ꯃꯇꯝ ꯀꯗꯥꯏꯗꯅꯣ?" },
+      { label: "ꯑꯩꯒꯤ ꯏꯃꯨꯡ", query: "ꯑꯩꯒꯤ ꯏꯃꯨꯡ ꯃꯅꯨꯡ ꯀꯗꯥꯏꯗꯥ ꯂꯩꯔꯤ?" },
+      { label: "ꯆꯥ ꯊꯛꯅꯕꯥ", query: "ꯆꯥ ꯊꯛꯅꯕꯥ ꯃꯇꯝ ꯑꯣꯏꯔꯕ꯭ꯔꯥ?" },
+      { label: "ꯋꯥꯔꯤ ꯑꯃꯥ", query: "ꯅꯨꯡꯉꯥꯏꯔꯕꯥ ꯋꯥꯔꯤ ꯑꯃꯥ ꯍꯥꯌꯕꯤꯌꯨ꯫" },
+      { label: "ꯋꯥꯈꯜ ꯅꯨꯡꯉꯥꯏꯍꯅꯕꯥ", query: "ꯋꯥꯈꯜ ꯅꯨꯡꯉꯥꯏꯇꯕꯥ ꯐꯥꯎꯋꯤ꯫" },
     ],
     inputPlaceholder: "ꯋꯥꯍꯪ ꯃꯐꯝ ꯑꯁꯤꯗꯥ ꯏꯕꯤꯌꯨ...",
     sendBtn: "ꯍꯪꯕꯤꯌꯨ",
@@ -150,28 +150,28 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     replayBtn: "ꯑꯃꯨꯛ ꯇꯥꯕꯤꯌꯨ",
     stopBtn: "ꯂꯦꯞꯄꯤꯌꯨ",
     tapToSpeak: "ꯋꯥ ꯉꯥꯡꯅꯕꯥ ꯅꯝꯕꯤꯌꯨ",
-    listening: "🎙️ ꯇꯥꯔꯤ... ꯍꯧꯖꯤꯛ ꯉꯥꯡꯕꯤꯌꯨ",
+    listening: "ꯇꯥꯔꯤ... ꯍꯧꯖꯤꯛ ꯉꯥꯡꯕꯤꯌꯨ",
     youAreSpeaking: "ꯅꯍꯥꯛ ꯉꯥꯡꯂꯤ:",
-    doneSpeaking: "✓ ꯂꯣꯏꯔꯦ • ꯊꯥꯕꯤꯌꯨ",
+    doneSpeaking: "ꯂꯣꯏꯔꯦ • ꯊꯥꯕꯤꯌꯨ",
     cancelSpeaking: "ꯂꯦꯞꯄꯤꯌꯨ",
     micPermissionNeeded: "ꯃꯥꯏꯛ ꯑꯌꯥꯕꯥ ꯄꯤꯕꯤꯌꯨ (Allow তৌꯕꯤꯌꯨ)",
     speakNaturally: "ꯇꯞꯅꯥ ꯉꯥꯡꯕꯤꯌꯨ",
     youAsked: "ꯅꯍꯥꯛꯅꯥ ꯍꯪꯈꯤꯕꯥ:",
   },
   brx: {
-    trigger: "स्मृति AI गारां",
-    modalTitle: "स्मृति AI लोगो • Smriti Voice",
-    greeting: "खुलुमबाय आबौ 👋",
+    trigger: "स्मृति गारां",
+    modalTitle: "स्मृति गारां लोगो",
+    greeting: "खुलुमबाय आबौ",
     defaultPrompt: "नोंथाङा नखराव मोजाङैनो दं। आंखौ जेबो सोंनो हागोन।",
     englishPrompt: "You are safe at home with your family. Ask me anything.",
-    chipsHeader: "Quick Prompts • गोख्रै सों",
+    chipsHeader: "गोख्रै सों",
     chips: [
-      { label: "📍 आं बबेयाव दं?", query: "आं दा बबेयाव दं?" },
-      { label: "💊 मुलिनि सम?", query: "मुलि जानायनि सम जाबाय नामा?" },
-      { label: "👨‍👩‍👧 आंनि नखर", query: "आंनि नखरनि मानसिफोरा बबेयाव?" },
-      { label: "☕ साहा लोंनाय", query: "साहा लोंनायनि सम जाबाय नामा?" },
-      { label: "📖 सल' खोनासं", query: "आंखौ मोनसे मोजां सल' खोनथा।" },
-      { label: "🌸 गोसो शान्ति", query: "आंनि गोसोआ खायफा खायफा मोनदों।" },
+      { label: "आं बबेयाव दं?", query: "आं दा बबेयाव दं?" },
+      { label: "मुलिनि सम?", query: "मुलि जानायनि सम जाबाय नामा?" },
+      { label: "आंनि नखर", query: "आंनि नखरनि मानसिफोरा बबेयाव?" },
+      { label: "साहा लोंनाय", query: "साहा लोंनायनि सम जाबाय नामा?" },
+      { label: "सल' खोनासं", query: "आंखौ मोनसे मोजां सल' खोनथा।" },
+      { label: "गोसो शान्ति", query: "आंनि गोसोआ खायफा खायफा मोनदों।" },
     ],
     inputPlaceholder: "बेयाव सों...",
     sendBtn: "सों",
@@ -179,28 +179,28 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     replayBtn: "खोनासं",
     stopBtn: "थानो हो",
     tapToSpeak: "रायहोनो थु",
-    listening: "🎙️ खोनादों... दा बुं",
+    listening: "खोनादों... दा बुं",
     youAreSpeaking: "नों बुंदों:",
-    doneSpeaking: "✓ जाबाय • हर",
+    doneSpeaking: "जाबाय • हर",
     cancelSpeaking: "थानो हो",
     micPermissionNeeded: "माइकनि गनायथि हो (Allow खालाम)",
     speakNaturally: "मोजाङै बुं",
     youAsked: "नों सोंदों:",
   },
   kha: {
-    trigger: "Smriti AI Sur",
-    modalTitle: "Smriti AI Companion",
-    greeting: "Khublei Kpa 👋",
+    trigger: "Smriti Sur",
+    modalTitle: "Smriti Voice Companion",
+    greeting: "Khublei Kpa",
     defaultPrompt: "Phi shngain ha iing bad kiba ha iing. Kiei kiba ngan lah ban ïarap?",
     englishPrompt: "You are safe at home with your family. Ask me anything.",
-    chipsHeader: "Quick Prompts • Kylli kloi",
+    chipsHeader: "Kylli kloi",
     chips: [
-      { label: "📍 Nga don haei?", query: "Nga don haei mynta?" },
-      { label: "💊 Ka por dawai?", query: "Kano ka por dawai kaba bud?" },
-      { label: "👨‍👩‍👧 Ka ïing ka sem", query: "Haei kiba ha ïing jong nga?" },
-      { label: "☕ Ka por dih sha", query: "La dei ka por ban dih sha?" },
-      { label: "📖 Ka puriskam", query: "Iathuh ïa kawei ka puriskam." },
-      { label: "🌸 Pynjem jingmut", query: "Nga sngew diaw jingmut." },
+      { label: "Nga don haei?", query: "Nga don haei mynta?" },
+      { label: "Ka por dawai?", query: "Kano ka por dawai kaba bud?" },
+      { label: "Ka ïing ka sem", query: "Haei kiba ha ïing jong nga?" },
+      { label: "Ka por dih sha", query: "La dei ka por ban dih sha?" },
+      { label: "Ka puriskam", query: "Iathuh ïa kawei ka puriskam." },
+      { label: "Pynjem jingmut", query: "Nga sngew diaw jingmut." },
     ],
     inputPlaceholder: "Kylli hangne...",
     sendBtn: "Kylli",
@@ -208,28 +208,28 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     replayBtn: "Sngap pat",
     stopBtn: "Sangeh",
     tapToSpeak: "Kren hangne",
-    listening: "🎙️ Dang sngap... kren mynta",
+    listening: "Dang sngap... kren mynta",
     youAreSpeaking: "Phi dang kren:",
-    doneSpeaking: "✓ Lah dep • Phah",
+    doneSpeaking: "Lah dep • Phah",
     cancelSpeaking: "Sangeh",
     micPermissionNeeded: "Ai bor ïa u mic ha ka browser",
     speakNaturally: "Kren suki bad shai",
     youAsked: "Phi la kylli:",
   },
   lus: {
-    trigger: "Smriti AI Aw",
-    modalTitle: "Smriti AI Ṭhian",
-    greeting: "Chibai Ka Pu 👋",
+    trigger: "Smriti Aw",
+    modalTitle: "Smriti Ṭhian",
+    greeting: "Chibai Ka Pu",
     defaultPrompt: "In lamah i him e. Engtin nge ka puih theih che?",
     englishPrompt: "You are safe at home with your family. Ask me anything.",
-    chipsHeader: "Quick Prompts • Zawt zung zung rawh",
+    chipsHeader: "Zawt zung zung rawh",
     chips: [
-      { label: "📍 Khawiah nge ka awm?", query: "Khawiah nge ka awm mek?" },
-      { label: "💊 Damdawi ei hun?", query: "Engtikah nge damdawi ei leh hun?" },
-      { label: "👨‍👩‍👧 Ka chhungte", query: "Khawiah nge ka chhungte an awm?" },
-      { label: "☕ Thingpui in hun", query: "Thingpui in a hun tawh em?" },
-      { label: "📖 Thawnthu min hrilh", query: "Thawnthu ngaihnawm tak min hrilh rawh." },
-      { label: "🌸 Rilru hahdamna", query: "Ka rilru a hah deuh riau mai." },
+      { label: "Khawiah nge ka awm?", query: "Khawiah nge ka awm mek?" },
+      { label: "Damdawi ei hun?", query: "Engtikah nge damdawi ei leh hun?" },
+      { label: "Ka chhungte", query: "Khawiah nge ka chhungte an awm?" },
+      { label: "Thingpui in hun", query: "Thingpui in a hun tawh em?" },
+      { label: "Thawnthu min hrilh", query: "Thawnthu ngaihnawm tak min hrilh rawh." },
+      { label: "Rilru hahdamna", query: "Ka rilru a hah deuh riau mai." },
     ],
     inputPlaceholder: "Zawt rawh le...",
     sendBtn: "Zawt",
@@ -237,40 +237,40 @@ const ASSISTANT_LOCALES: Record<string, LocalizedAssistantLabels> = {
     replayBtn: "Ngaithla leh rawh",
     stopBtn: "Tawp rawh",
     tapToSpeak: "Tawng turin hmet rawh",
-    listening: "🎙️ Ka ngaithla mek... sawi rawh le",
+    listening: "Ka ngaithla mek... sawi rawh le",
     youAreSpeaking: "I sawi mek:",
-    doneSpeaking: "✓ Ka zo e • Thawn rawh",
+    doneSpeaking: "Ka zo e • Thawn rawh",
     cancelSpeaking: "Tawp rawh",
-    micPermissionNeeded: "Khawngaihin browser-ah mic phalna pe rawh",
+    micPermissionNeeded: "Khawngaihin mic phalna pe rawh",
     speakNaturally: "Muangchangin sawi rawh",
     youAsked: "I zawh mek chu:",
   },
   en: {
-    trigger: "Smriti AI Voice",
-    modalTitle: "Smriti AI Voice Companion",
-    greeting: "Hello Grandfather 👋",
+    trigger: "Smriti Voice",
+    modalTitle: "Smriti Voice Companion",
+    greeting: "Hello Grandfather",
     defaultPrompt: "You are safe and warm at home with family. How may I help you today?",
     englishPrompt: "You are safe and warm at home with family.",
-    chipsHeader: "Quick Prompts • Tap to Ask",
+    chipsHeader: "Quick Prompts",
     chips: [
-      { label: "📍 Where am I?", query: "Where am I right now?" },
-      { label: "💊 Next medicine?", query: "When is my next medicine?" },
-      { label: "👨‍👩‍👧 My family", query: "Where is my family right now?" },
-      { label: "☕ Tea time?", query: "Is it time for a cup of tea?" },
-      { label: "📖 Tell a folk story", query: "Tell me a soothing folk story." },
-      { label: "🌸 Help me relax", query: "I am feeling a little restless." },
+      { label: "Where am I?", query: "Where am I right now?" },
+      { label: "Next medicine?", query: "When is my next medicine?" },
+      { label: "My family", query: "Where is my family right now?" },
+      { label: "Tea time?", query: "Is it time for a cup of tea?" },
+      { label: "Tell a folk story", query: "Tell me a soothing folk story." },
+      { label: "Help me relax", query: "I am feeling a little restless." },
     ],
-    inputPlaceholder: "Ask me anything or tap a prompt above...",
+    inputPlaceholder: "Ask anything or select a prompt...",
     sendBtn: "Ask",
     thinking: "Thinking peacefully...",
     replayBtn: "Listen Again",
     stopBtn: "Stop Voice",
     tapToSpeak: "Tap to Speak",
-    listening: "🎙️ Listening... speak now",
+    listening: "Listening... speak now",
     youAreSpeaking: "You are saying:",
-    doneSpeaking: "✓ Done • Send",
+    doneSpeaking: "Done • Send",
     cancelSpeaking: "Cancel",
-    micPermissionNeeded: "Microphone access is needed. Please allow it in your browser.",
+    micPermissionNeeded: "Microphone permission is needed. Please allow it.",
     speakNaturally: "Speak clearly and calmly at your own pace",
     youAsked: "You asked:",
   },
@@ -304,8 +304,7 @@ export default function VoiceAssistantButton({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const animFrameRef = useRef<number | null>(null);
+  const animIntervalRef = useRef<number | null>(null);
   const transcriptRef = useRef<string>("");
   const maxTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -329,7 +328,7 @@ export default function VoiceAssistantButton({
     offlineMobileStore.setGeminiApiKey(apiKeyInput);
     const hasKey = Boolean(apiKeyInput && apiKeyInput.trim().length > 0);
     setHasApiKey(hasKey);
-    setKeySavedMessage(hasKey ? "✓ Gemini API Key saved! Live AI activated." : "✓ Offline clinical engine active.");
+    setKeySavedMessage(hasKey ? "✓ Gemini API Key saved. Cloud AI active." : "✓ Offline clinical engine active.");
     setTimeout(() => setKeySavedMessage(""), 3500);
   };
 
@@ -346,14 +345,14 @@ export default function VoiceAssistantButton({
     setIsSpeaking(true);
     setIsTestingVoice(true);
     const testPhrases: Record<string, string> = {
-      hi: "नमस्ते दादाजी, मैं स्मृति हूँ। मेरी आवाज अब शांत, सहज और स्वाभाविक है।",
-      bn: "নমস্কার দাদু, আমি স্মৃতি। আমার কণ্ঠ এখন শান্ত এবং স্বাভাবিক।",
-      as: "নমস্কাৰ বৰদেউতা, মই স্মৃতি। মোৰ মাত এতিয়া শান্ত আৰু সহজ।",
-      mni: "ꯈꯨꯔꯨꯝꯖꯔꯤ ꯏꯄꯥ, ꯑꯩ ꯁ꯭ꯃ꯭ꯔꯤꯇꯤꯅꯤ꯫ ꯑꯩꯒꯤ ꯈꯣꯟꯊꯣꯛ ꯑꯁꯤ ꯅꯨꯡꯉꯥꯏꯔꯕꯥ ꯑꯣꯏꯔꯦ꯫",
-      brx: "खुलुमबाय आबौ, आं स्मृति। आंनि गाराङा दा गोजोन आरो मोजां जाबाय।",
-      kha: "Khublei Kpa, nga dei ka Smriti. Ka sur kren jong nga ka la wan jem mynta.",
-      lus: "Chibai Ka Pu, Smriti ka ni e. Ka aw hi a dam tawh hle mai.",
-      en: "Hello Grandfather, I am Smriti. My voice is now warm, gentle, and natural.",
+      hi: "नमस्ते दादाजी, मैं आपकी देखभाल साथी स्मृति हूँ। सब कुछ सुरक्षित और शांत है।",
+      bn: "নমস্কার দাদু, আমি স্মৃতি। আপনার সেবায় আমি সর্বদা পাশে আছি।",
+      as: "নমস্কাৰ বৰদেউতা, মই স্মৃতি। আপুনি নিজৰ ঘৰতেই সুৰক্ষিতভাৱে আছে।",
+      mni: "ꯈꯨꯔꯨꯝꯖꯔꯤ ꯏꯄꯥ, ꯑꯩ ꯁ꯭ꯃ꯭ꯔꯤꯇꯤꯅꯤ꯫ ꯅꯍꯥꯛ ꯃꯌꯨꯃꯗꯥ ꯅꯨꯡꯉꯥꯏꯅꯥ ꯂꯩꯔꯤ꯫",
+      brx: "खुलुमबाय आबौ, आं स्मृति। नोंथाङा नखराव मोजाङैनो दं।",
+      kha: "Khublei Kpa, nga dei ka Smriti. Phi shngain ha iing bad kiba ha iing.",
+      lus: "Chibai Ka Pu, Smriti ka ni e. In lamah i him e.",
+      en: "Hello Grandfather, I am Smriti. You are safe at home with your family.",
     };
     const phrase = testPhrases[language] || testPhrases.en;
     speakTextWithTTS(
@@ -405,7 +404,7 @@ export default function VoiceAssistantButton({
       emotionTone: "CALMING",
     });
 
-    // Speak initial greeting with normal TTS
+    // Speak initial greeting safely
     setIsSpeaking(true);
     speakTextWithTTS(
       initialText,
@@ -426,259 +425,223 @@ export default function VoiceAssistantButton({
   };
 
   /**
-   * Start listening to the microphone
-   * Immediately activates listening UI and launches dual speech engines:
-   * 1. In-browser SpeechRecognition with real-time interim results
-   * 2. getUserMedia + MediaRecorder fallback for Gemini Multimodal Audio
+   * Safe, non-blocking microphone activator
+   * Prevents audio hardware conflict on Android WebView
    */
   const startListening = () => {
-    // 1. Cancel TTS playback & clear previous state
-    stopTTS();
-    setIsSpeaking(false);
-    setLiveTranscript("");
-    transcriptRef.current = "";
-    audioChunksRef.current = [];
-    setMicPermissionDenied(false);
+    try {
+      stopTTS();
+      setIsSpeaking(false);
+      setLiveTranscript("");
+      transcriptRef.current = "";
+      audioChunksRef.current = [];
+      setMicPermissionDenied(false);
+      setIsListeningMic(true);
+      triggerHaptic("tap");
 
-    // 2. Immediately activate listening state for instant visual feedback
-    setIsListeningMic(true);
-    playBeep(600, 100);
-    triggerHaptic("tap");
-
-    // 3. Start Web Speech Recognition immediately
-    const SpeechRecognition =
-      typeof window !== "undefined"
-        ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-        : null;
-
-    if (SpeechRecognition) {
-      try {
-        const recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = getWebSpeechLang(language);
-
-        recognition.onresult = (event: any) => {
-          let interim = "";
-          let final = "";
-          for (let i = 0; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-              final += event.results[i][0].transcript + " ";
-            } else {
-              interim += event.results[i][0].transcript;
-            }
-          }
-          const currentCombined = (final + interim).trim();
-          if (currentCombined) {
-            setLiveTranscript(currentCombined);
-            transcriptRef.current = currentCombined;
-          }
-        };
-
-        recognition.onerror = (err: any) => {
-          console.debug("Web Speech API note:", err?.error);
-          if (err?.error === "not-allowed" || err?.error === "service-not-allowed") {
-            setMicPermissionDenied(true);
-          }
-        };
-
-        recognition.onend = () => {
-          // Keep listening active until user stops
-        };
-
-        recognition.start();
-        recognitionRef.current = recognition;
-      } catch (speechErr) {
-        console.debug("SpeechRecognition initialization note:", speechErr);
+      // Simulated soundwave pulsation (zero hardware conflict)
+      if (animIntervalRef.current) {
+        clearInterval(animIntervalRef.current);
       }
-    }
+      let step = 0;
+      animIntervalRef.current = window.setInterval(() => {
+        step = (step + 1) % 10;
+        const level = 35 + Math.sin(step) * 25 + Math.random() * 20;
+        setAudioLevel(Math.round(level));
+      }, 100) as unknown as number;
 
-    // 4. Concurrently request getUserMedia for live volume visualizer & MediaRecorder fallback
-    if (typeof window !== "undefined" && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ audio: true })
-        .then((stream) => {
-          streamRef.current = stream;
+      // Primary Speech Engine: Web Speech API
+      const SpeechRecognition =
+        typeof window !== "undefined"
+          ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+          : null;
 
-          // Set up live volume visualizer (AudioContext + AnalyserNode)
-          try {
-            const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-            if (AudioCtx) {
-              const ctx = new AudioCtx();
-              audioContextRef.current = ctx;
-              const analyser = ctx.createAnalyser();
-              analyser.fftSize = 64;
-              const source = ctx.createMediaStreamSource(stream);
-              source.connect(analyser);
+      if (SpeechRecognition) {
+        try {
+          const recognition = new SpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.lang = getWebSpeechLang(language);
 
-              const dataArr = new Uint8Array(analyser.frequencyBinCount);
-              const checkVolume = () => {
-                if (!analyser) return;
-                analyser.getByteFrequencyData(dataArr);
-                let sum = 0;
-                for (let i = 0; i < dataArr.length; i++) {
-                  sum += dataArr[i];
-                }
-                const avg = sum / dataArr.length;
-                setAudioLevel(Math.min(100, Math.round((avg / 128) * 100)));
-                animFrameRef.current = requestAnimationFrame(checkVolume);
-              };
-              checkVolume();
-            }
-          } catch (err) {
-            console.debug("Audio visualizer note:", err);
-          }
-
-          // Set up MediaRecorder fallback
-          try {
-            const mimeType =
-              typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/webm")
-                ? "audio/webm"
-                : typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/mp4")
-                ? "audio/mp4"
-                : "";
-            const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
-            mediaRecorderRef.current = recorder;
-            recorder.ondataavailable = (e) => {
-              if (e.data && e.data.size > 0) {
-                audioChunksRef.current.push(e.data);
+          recognition.onresult = (event: any) => {
+            let interim = "";
+            let final = "";
+            for (let i = 0; i < event.results.length; ++i) {
+              if (event.results[i].isFinal) {
+                final += event.results[i][0].transcript + " ";
+              } else {
+                interim += event.results[i][0].transcript;
               }
-            };
-            recorder.start(250);
-          } catch (recErr) {
-            console.warn("MediaRecorder start note:", recErr);
-          }
-        })
-        .catch((permErr) => {
-          console.warn("Microphone access note:", permErr);
-          if (!recognitionRef.current) {
+            }
+            const currentCombined = (final + interim).trim();
+            if (currentCombined) {
+              setLiveTranscript(currentCombined);
+              transcriptRef.current = currentCombined;
+            }
+          };
+
+          recognition.onerror = (err: any) => {
+            console.debug("Web Speech notice:", err?.error);
+            if (err?.error === "not-allowed" || err?.error === "service-not-allowed") {
+              setMicPermissionDenied(true);
+            }
+          };
+
+          recognition.onend = () => {
+            // Speech engine stopped
+          };
+
+          recognition.start();
+          recognitionRef.current = recognition;
+        } catch (speechErr) {
+          console.debug("SpeechRecognition notice:", speechErr);
+        }
+      } else if (
+        typeof window !== "undefined" &&
+        navigator.mediaDevices &&
+        navigator.mediaDevices.getUserMedia
+      ) {
+        // Fallback to MediaRecorder ONLY if Web Speech is unavailable
+        navigator.mediaDevices
+          .getUserMedia({ audio: true })
+          .then((stream) => {
+            streamRef.current = stream;
+            try {
+              const mimeType =
+                typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/webm")
+                  ? "audio/webm"
+                  : typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/mp4")
+                  ? "audio/mp4"
+                  : "";
+              const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+              mediaRecorderRef.current = recorder;
+              recorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) {
+                  audioChunksRef.current.push(e.data);
+                }
+              };
+              recorder.start(250);
+            } catch (recErr) {
+              console.warn("MediaRecorder start notice:", recErr);
+            }
+          })
+          .catch((permErr) => {
+            console.warn("Microphone access notice:", permErr);
             setMicPermissionDenied(true);
             setIsListeningMic(false);
-          }
-        });
-    }
+          });
+      }
 
-    // 5. Automatic safety timeout after 18 seconds
-    maxTimerRef.current = setTimeout(() => {
-      stopListeningAndSubmit();
-    }, 18000);
+      // 18s safety timeout
+      if (maxTimerRef.current) clearTimeout(maxTimerRef.current);
+      maxTimerRef.current = setTimeout(() => {
+        stopListeningAndSubmit();
+      }, 18000);
+    } catch (err) {
+      console.warn("startListening error safely intercepted:", err);
+      setIsListeningMic(false);
+      setMicPermissionDenied(true);
+    }
   };
 
-  /**
-   * Stop listening and submit either recognized text or recorded audio
-   */
   const stopListeningAndSubmit = async () => {
-    if (maxTimerRef.current) {
-      clearTimeout(maxTimerRef.current);
-      maxTimerRef.current = null;
-    }
-    if (animFrameRef.current) {
-      cancelAnimationFrame(animFrameRef.current);
-      animFrameRef.current = null;
-    }
-    if (audioContextRef.current) {
-      try {
-        audioContextRef.current.close();
-      } catch {}
-      audioContextRef.current = null;
-    }
+    try {
+      if (maxTimerRef.current) {
+        clearTimeout(maxTimerRef.current);
+        maxTimerRef.current = null;
+      }
+      if (animIntervalRef.current) {
+        clearInterval(animIntervalRef.current);
+        animIntervalRef.current = null;
+      }
+      setAudioLevel(0);
+      setIsListeningMic(false);
 
-    setAudioLevel(0);
-    setIsListeningMic(false);
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {}
+        recognitionRef.current = null;
+      }
 
-    // Stop Speech Recognition
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch {}
-      recognitionRef.current = null;
-    }
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+        try {
+          mediaRecorderRef.current.stop();
+        } catch {}
+      }
+      mediaRecorderRef.current = null;
 
-    // Stop MediaRecorder
-    const recorder = mediaRecorderRef.current;
-    if (recorder && recorder.state !== "inactive") {
-      try {
-        recorder.stop();
-      } catch {}
-    }
-    mediaRecorderRef.current = null;
+      if (streamRef.current) {
+        try {
+          streamRef.current.getTracks().forEach((t) => t.stop());
+        } catch {}
+        streamRef.current = null;
+      }
 
-    // Release microphone hardware
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-
-    const recognizedText = (transcriptRef.current || liveTranscript).trim();
-
-    // Primary: If Web Speech recognition captured speech
-    if (recognizedText) {
-      setUserSpokenQuery(recognizedText);
-      setLiveTranscript("");
-      handleSendQuery(recognizedText);
-      return;
-    }
-
-    // Secondary fallback: If Web Speech was silent/unsupported, send recorded audio blob to Gemini multimodal
-    if (audioChunksRef.current.length > 0) {
-      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-      if (audioBlob.size > 1500) {
-        handleSendAudioBlob(audioBlob);
+      const recognizedText = (transcriptRef.current || liveTranscript).trim();
+      if (recognizedText) {
+        setUserSpokenQuery(recognizedText);
+        setLiveTranscript("");
+        handleSendQuery(recognizedText);
         return;
       }
-    }
 
-    // No speech detected
-    setLiveTranscript("");
+      if (audioChunksRef.current.length > 0) {
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        if (audioBlob.size > 1500) {
+          handleSendAudioBlob(audioBlob);
+          return;
+        }
+      }
+      setLiveTranscript("");
+    } catch (submitErr) {
+      console.warn("Submit voice query error:", submitErr);
+      setIsListeningMic(false);
+    }
   };
 
-  /**
-   * Abort listening without submitting
-   */
   const cancelListening = () => {
-    if (maxTimerRef.current) {
-      clearTimeout(maxTimerRef.current);
-      maxTimerRef.current = null;
-    }
-    if (animFrameRef.current) {
-      cancelAnimationFrame(animFrameRef.current);
-      animFrameRef.current = null;
-    }
-    if (audioContextRef.current) {
-      try {
-        audioContextRef.current.close();
-      } catch {}
-      audioContextRef.current = null;
-    }
-    setAudioLevel(0);
-    setIsListeningMic(false);
-    setLiveTranscript("");
-    transcriptRef.current = "";
-    audioChunksRef.current = [];
+    try {
+      if (maxTimerRef.current) {
+        clearTimeout(maxTimerRef.current);
+        maxTimerRef.current = null;
+      }
+      if (animIntervalRef.current) {
+        clearInterval(animIntervalRef.current);
+        animIntervalRef.current = null;
+      }
+      setAudioLevel(0);
+      setIsListeningMic(false);
+      setLiveTranscript("");
+      transcriptRef.current = "";
+      audioChunksRef.current = [];
 
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch {}
-      recognitionRef.current = null;
-    }
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-      try {
-        mediaRecorderRef.current.stop();
-      } catch {}
-    }
-    mediaRecorderRef.current = null;
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {}
+        recognitionRef.current = null;
+      }
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+        try {
+          mediaRecorderRef.current.stop();
+        } catch {}
+      }
+      mediaRecorderRef.current = null;
 
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
+      if (streamRef.current) {
+        try {
+          streamRef.current.getTracks().forEach((t) => t.stop());
+        } catch {}
+        streamRef.current = null;
+      }
+    } catch {}
   };
 
   const handleSendAudioBlob = async (blob: Blob) => {
     setIsLoading(true);
     stopTTS();
     setIsSpeaking(false);
-    playBeep(480, 80);
 
     const reader = new FileReader();
     reader.onloadend = async () => {
@@ -695,8 +658,6 @@ export default function VoiceAssistantButton({
           setUserSpokenQuery(resp.transcript);
         }
         setIsLoading(false);
-
-        // Speak response aloud with browser TTS at calming 0.85x speed
         setIsSpeaking(true);
         speakTextWithTTS(
           resp.replyText,
@@ -720,14 +681,12 @@ export default function VoiceAssistantButton({
     setIsLoading(true);
     stopTTS();
     setIsSpeaking(false);
-    playBeep(480, 80);
 
     try {
       const resp = await generateGeminiCompanionReply(queryText, language);
       setCurrentReply(resp);
       setIsLoading(false);
 
-      // Speak response aloud with browser TTS at calming 0.85x speed
       setIsSpeaking(true);
       speakTextWithTTS(
         resp.replyText,
@@ -773,7 +732,7 @@ export default function VoiceAssistantButton({
         data-testid="voice-assistant-fab-btn"
         type="button"
         onClick={handleOpen}
-        aria-label="Smriti Voice Assistant: Tap to speak and listen"
+        aria-label="Smriti Voice Assistant"
         style={{
           position: "fixed",
           bottom: "calc(5.5rem + env(safe-area-inset-bottom, 0px))",
@@ -788,25 +747,22 @@ export default function VoiceAssistantButton({
           alignItems: "center",
           gap: "0.6rem",
           cursor: "pointer",
-          boxShadow:
-            "0 10px 25px -5px rgba(2, 132, 199, 0.45), 0 8px 10px -6px rgba(2, 132, 199, 0.3)",
+          boxShadow: "0 10px 25px -5px rgba(2, 132, 199, 0.45)",
           minHeight: "56px",
-          transition: "transform 0.15s ease, box-shadow 0.15s ease",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.04)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
+          transition: "transform 0.15s ease",
         }}
       >
-        <span style={{ fontSize: "1.35rem" }}>🎙️</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+          <line x1="12" x2="12" y1="19" y2="22" />
+        </svg>
         <span style={{ fontSize: "0.95rem", fontWeight: 800, letterSpacing: "0.02em" }}>
           {loc.trigger}
         </span>
       </button>
 
-      {/* ── Reassuring Voice Dialogue Modal ── */}
+      {/* ── Voice Dialogue Modal ── */}
       {isOpen && (
         <div
           role="dialog"
@@ -835,48 +791,43 @@ export default function VoiceAssistantButton({
               boxShadow: "0 -10px 30px -5px rgba(0, 0, 0, 0.25)",
               maxHeight: "92dvh",
               overflowY: "auto",
+              color: "#0f172a",
+              fontFamily: "system-ui, -apple-system, sans-serif",
             }}
           >
-            {/* Header / Dismiss & Settings */}
+            {/* Header & Controls */}
             <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 marginBottom: "0.85rem",
-                borderBottom: "1px solid var(--gray-200)",
+                borderBottom: "1px solid #e2e8f0",
                 paddingBottom: "0.6rem",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "0.45rem", flexWrap: "wrap" }}>
-                <span style={{ fontSize: "1.4rem" }}>🤖</span>
-                <div>
+              <div>
+                <span
+                  id="voice-modal-title"
+                  style={{ fontSize: "1.05rem", fontWeight: 800, color: "#0f172a" }}
+                >
+                  {loc.modalTitle}
+                </span>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginTop: "2px" }}>
                   <span
-                    id="voice-modal-title"
-                    style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--gray-900)" }}
+                    id="ai-engine-status-pill"
+                    style={{
+                      fontSize: "0.7rem",
+                      fontWeight: 700,
+                      padding: "0.15rem 0.5rem",
+                      borderRadius: "999px",
+                      background: hasApiKey ? "#ecfdf5" : "#eff6ff",
+                      color: hasApiKey ? "#065f46" : "#1e40af",
+                      border: hasApiKey ? "1px solid #a7f3d0" : "1px solid #bfdbfe",
+                    }}
                   >
-                    {loc.modalTitle}
+                    {hasApiKey ? "Live AI (Gemini 1.5)" : "Clinical AI (Offline)"}
                   </span>
-                  {/* Engine Status Pill */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginTop: "2px" }}>
-                    <span
-                      id="ai-engine-status-pill"
-                      style={{
-                        fontSize: "0.7rem",
-                        fontWeight: 700,
-                        padding: "0.15rem 0.5rem",
-                        borderRadius: "999px",
-                        background: hasApiKey ? "#ecfdf5" : "#eff6ff",
-                        color: hasApiKey ? "#065f46" : "#1e40af",
-                        border: hasApiKey ? "1px solid #a7f3d0" : "1px solid #bfdbfe",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.25rem",
-                      }}
-                    >
-                      {hasApiKey ? "⚡ Gemini 1.5 Flash (Live AI)" : "🟢 Smriti Clinical AI (100% Offline)"}
-                    </span>
-                  </div>
                 </div>
               </div>
 
@@ -884,42 +835,38 @@ export default function VoiceAssistantButton({
                 <button
                   type="button"
                   id="voice-settings-gear-btn"
-                  data-testid="voice-settings-gear-btn"
                   onClick={() => setShowSettings(!showSettings)}
-                  aria-label="Caregiver AI and Voice Settings"
-                  title="Caregiver AI & Voice Settings"
+                  aria-label="Caregiver Voice Settings"
                   style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: "50%",
-                    border: showSettings ? "2px solid #0284c7" : "1px solid var(--gray-300)",
-                    background: showSettings ? "#e0f2fe" : "var(--gray-100)",
+                    padding: "0.4rem 0.65rem",
+                    borderRadius: "8px",
+                    border: showSettings ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                    background: showSettings ? "#e0f2fe" : "#f8fafc",
                     cursor: "pointer",
-                    fontSize: "1.1rem",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    color: "#334155",
                   }}
                 >
-                  ⚙️
+                  Settings
                 </button>
                 <button
                   type="button"
                   id="voice-assistant-close-btn"
                   onClick={handleClose}
-                  aria-label="Close voice assistant"
+                  aria-label="Close"
                   style={{
-                    width: 38,
-                    height: 38,
+                    width: 36,
+                    height: 36,
                     borderRadius: "50%",
-                    border: "1px solid var(--gray-300)",
-                    background: "var(--gray-100)",
+                    border: "1px solid #cbd5e1",
+                    background: "#f1f5f9",
                     cursor: "pointer",
-                    fontSize: "1.2rem",
+                    fontSize: "1.1rem",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    color: "var(--gray-700)",
+                    color: "#475569",
                   }}
                 >
                   ✕
@@ -927,59 +874,39 @@ export default function VoiceAssistantButton({
               </div>
             </div>
 
-            {/* Caregiver AI & Natural Voice Configuration Card */}
+            {/* Caregiver Settings Card */}
             {showSettings && (
               <div
                 id="caregiver-voice-settings-card"
                 style={{
                   background: "#f8fafc",
                   border: "1.5px solid #cbd5e1",
-                  borderRadius: "16px",
-                  padding: "0.9rem",
+                  borderRadius: "14px",
+                  padding: "0.85rem",
                   marginBottom: "1rem",
                   textAlign: "left",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  <div style={{ fontWeight: 800, fontSize: "0.85rem", color: "#0f172a" }}>
-                    🛠️ Caregiver AI & Natural Voice Setup
-                  </div>
-                  <span style={{ fontSize: "0.72rem", color: "#64748b" }}>On-Device Storage</span>
+                <div style={{ fontWeight: 800, fontSize: "0.82rem", color: "#0f172a", marginBottom: "0.4rem" }}>
+                  Caregiver AI & Voice Setup
                 </div>
 
-                {/* Gemini API Key config */}
-                <div style={{ marginBottom: "0.75rem" }}>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: "0.76rem",
-                      fontWeight: 700,
-                      color: "#334155",
-                      marginBottom: "0.25rem",
-                    }}
-                  >
-                    Google Gemini API Key (Optional for Cloud AI):
+                <div style={{ marginBottom: "0.65rem" }}>
+                  <label style={{ display: "block", fontSize: "0.74rem", fontWeight: 700, color: "#334155", marginBottom: "0.2rem" }}>
+                    Google Gemini API Key (Optional):
                   </label>
                   <div style={{ display: "flex", gap: "0.4rem" }}>
                     <input
                       type="password"
                       value={apiKeyInput}
                       onChange={(e) => setApiKeyInput(e.target.value)}
-                      placeholder="AIzaSy... (leave blank for offline NLU)"
+                      placeholder="Leave blank for offline engine"
                       style={{
                         flex: 1,
                         padding: "0.45rem 0.6rem",
                         borderRadius: "8px",
                         border: "1px solid #94a3b8",
                         fontSize: "0.8rem",
-                        fontFamily: "monospace",
                       }}
                     />
                     <button
@@ -991,7 +918,7 @@ export default function VoiceAssistantButton({
                         color: "#ffffff",
                         border: "none",
                         borderRadius: "8px",
-                        fontSize: "0.78rem",
+                        fontSize: "0.76rem",
                         fontWeight: 700,
                         cursor: "pointer",
                       }}
@@ -1018,38 +945,19 @@ export default function VoiceAssistantButton({
                     )}
                   </div>
                   {keySavedMessage && (
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        fontWeight: 700,
-                        color: "#059669",
-                        marginTop: "0.3rem",
-                      }}
-                    >
+                    <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#059669", marginTop: "0.25rem" }}>
                       {keySavedMessage}
                     </div>
                   )}
-                  <div style={{ fontSize: "0.72rem", color: "#64748b", marginTop: "0.3rem", lineHeight: 1.3 }}>
-                    💡 <em>100% Offline by default:</em> Smriti works everywhere without internet using its built-in 12-domain clinical brain. Add a Gemini API key anytime for live generative AI.
-                  </div>
                 </div>
 
-                {/* Natural Voice Test Button */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    paddingTop: "0.5rem",
-                    borderTop: "1px solid #e2e8f0",
-                  }}
-                >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "0.5rem", borderTop: "1px solid #e2e8f0" }}>
                   <div>
-                    <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#1e293b" }}>
-                      🎙️ Neural / Natural Human Voice
+                    <div style={{ fontSize: "0.76rem", fontWeight: 700, color: "#1e293b" }}>
+                      Neural Voice Synthesizer
                     </div>
                     <div style={{ fontSize: "0.7rem", color: "#64748b" }}>
-                      Calibrated 0.88x speed, soothing prosody
+                      Calibrated 0.88x speed with comforting prosody
                     </div>
                   </div>
                   <button
@@ -1057,40 +965,35 @@ export default function VoiceAssistantButton({
                     onClick={handleTestNaturalVoice}
                     disabled={isTestingVoice}
                     style={{
-                      padding: "0.4rem 0.75rem",
+                      padding: "0.35rem 0.7rem",
                       background: isTestingVoice ? "#e2e8f0" : "#dbeafe",
                       color: isTestingVoice ? "#64748b" : "#1d4ed8",
                       border: "1px solid #93c5fd",
                       borderRadius: "8px",
-                      fontSize: "0.76rem",
+                      fontSize: "0.75rem",
                       fontWeight: 700,
                       cursor: isTestingVoice ? "default" : "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.3rem",
                     }}
                   >
-                    <span>{isTestingVoice ? "🔊 Speaking..." : "🔊 Test Voice"}</span>
+                    {isTestingVoice ? "Speaking..." : "Test Voice"}
                   </button>
                 </div>
               </div>
             )}
 
-            {/* ── Prominent Elder Microphone Station ── */}
+            {/* Microphone Station */}
             <div
               id="voice-center-mic-card"
               style={{
                 background: isListeningMic ? "#fef2f2" : "#f0f9ff",
                 border: isListeningMic ? "2px solid #ef4444" : "1.5px solid #bae6fd",
-                borderRadius: "20px",
+                borderRadius: "18px",
                 padding: "1.1rem 1rem",
                 marginBottom: "1rem",
                 textAlign: "center",
-                transition: "all 0.25s ease",
               }}
             >
               {!isListeningMic ? (
-                /* IDLE STATE: Large, accessible Tap-to-Speak button */
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                   <button
                     id="main-mic-listen-btn"
@@ -1098,130 +1001,102 @@ export default function VoiceAssistantButton({
                     type="button"
                     onClick={startListening}
                     aria-label={loc.tapToSpeak}
-                    className="mic-idle-pulse"
                     style={{
-                      width: "82px",
-                      height: "82px",
+                      width: "76px",
+                      height: "76px",
                       borderRadius: "50%",
                       background: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
                       color: "#ffffff",
                       border: "3px solid #38bdf8",
-                      fontSize: "2.4rem",
                       cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       marginBottom: "0.6rem",
-                      touchAction: "manipulation",
+                      boxShadow: "0 4px 12px rgba(2, 132, 199, 0.35)",
                     }}
                   >
-                    🎙️
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                      <line x1="12" x2="12" y1="19" y2="22" />
+                    </svg>
                   </button>
-
-                  <div
-                    style={{
-                      fontSize: "1.15rem",
-                      fontWeight: 800,
-                      color: "#0369a1",
-                      letterSpacing: "0.01em",
-                      marginBottom: "0.2rem",
-                    }}
-                  >
+                  <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0369a1", marginBottom: "0.15rem" }}>
                     {loc.tapToSpeak}
                   </div>
-                  <div style={{ fontSize: "0.82rem", color: "var(--gray-500)", fontWeight: 600 }}>
+                  <div style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 600 }}>
                     {loc.speakNaturally}
                   </div>
 
-                  {/* Microphone Permission Alert if denied */}
                   {micPermissionDenied && (
                     <div
                       style={{
-                        marginTop: "0.8rem",
-                        padding: "0.6rem 0.8rem",
+                        marginTop: "0.75rem",
+                        padding: "0.55rem 0.75rem",
                         background: "#fffbeb",
                         border: "1.5px solid #fcd34d",
-                        borderRadius: "12px",
+                        borderRadius: "10px",
                         color: "#92400e",
-                        fontSize: "0.82rem",
+                        fontSize: "0.78rem",
                         fontWeight: 700,
                         textAlign: "left",
-                        lineHeight: 1.35,
                       }}
                     >
-                      <div>⚠️ {loc.micPermissionNeeded}</div>
+                      <div>Notice: {loc.micPermissionNeeded}</div>
                       <button
                         type="button"
                         onClick={startListening}
                         style={{
-                          marginTop: "0.4rem",
+                          marginTop: "0.35rem",
                           padding: "0.3rem 0.6rem",
                           background: "#f59e0b",
                           color: "#ffffff",
                           border: "none",
-                          borderRadius: "8px",
-                          fontSize: "0.78rem",
-                          fontWeight: 800,
+                          borderRadius: "6px",
+                          fontSize: "0.75rem",
+                          fontWeight: 700,
                           cursor: "pointer",
                         }}
                       >
-                        अनुमति दें • Retry Permission
+                        Retry Permission
                       </button>
                     </div>
                   )}
                 </div>
               ) : (
-                /* ACTIVE LISTENING STATE: Soundwave Animation & Live Transcript */
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                   <button
                     id="main-mic-listen-btn"
                     data-testid="main-mic-listen-btn"
                     type="button"
                     onClick={stopListeningAndSubmit}
-                    aria-label="Stop speaking and submit"
-                    className="mic-listening-pulse"
+                    aria-label="Stop and send"
                     style={{
-                      width: "82px",
-                      height: "82px",
+                      width: "76px",
+                      height: "76px",
                       borderRadius: "50%",
                       background: "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)",
                       color: "#ffffff",
                       border: "3px solid #fca5a5",
-                      fontSize: "2.4rem",
                       cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       marginBottom: "0.5rem",
-                      transform: `scale(${1 + audioLevel / 500})`,
-                      transition: "transform 0.1s ease",
+                      boxShadow: "0 4px 12px rgba(239, 68, 68, 0.35)",
                     }}
                   >
-                    🔴
+                    <div style={{ width: "24px", height: "24px", background: "#ffffff", borderRadius: "4px" }} />
                   </button>
 
-                  <div
-                    style={{
-                      fontSize: "1.1rem",
-                      fontWeight: 800,
-                      color: "#b91c1c",
-                      marginBottom: "0.4rem",
-                    }}
-                  >
+                  <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "#b91c1c", marginBottom: "0.4rem" }}>
                     {loc.listening}
                   </div>
 
-                  {/* Real-time Dynamic Voice Sound Bars */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
-                      height: "30px",
-                      marginBottom: "0.75rem",
-                    }}
-                  >
-                    {[16, 28, 42, 24, 36, 20, 32, 18, 26, 14].map((baseH, idx) => {
+                  {/* Dynamic Soundwave */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px", height: "26px", marginBottom: "0.75rem" }}>
+                    {[16, 26, 38, 22, 32, 18, 28, 16, 24, 14].map((baseH, idx) => {
                       const dynamicH = Math.max(6, Math.round((baseH * (audioLevel + 30)) / 100));
                       return (
                         <div
@@ -1231,70 +1106,48 @@ export default function VoiceAssistantButton({
                             height: `${dynamicH}px`,
                             backgroundColor: "#ef4444",
                             borderRadius: "999px",
-                            transition: "height 0.12s ease",
+                            transition: "height 0.1s ease",
                           }}
                         />
                       );
                     })}
                   </div>
 
-                  {/* Live On-Screen Spoken Transcript Box */}
+                  {/* Spoken Transcript Box */}
                   <div
                     style={{
                       width: "100%",
                       background: "#ffffff",
                       border: "1.5px solid #fca5a5",
-                      borderRadius: "12px",
-                      padding: "0.75rem 0.9rem",
+                      borderRadius: "10px",
+                      padding: "0.65rem 0.8rem",
                       textAlign: "left",
-                      marginBottom: "0.85rem",
-                      boxShadow: "0 2px 6px rgba(239, 68, 68, 0.08)",
+                      marginBottom: "0.75rem",
                     }}
                   >
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        fontWeight: 700,
-                        color: "#991b1b",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.04em",
-                        marginBottom: "0.2rem",
-                      }}
-                    >
+                    <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#991b1b", textTransform: "uppercase", marginBottom: "2px" }}>
                       {loc.youAreSpeaking}
                     </div>
-                    <div
-                      style={{
-                        fontSize: "1.05rem",
-                        fontWeight: 700,
-                        color: liveTranscript ? "#0f172a" : "#94a3b8",
-                        fontStyle: liveTranscript ? "normal" : "italic",
-                        minHeight: "1.5rem",
-                        lineHeight: 1.35,
-                      }}
-                    >
-                      {liveTranscript || "बोलते रहिए... (Keep speaking, words appear here)"}
+                    <div style={{ fontSize: "0.95rem", fontWeight: 700, color: liveTranscript ? "#0f172a" : "#94a3b8" }}>
+                      {liveTranscript || "Speak comfortably into device..."}
                     </div>
                   </div>
 
-                  {/* Control Action Buttons */}
-                  <div style={{ display: "flex", gap: "0.6rem", width: "100%" }}>
+                  <div style={{ display: "flex", gap: "0.5rem", width: "100%" }}>
                     <button
                       id="mic-done-speaking-btn"
-                      data-testid="mic-done-speaking-btn"
                       type="button"
                       onClick={stopListeningAndSubmit}
                       style={{
                         flex: 1,
-                        padding: "0.65rem 1rem",
+                        padding: "0.6rem 1rem",
                         background: "#16a34a",
                         color: "#ffffff",
                         border: "none",
-                        borderRadius: "12px",
-                        fontSize: "0.95rem",
+                        borderRadius: "10px",
+                        fontSize: "0.9rem",
                         fontWeight: 800,
                         cursor: "pointer",
-                        boxShadow: "0 2px 4px rgba(22, 163, 74, 0.3)",
                       }}
                     >
                       {loc.doneSpeaking}
@@ -1303,12 +1156,12 @@ export default function VoiceAssistantButton({
                       type="button"
                       onClick={cancelListening}
                       style={{
-                        padding: "0.65rem 1rem",
+                        padding: "0.6rem 0.9rem",
                         background: "#f1f5f9",
                         color: "#475569",
-                        border: "1px solid var(--gray-300)",
-                        borderRadius: "12px",
-                        fontSize: "0.85rem",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: "10px",
+                        fontSize: "0.82rem",
                         fontWeight: 700,
                         cursor: "pointer",
                       }}
@@ -1320,70 +1173,46 @@ export default function VoiceAssistantButton({
               )}
             </div>
 
-            {/* User Spoken Query Badge (if available) */}
+            {/* Spoken Query Prompt */}
             {userSpokenQuery && !isListeningMic && (
               <div
                 style={{
-                  background: "#e0f2fe",
+                  background: "#f0f9ff",
                   border: "1px solid #bae6fd",
-                  borderRadius: "12px",
-                  padding: "0.45rem 0.8rem",
+                  borderRadius: "10px",
+                  padding: "0.45rem 0.75rem",
                   marginBottom: "0.75rem",
-                  fontSize: "0.85rem",
+                  fontSize: "0.82rem",
                   color: "#0369a1",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.4rem",
                 }}
               >
-                <span style={{ fontWeight: 800 }}>{loc.youAsked}</span>
-                <span style={{ fontStyle: "italic" }}>&ldquo;{userSpokenQuery}&rdquo;</span>
+                <span style={{ fontWeight: 800 }}>{loc.youAsked} </span>
+                <span>&ldquo;{userSpokenQuery}&rdquo;</span>
               </div>
             )}
 
-            {/* AI Companion Voice Response Display */}
+            {/* AI Response Display */}
             <div
               style={{
                 background: "#f8fafc",
-                borderRadius: "var(--radius)",
-                border: "1.5px solid var(--gray-200)",
-                padding: "1rem",
+                borderRadius: "14px",
+                border: "1.5px solid #e2e8f0",
+                padding: "0.9rem",
                 marginBottom: "1rem",
                 textAlign: "left",
               }}
             >
-              {/* Animated Speaking / Ready Status Badge */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "0.4rem",
-                  marginBottom: "0.45rem",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: "8px",
-                      height: "8px",
-                      borderRadius: "50%",
-                      background: isSpeaking ? "#16a34a" : isLoading ? "#f59e0b" : "#0284c7",
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 800,
-                      color: isSpeaking ? "#15803d" : isLoading ? "#b45309" : "#0369a1",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.03em",
-                    }}
-                  >
-                    {isSpeaking ? "Speaking 🔊" : isLoading ? "Thinking..." : "AI Companion Reply"}
-                  </span>
-                </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.35rem" }}>
+                <span
+                  style={{
+                    fontSize: "0.72rem",
+                    fontWeight: 800,
+                    color: isSpeaking ? "#15803d" : isLoading ? "#b45309" : "#0369a1",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {isSpeaking ? "Speaking Voice..." : isLoading ? "Thinking..." : "Companion Response"}
+                </span>
                 {currentReply?.source && (
                   <span
                     style={{
@@ -1396,94 +1225,68 @@ export default function VoiceAssistantButton({
                       border: currentReply.source === "gemini_online" ? "1px solid #a7f3d0" : "1px solid #cbd5e1",
                     }}
                   >
-                    {currentReply.source === "gemini_online" ? "⚡ Live Gemini AI" : "🟢 Offline Clinical AI"}
+                    {currentReply.source === "gemini_online" ? "Gemini Live" : "Offline Clinical"}
                   </span>
                 )}
               </div>
 
-              {/* Main Response Message in Elder's Selected Language */}
-              <div
-                style={{
-                  fontSize: "1.15rem",
-                  fontWeight: 800,
-                  color: "#0f172a",
-                  marginBottom: "0.35rem",
-                  lineHeight: 1.45,
-                }}
-              >
+              <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0f172a", lineHeight: 1.4, marginBottom: "0.3rem" }}>
                 {isLoading ? loc.thinking : currentReply?.replyText || loc.defaultPrompt}
               </div>
 
-              {/* Side Language (Caregiver English translation strictly isolated when regional language active) */}
               {language !== "en" && currentReply?.englishTranslation && (
-                <div
-                  style={{
-                    fontSize: "0.82rem",
-                    fontWeight: 600,
-                    color: "var(--gray-500)",
-                    fontStyle: "italic",
-                    marginTop: "0.35rem",
-                    borderTop: "1px dashed var(--gray-200)",
-                    paddingTop: "0.35rem",
-                  }}
-                >
-                  Sub: {currentReply.englishTranslation}
+                <div style={{ fontSize: "0.78rem", color: "#64748b", fontStyle: "italic", borderTop: "1px dashed #e2e8f0", paddingTop: "0.3rem" }}>
+                  Translation: {currentReply.englishTranslation}
                 </div>
               )}
 
-              {/* Audio Controls (Replay / Stop / Navigation) */}
-              <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem", flexWrap: "wrap" }}>
+              {/* Audio Controls */}
+              <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.65rem", flexWrap: "wrap" }}>
                 <button
                   type="button"
                   onClick={handleReplay}
                   style={{
-                    padding: "0.4rem 0.8rem",
+                    padding: "0.35rem 0.75rem",
                     background: "#eff6ff",
                     border: "1px solid #bfdbfe",
                     borderRadius: "999px",
-                    fontSize: "0.78rem",
-                    fontWeight: 800,
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
                     color: "#1d4ed8",
                     cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.3rem",
                   }}
                 >
-                  <span>🔊</span>
-                  <span>{loc.replayBtn}</span>
+                  {loc.replayBtn}
                 </button>
-
                 {isSpeaking && (
                   <button
                     type="button"
                     onClick={handleStopSpeech}
                     style={{
-                      padding: "0.4rem 0.8rem",
+                      padding: "0.35rem 0.75rem",
                       background: "#fee2e2",
                       border: "1px solid #fca5a5",
                       borderRadius: "999px",
-                      fontSize: "0.78rem",
-                      fontWeight: 800,
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
                       color: "#b91c1c",
                       cursor: "pointer",
                     }}
                   >
-                    ⏹️ {loc.stopBtn}
+                    {loc.stopBtn}
                   </button>
                 )}
-
                 {currentReply?.suggestedScreen && (
                   <button
                     type="button"
                     onClick={() => handleScreenAction(currentReply.suggestedScreen!)}
                     style={{
-                      padding: "0.4rem 0.8rem",
+                      padding: "0.35rem 0.75rem",
                       background: "#ecfdf5",
                       border: "1px solid #a7f3d0",
                       borderRadius: "999px",
-                      fontSize: "0.78rem",
-                      fontWeight: 800,
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
                       color: "#065f46",
                       cursor: "pointer",
                       marginLeft: "auto",
@@ -1495,37 +1298,27 @@ export default function VoiceAssistantButton({
               </div>
             </div>
 
-            {/* Quick 1-Tap Question Chips in Elder's Selected Language */}
-            <div style={{ marginBottom: "1rem", textAlign: "left" }}>
-              <div
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 800,
-                  color: "var(--gray-500)",
-                  marginBottom: "0.4rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.04em",
-                }}
-              >
-                {loc.chipsHeader || "Quick Prompts"}
+            {/* Quick 1-Tap Prompts */}
+            <div style={{ marginBottom: "0.85rem", textAlign: "left" }}>
+              <div style={{ fontSize: "0.72rem", fontWeight: 800, color: "#64748b", marginBottom: "0.35rem", textTransform: "uppercase" }}>
+                {loc.chipsHeader}
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.45rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.4rem" }}>
                 {loc.chips.map((c, idx) => (
                   <button
                     key={idx}
                     id={`prompt-chip-${idx}`}
-                    data-testid={`prompt-chip-${idx}`}
                     type="button"
                     onClick={() => handleSendQuery(c.query)}
                     style={{
-                      padding: "0.6rem 0.5rem",
-                      background: "#f1f5f9",
-                      border: "1px solid var(--gray-300)",
-                      borderRadius: "var(--radius)",
+                      padding: "0.55rem 0.6rem",
+                      background: "#f8fafc",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: "10px",
                       cursor: "pointer",
-                      fontSize: "0.82rem",
+                      fontSize: "0.78rem",
                       fontWeight: 700,
-                      color: "var(--gray-800)",
+                      color: "#1e293b",
                       textAlign: "left",
                       lineHeight: 1.25,
                     }}
@@ -1536,7 +1329,7 @@ export default function VoiceAssistantButton({
               </div>
             </div>
 
-            {/* Keyboard / Text Input Bar with Quick Mic Trigger */}
+            {/* Text Input Fallback */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -1544,29 +1337,6 @@ export default function VoiceAssistantButton({
               }}
               style={{ display: "flex", gap: "0.4rem" }}
             >
-              <button
-                type="button"
-                id="voice-mini-mic-btn"
-                onClick={isListeningMic ? stopListeningAndSubmit : startListening}
-                aria-label={isListeningMic ? "Stop recording" : "Speak to assistant"}
-                style={{
-                  width: "46px",
-                  height: "46px",
-                  borderRadius: "12px",
-                  border: isListeningMic ? "2px solid #ef4444" : "1.5px solid var(--gray-300)",
-                  background: isListeningMic ? "#fee2e2" : "var(--gray-100)",
-                  color: isListeningMic ? "#dc2626" : "var(--gray-700)",
-                  fontSize: "1.25rem",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                {isListeningMic ? "🔴" : "🎙️"}
-              </button>
-
               <input
                 type="text"
                 value={inputText}
@@ -1574,29 +1344,27 @@ export default function VoiceAssistantButton({
                 placeholder={loc.inputPlaceholder}
                 style={{
                   flex: 1,
-                  padding: "0.75rem",
-                  borderRadius: "12px",
-                  border: "1.5px solid var(--gray-300)",
-                  fontSize: "0.9rem",
-                  color: "var(--gray-900)",
+                  padding: "0.65rem 0.75rem",
+                  borderRadius: "10px",
+                  border: "1.5px solid #cbd5e1",
+                  fontSize: "0.85rem",
+                  color: "#0f172a",
                   outline: "none",
                 }}
               />
-
               <button
                 type="submit"
                 id="voice-text-send-btn"
                 disabled={!inputText.trim()}
                 style={{
-                  padding: "0.75rem 1rem",
-                  background: inputText.trim() ? "var(--primary)" : "var(--gray-200)",
-                  color: inputText.trim() ? "#ffffff" : "var(--gray-400)",
+                  padding: "0.65rem 1rem",
+                  background: inputText.trim() ? "#0284c7" : "#e2e8f0",
+                  color: inputText.trim() ? "#ffffff" : "#94a3b8",
                   border: "none",
-                  borderRadius: "12px",
+                  borderRadius: "10px",
                   fontWeight: 800,
-                  fontSize: "0.85rem",
+                  fontSize: "0.82rem",
                   cursor: inputText.trim() ? "pointer" : "default",
-                  flexShrink: 0,
                 }}
               >
                 {loc.sendBtn}

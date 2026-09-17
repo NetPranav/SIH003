@@ -44,7 +44,7 @@ const LOCALIZED_HOME: Record<string, {
   langLabel: string;
 }> = {
   as: {
-    greeting: "নমস্কাৰ, বৰদেউতা 👋",
+    greeting: "নমস্কাৰ, বৰদেউতা",
     safeMessage: "আপুনি গুৱাহাটীৰ নিজা ঘৰত সুৰক্ষিতভাৱে আছে",
     comfortTitle: "শান্তিপূৰ্ণ প্ৰভাতীয় কাৰ্যসূচী",
     comfortDesc: "আজি ৫ টাৰ ভিতৰত ২ টা কাৰ্যসূচী সম্পন্ন হৈছে",
@@ -67,7 +67,7 @@ const LOCALIZED_HOME: Record<string, {
     langLabel: "অসমীয়া"
   },
   mni: {
-    greeting: "ꯈꯨꯔꯨꯝꯖꯔꯤ, ꯏꯕꯨꯡꯉꯣ 👋",
+    greeting: "ꯈꯨꯔꯨꯝꯖꯔꯤ, ꯏꯕꯨꯡꯉꯣ",
     safeMessage: "ꯅꯍꯥꯛ ꯏꯝꯐꯥꯜꯗꯥ ꯂꯩꯕꯥ ꯅꯍꯥꯛꯀꯤ ꯌꨨꯨꯃꯗꯥ ꯂꯩꯔꯤ",
     comfortTitle: "ꯅꯨꯡꯉꯥꯏꯔꯕꯥ ꯑꯌꯨꯛꯀꯤ ꯊꯧꯔꯥꯡ",
     comfortDesc: "ꯉꯁꯤ ꯊꯕꯛ ꯵ꯒꯤ ꯃꯅꯨꯡꯗꯥ ꯲ ꯂꯣꯏꯁꯤꯅꯈ꯭ꯔꯦ",
@@ -90,7 +90,7 @@ const LOCALIZED_HOME: Record<string, {
     langLabel: "ꯃꯩꯇꯩꯂꯣꯟ"
   },
   bn: {
-    greeting: "নমস্কার, দাদু 👋",
+    greeting: "নমস্কার, দাদু",
     safeMessage: "আপনি নিজের বাড়িতে নিরাপদে আছেন",
     comfortTitle: "শান্তিপূর্ণ সকালের রুটিন",
     comfortDesc: "আজ ৫ টির মধ্যে ২টি ক্রিয়াকলাপ সম্পন্ন হয়েছে",
@@ -113,7 +113,7 @@ const LOCALIZED_HOME: Record<string, {
     langLabel: "বাংলা"
   },
   brx: {
-    greeting: "खुलुमबाय, आबौ 👋",
+    greeting: "खुलुमबाय, आबौ",
     safeMessage: "नोंथाङा नखराव मोजाङैनो दं",
     comfortTitle: "शान्ति गोनां फुंनि हाबाफारि",
     comfortDesc: "दिनै ५ टा हाबानि गेजेराव २ टा जोबबाय",
@@ -136,7 +136,7 @@ const LOCALIZED_HOME: Record<string, {
     langLabel: "बड़ो"
   },
   kha: {
-    greeting: "Khublei, Kpa 👋",
+    greeting: "Khublei, Kpa",
     safeMessage: "Phi shngain ha iing",
     comfortTitle: "Ka Rukom Kiew Step Bymynsaw",
     comfortDesc: "2 na ki 5 ki jingtrei la pyndep mynta",
@@ -159,7 +159,7 @@ const LOCALIZED_HOME: Record<string, {
     langLabel: "Khasi"
   },
   lus: {
-    greeting: "Chibai, Ka Pu 👋",
+    greeting: "Chibai, Ka Pu",
     safeMessage: "In lamah i him e",
     comfortTitle: "Tukthuan Hauhuk Lo Tak",
     comfortDesc: "Vawiinah thiltih 5 atangin 2 i tlingtla tawh",
@@ -182,7 +182,7 @@ const LOCALIZED_HOME: Record<string, {
     langLabel: "Mizo"
   },
   hi: {
-    greeting: "नमस्ते, दादाजी 👋",
+    greeting: "नमस्ते, दादाजी",
     safeMessage: "आप अपने घर पर पूरी तरह सुरक्षित और आराम से हैं",
     comfortTitle: "शांत प्रभात दिनचर्या",
     comfortDesc: "आज ५ में से २ दैनिक गतिविधियां पूरी हुईं",
@@ -205,7 +205,7 @@ const LOCALIZED_HOME: Record<string, {
     langLabel: "हिन्दी"
   },
   en: {
-    greeting: "Namaskar, Grandfather 👋",
+    greeting: "Namaskar, Grandfather",
     safeMessage: "You are safe and resting comfortably at home",
     comfortTitle: "Peaceful Morning Routine",
     comfortDesc: "2 out of 5 daily wellness activities completed today",
@@ -365,7 +365,7 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
                 padding: "0.4rem 0.75rem",
                 display: "flex",
                 alignItems: "center",
-                gap: "0.3rem",
+                gap: "0.35rem",
                 fontSize: "0.78rem",
                 fontWeight: 700,
                 color: "#1e40af",
@@ -373,7 +373,7 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
                 boxShadow: "var(--shadow-sm)",
               }}
             >
-              <span>🗣️</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
               <span>{loc.langLabel}</span>
             </button>
 
@@ -388,14 +388,14 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
                 padding: "0.4rem 0.65rem",
                 display: "flex",
                 alignItems: "center",
-                gap: "0.25rem",
+                gap: "0.3rem",
                 fontSize: "0.78rem",
                 fontWeight: 700,
                 color: "#065f46",
                 cursor: "pointer",
               }}
             >
-              <span>🩺</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
               <span>ASHA</span>
             </button>
           </div>
@@ -412,14 +412,14 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
               padding: "0.35rem 0.75rem",
               display: "flex",
               alignItems: "center",
-              gap: "0.3rem",
+              gap: "0.35rem",
               fontSize: "0.75rem",
               fontWeight: 700,
               color: "var(--gray-700)",
               cursor: "pointer",
             }}
           >
-            <span>🔒</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <span>Caregiver Portal</span>
           </button>
         </div>
@@ -441,7 +441,19 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "0.85rem", flex: 1 }}>
-          <div style={{ fontSize: "2rem", flexShrink: 0 }}>☀️</div>
+          <div style={{
+            width: 40,
+            height: 40,
+            borderRadius: "50%",
+            background: "#bbf7d0",
+            color: "#166534",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </div>
           <div>
             <div style={{ fontSize: "1rem", fontWeight: 800, color: "#166534" }}>
               {loc.comfortTitle}
@@ -466,7 +478,7 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
               fontWeight: 700,
               color: "#166534"
             }}>
-              <span>💾</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               <span>100% On-Device Offline Storage</span>
             </div>
           </div>
@@ -496,7 +508,6 @@ export default function HomeScreen({ navigate, language = "en", onSelectLanguage
           gap: "0.4rem"
         }}
       >
-        <span>🎯</span>
         <span>{loc.activitiesHeader}</span>
       </h2>
 

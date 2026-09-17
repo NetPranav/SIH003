@@ -175,7 +175,7 @@ export default function AshaWorkerScreen({ navigate }: Props) {
             cursor: "pointer",
           }}
         >
-          👥 Cohort & Home Visit
+          Cohort & Home Visit
         </button>
         <button
           onClick={() => { setSubTab("circle_scheduler"); playAudioFeedback("click"); }}
@@ -192,7 +192,7 @@ export default function AshaWorkerScreen({ navigate }: Props) {
             cursor: "pointer",
           }}
         >
-          📅 Community Circles ({circleSchedules.length})
+          Community Circles ({circleSchedules.length})
         </button>
       </div>
 
@@ -210,7 +210,19 @@ export default function AshaWorkerScreen({ navigate }: Props) {
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span style={{ fontSize: "1.4rem" }}>⚡</span>
+                <div style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "8px",
+                  background: "#d1fae5",
+                  color: "#065f46",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
                 <div>
                   <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--gray-900)" }}>
                     Bluetooth Mesh Offline Delta Relay
@@ -415,7 +427,7 @@ export default function AshaWorkerScreen({ navigate }: Props) {
                   fontSize: "0.75rem",
                   fontWeight: 700
                 }}>
-                  🚨 Clinical Alert Dispatched: Tele-consultation referral queued with District Hospital Neurologist (GMCH Tele-medicine Node).
+                  Clinical Alert Dispatched: Tele-consultation referral queued with District Hospital Neurologist (GMCH Tele-medicine Node).
                 </div>
               ) : (
                 <button
@@ -435,7 +447,7 @@ export default function AshaWorkerScreen({ navigate }: Props) {
                     cursor: "pointer"
                   }}
                 >
-                  ⚠️ Flag for District Tele-Neurologist Referral
+                  Flag for District Tele-Neurologist Referral
                 </button>
               )}
             </div>
@@ -468,7 +480,7 @@ export default function AshaWorkerScreen({ navigate }: Props) {
                   marginBottom: "0.5rem",
                 }}
               >
-                💾 Save Home Visit Checklist (Offline Encrypted)
+                Save Home Visit Checklist (Offline Encrypted)
               </button>
               {visitSaved && (
                 <div style={{
@@ -481,7 +493,7 @@ export default function AshaWorkerScreen({ navigate }: Props) {
                   fontWeight: 700,
                   textAlign: "center",
                 }}>
-                  ✅ Visit Checklist Persisted to On-Device Offline Records.
+                  Visit Checklist Persisted to On-Device Offline Records.
                 </div>
               )}
             </div>
@@ -663,8 +675,9 @@ export default function AshaWorkerScreen({ navigate }: Props) {
                     <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--gray-900)" }}>
                       {c.circleName}
                     </div>
-                    <div style={{ fontSize: "0.74rem", color: "var(--gray-600)", marginTop: "0.15rem" }}>
-                      📍 {c.villageVenue}
+                    <div style={{ fontSize: "0.74rem", color: "var(--gray-600)", marginTop: "0.15rem", display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      <span>{c.villageVenue}</span>
                     </div>
                   </div>
                   <span style={{

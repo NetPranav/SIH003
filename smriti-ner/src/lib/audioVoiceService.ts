@@ -112,6 +112,10 @@ export interface SpeakOptions {
  * Selects the highest quality, most natural, human-sounding voice available on the device.
  * Actively demotes and penalizes mechanical, robotic system voices (like eSpeak or default monotone synthesizers).
  */
+/**
+ * Selects the highest quality, most natural, human-sounding voice available on the device.
+ * Guarantees language compatibility: never assigns an English voice to Hindi/Bengali/Assamese text.
+ */
 export function selectBestNaturalVoice(
   voices: SpeechSynthesisVoice[],
   targetLang: string
@@ -120,6 +124,7 @@ export function selectBestNaturalVoice(
 
   const targetClean = targetLang.toLowerCase().replace("_", "-");
   const targetPrefix = targetClean.split("-")[0];
+  const isTargetEnglish = targetPrefix === "en";
 
   let bestVoice: SpeechSynthesisVoice | null = null;
   let bestScore = -9999;
@@ -128,28 +133,33 @@ export function selectBestNaturalVoice(
     let score = 0;
     const name = v.name.toLowerCase();
     const lang = v.lang.toLowerCase().replace("_", "-");
+    const voicePrefix = lang.split("-")[0];
+
+    // Language Compatibility Guard:
+    // If target is non-English (e.g. Hindi, Bengali, Assamese), REJECT foreign language voices
+    if (!isTargetEnglish && voicePrefix !== targetPrefix) {
+      continue; // Never match an English or Spanish voice to Hindi/Bengali/Assamese script!
+    }
 
     // 1. Language Match Quality
     if (lang === targetClean) {
-      score += 200; // Exact dialect (e.g. hi-IN, bn-IN, as-IN, en-IN)
-    } else if (lang.startsWith(targetPrefix)) {
-      score += 120; // Same language root
-    } else if (lang.includes("in") || name.includes("india")) {
-      score += 60; // Familiar Indian accent & cadence for NER elders
-    } else if (lang.startsWith("en")) {
-      score += 30; // English fallback
+      score += 250; // Exact dialect match (e.g. hi-IN, bn-IN, as-IN, en-IN)
+    } else if (voicePrefix === targetPrefix) {
+      score += 180; // Same language root
+    } else if (isTargetEnglish && (lang.includes("in") || name.includes("india"))) {
+      score += 60; // Indian English accent for elders
     }
 
-    // 2. High-Definition & Natural Speech Engine Bonuses (avoids system voice)
+    // 2. High-Definition & Natural Speech Engine Bonuses
     if (name.includes("natural")) score += 100;
     if (name.includes("neural")) score += 100;
-    if (name.includes("google")) score += 80; // Google Cloud/Wavenet voices on Android & Chrome sound remarkably human
+    if (name.includes("google")) score += 80;
     if (name.includes("premium")) score += 70;
     if (name.includes("enhanced")) score += 70;
     if (name.includes("siri")) score += 60;
     if (name.includes("online")) score += 50;
 
-    // 3. Warm, Soothing, Motherly Timbre (psychiatrically proven to soothe dementia restlessness)
+    // 3. Warm, Soothing, Motherly Timbre
     if (
       name.includes("swara") ||
       name.includes("neerja") ||
@@ -173,12 +183,11 @@ export function selectBestNaturalVoice(
       name.includes("sampler") ||
       name.includes("system")
     ) {
-      score -= 120;
+      score -= 150;
     }
 
-    // Remote voices on Chrome/Android often have higher acoustic fidelity
     if (v.localService === false) {
-      score += 30;
+      score += 25;
     }
 
     if (score > bestScore) {
@@ -187,7 +196,7 @@ export function selectBestNaturalVoice(
     }
   }
 
-  return bestVoice || voices[0] || null;
+  return bestVoice;
 }
 
 /**
@@ -224,20 +233,18 @@ export function speakSpokenVoice(
     return false;
   }
 
-  // Pre-speech calming chime for auditory attention
-  playGentleChime();
-
   if (!("speechSynthesis" in window) || !window.speechSynthesis) {
-    console.debug("WebSpeech not supported, playing parametric harmonic chime");
+    console.debug("WebSpeech not supported, playing parametric harmonic cadence");
     playParametricFormantCadence(cleanText.length);
     setTimeout(() => options.onEnd?.(), 1500);
     return true;
   }
 
   try {
-    // Cancel any stuck utterances and resume audio pipe
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.resume();
+    // Unpause speech engine if suspended
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+    }
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
 
@@ -253,6 +260,7 @@ export function speakSpokenVoice(
       en: "en-IN",
     };
     const targetLang = (langMap[language] || "en-IN").toLowerCase();
+    const targetPrefix = targetLang.split("-")[0];
     utterance.lang = targetLang;
 
     // Geriatric prosody: 0.88x speed and 1.04 warm pitch for compassionate tone
@@ -260,20 +268,17 @@ export function speakSpokenVoice(
     utterance.pitch = options.pitch ?? 1.04;
     utterance.volume = 1.0;
 
-    // Get fresh voices if cached is empty
-    let voices = cachedVoices;
+    // Retrieve fresh voices
+    let voices = window.speechSynthesis.getVoices();
     if (!voices || voices.length === 0) {
-      voices = window.speechSynthesis.getVoices() || [];
-      cachedVoices = voices;
+      voices = cachedVoices || [];
     }
 
     if (voices && voices.length > 0) {
       const bestVoice = selectBestNaturalVoice(voices, targetLang);
       if (bestVoice) {
         utterance.voice = bestVoice;
-        if (!bestVoice.lang.toLowerCase().startsWith(targetLang.split("-")[0])) {
-          utterance.lang = bestVoice.lang;
-        }
+        utterance.lang = bestVoice.lang;
       }
     }
 
@@ -294,17 +299,16 @@ export function speakSpokenVoice(
     };
 
     utterance.onerror = (e) => {
-      console.debug("Speech synthesis error event:", e);
-      // If native TTS fails (e.g. language-unavailable), provide audio cadence fallback
+      console.debug("Speech synthesis notice:", e);
       playParametricFormantCadence(cleanText.length);
       safeComplete();
     };
 
-    // Safety timeout: prevent UI being permanently stuck in "speaking" state if browser hangs
+    // Safety timeout: prevent UI being permanently stuck in "speaking" state
     const expectedDurationMs = Math.max(2500, (cleanText.length / 10) * 1000);
     setTimeout(() => {
-      if (!hasEnded && window.speechSynthesis.speaking) {
-        window.speechSynthesis.resume(); // nudge Chrome if stalled
+      if (!hasEnded && window.speechSynthesis && window.speechSynthesis.speaking) {
+        window.speechSynthesis.resume();
       }
       setTimeout(safeComplete, 2000);
     }, expectedDurationMs);
@@ -312,7 +316,7 @@ export function speakSpokenVoice(
     window.speechSynthesis.speak(utterance);
     return true;
   } catch (err) {
-    console.debug("Speech execution error, falling back to harmonic chime:", err);
+    console.debug("Speech execution notice, using fallback chime:", err);
     playParametricFormantCadence(cleanText.length);
     options.onEnd?.();
     return false;
