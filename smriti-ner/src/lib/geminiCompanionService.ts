@@ -689,6 +689,93 @@ export async function resolveAvailableGeminiModel(apiKey: string): Promise<strin
 }
 
 /**
+ * Robust JSON parser for Gemini responses.
+ * Handles markdown code fences (```json ... ```), raw bracketed objects,
+ * and gracefully falls back to using Gemini's live text without crashing.
+ */
+function parseCompanionJson(
+  rawText: string,
+  fallbackPrompt: string,
+  language: string
+): {
+  replyText: string;
+  englishTranslation: string;
+  emotionTone: "CALMING" | "VALIDATING" | "REMINISCING" | "REASSURING";
+  suggestedScreen?: ScreenId;
+  transcript?: string;
+} {
+  if (!rawText || !rawText.trim()) {
+    return {
+      replyText: "আমি আপনার সাথে আছি।",
+      englishTranslation: "I am here with you.",
+      emotionTone: "CALMING",
+    };
+  }
+
+  const cleaned = rawText.trim();
+
+  // 1. Direct JSON parse
+  try {
+    const direct = JSON.parse(cleaned);
+    if (direct && typeof direct === "object" && (direct.replyText || direct.reply)) {
+      return {
+        replyText: direct.replyText || direct.reply || cleaned,
+        englishTranslation: direct.englishTranslation || direct.translation || direct.replyText || cleaned,
+        emotionTone: direct.emotionTone || "CALMING",
+        suggestedScreen: direct.suggestedScreen || undefined,
+        transcript: direct.transcript || fallbackPrompt,
+      };
+    }
+  } catch {}
+
+  // 2. Strip markdown fences: ```json ... ``` or ``` ... ```
+  const codeBlockMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  if (codeBlockMatch) {
+    try {
+      const parsed = JSON.parse(codeBlockMatch[1].trim());
+      if (parsed && typeof parsed === "object" && (parsed.replyText || parsed.reply)) {
+        return {
+          replyText: parsed.replyText || parsed.reply || cleaned,
+          englishTranslation: parsed.englishTranslation || parsed.translation || parsed.replyText || cleaned,
+          emotionTone: parsed.emotionTone || "CALMING",
+          suggestedScreen: parsed.suggestedScreen || undefined,
+          transcript: parsed.transcript || fallbackPrompt,
+        };
+      }
+    } catch {}
+  }
+
+  // 3. Extract bracketed {...} substring
+  const startIdx = cleaned.indexOf("{");
+  const endIdx = cleaned.lastIndexOf("}");
+  if (startIdx !== -1 && endIdx > startIdx) {
+    try {
+      const sub = cleaned.substring(startIdx, endIdx + 1);
+      const parsed = JSON.parse(sub);
+      if (parsed && typeof parsed === "object" && (parsed.replyText || parsed.reply)) {
+        return {
+          replyText: parsed.replyText || parsed.reply || cleaned,
+          englishTranslation: parsed.englishTranslation || parsed.translation || parsed.replyText || cleaned,
+          emotionTone: parsed.emotionTone || "CALMING",
+          suggestedScreen: parsed.suggestedScreen || undefined,
+          transcript: parsed.transcript || fallbackPrompt,
+        };
+      }
+    } catch {}
+  }
+
+  // 4. If Gemini returned plain conversational text instead of JSON:
+  // Never discard a live AI response! Show and speak Gemini's actual response!
+  const sanitized = cleaned.replace(/^```json|^```|```$/gi, "").trim();
+  return {
+    replyText: sanitized,
+    englishTranslation: sanitized,
+    emotionTone: "CALMING",
+    transcript: fallbackPrompt,
+  };
+}
+
+/**
  * Queries Gemini AI directly from the client (if API key present)
  * with gemini-3.6-flash as default, falling back cleanly to the On-Device Clinical Brain.
  */
@@ -698,8 +785,8 @@ export async function generateGeminiCompanionReply(
 ): Promise<CompanionResponse> {
   const apiKey = offlineMobileStore.getGeminiApiKey();
 
-  // 1. Direct Client-Side Gemini REST API (if key is configured and device is online)
-  if (apiKey && typeof window !== "undefined" && navigator.onLine) {
+  // 1. Direct Client-Side Gemini REST API (if key is configured)
+  if (apiKey && typeof window !== "undefined") {
     const modelsToTry = Array.from(
       new Set(["gemini-3.6-flash", activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS])
     );
@@ -707,14 +794,18 @@ export async function generateGeminiCompanionReply(
       const model = rawModel.replace(/^models\//, "");
       try {
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
+
         const response = await fetch(geminiUrl, {
           method: "POST",
+          signal: controller.signal,
           headers: {
             "Content-Type": "application/json",
             "x-goog-api-key": apiKey,
           },
           body: JSON.stringify({
-            system_instruction: {
+            systemInstruction: {
               parts: [{ text: GEMINI_SYSTEM_INSTRUCTION }],
             },
             contents: [
@@ -722,25 +813,26 @@ export async function generateGeminiCompanionReply(
                 role: "user",
                 parts: [
                   {
-                    text: `Target Language: ${language}. The elder spoke/typed: "${prompt}". Provide compassionate, soothing JSON response.`,
+                    text: `${GEMINI_SYSTEM_INSTRUCTION}\n\nElder spoken/typed input: "${prompt}".\nTarget Language: ${language}.\nProvide a compassionate, brief reassuring response in valid JSON format with keys "replyText", "englishTranslation", "emotionTone".`,
                   },
                 ],
               },
             ],
             generationConfig: {
-              response_mime_type: "application/json",
+              responseMimeType: "application/json",
               temperature: 0.35,
-              maxOutputTokens: 250,
+              maxOutputTokens: 800,
             },
           }),
         });
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           activeGeminiModelName = model;
           const result = await response.json();
           const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (rawText) {
-            const parsed = JSON.parse(rawText);
+            const parsed = parseCompanionJson(rawText, prompt, language);
             return {
               replyText: parsed.replyText || rawText,
               englishTranslation: parsed.englishTranslation || parsed.replyText || rawText,
@@ -751,6 +843,9 @@ export async function generateGeminiCompanionReply(
               source: "gemini_online",
             };
           }
+        } else {
+          const errText = await response.text().catch(() => "");
+          console.warn(`Gemini text call to ${model} failed HTTP ${response.status}:`, errText);
         }
       } catch (apiErr) {
         console.warn(`Gemini call to ${model} failed, trying next candidate:`, apiErr);
@@ -782,22 +877,28 @@ export async function generateGeminiCompanionAudioReply(
   const apiKey = offlineMobileStore.getGeminiApiKey();
 
   // 1. Direct Multimodal Gemini API Call
-  if (apiKey && typeof window !== "undefined" && navigator.onLine) {
+  if (apiKey && typeof window !== "undefined") {
     const modelsToTry = Array.from(
       new Set(["gemini-3.6-flash", activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS])
     );
+    const cleanMime = (mimeType || "audio/webm").split(";")[0].trim();
+
     for (const rawModel of modelsToTry) {
       const model = rawModel.replace(/^models\//, "");
       try {
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
         const response = await fetch(geminiUrl, {
           method: "POST",
+          signal: controller.signal,
           headers: {
             "Content-Type": "application/json",
             "x-goog-api-key": apiKey,
           },
           body: JSON.stringify({
-            system_instruction: {
+            systemInstruction: {
               parts: [{ text: GEMINI_SYSTEM_INSTRUCTION }],
             },
             contents: [
@@ -806,40 +907,44 @@ export async function generateGeminiCompanionAudioReply(
                 parts: [
                   {
                     inlineData: {
-                      mimeType: mimeType.split(";")[0],
+                      mimeType: cleanMime,
                       data: audioBase64,
                     },
                   },
                   {
-                    text: `Target Language: ${language}. The elder spoke into the microphone. Transcribe their words accurately in "transcript" and provide your soothing JSON response.`,
+                    text: `${GEMINI_SYSTEM_INSTRUCTION}\n\nTarget Language: ${language}. The elder spoke into the microphone. Transcribe their words accurately in "transcript" and provide your soothing response in JSON format with "replyText", "englishTranslation", "emotionTone", "transcript".`,
                   },
                 ],
               },
             ],
             generationConfig: {
-              response_mime_type: "application/json",
+              responseMimeType: "application/json",
               temperature: 0.35,
-              maxOutputTokens: 250,
+              maxOutputTokens: 800,
             },
           }),
         });
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           activeGeminiModelName = model;
           const result = await response.json();
           const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (rawText) {
-            const parsed = JSON.parse(rawText);
+            const parsed = parseCompanionJson(rawText, "Elder's Spoken Voice", language);
             return {
               replyText: parsed.replyText || rawText,
               englishTranslation: parsed.englishTranslation || parsed.replyText || rawText,
               language,
               emotionTone: parsed.emotionTone || "CALMING",
               suggestedScreen: parsed.suggestedScreen || undefined,
-              transcript: parsed.transcript || "Spoken Voice Query",
+              transcript: parsed.transcript || "Elder's Spoken Voice",
               source: "gemini_online",
             };
           }
+        } else {
+          const errText = await response.text().catch(() => "");
+          console.warn(`Gemini audio call to ${model} failed HTTP ${response.status}:`, errText);
         }
       } catch (apiErr) {
         console.warn(`Multimodal call to ${model} failed, trying next candidate:`, apiErr);
