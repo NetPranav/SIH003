@@ -1,6 +1,7 @@
 package org.sih.smriti;
 
 import android.Manifest;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.webkit.PermissionRequest;
@@ -16,6 +17,13 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Strictly lock screen orientation to portrait to prevent unwanted layout switching
+        try {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } catch (Exception e) {
+            android.util.Log.w("SmritiMainActivity", "Orientation lock notice: " + e.getMessage());
+        }
 
         // Request runtime microphone permission if not already granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)

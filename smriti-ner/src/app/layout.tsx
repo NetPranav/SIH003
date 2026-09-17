@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_Bengali } from "next/font/google";
+import OrientationGuard from "@/components/ui/OrientationGuard";
 import "./globals.css";
 
 const inter = Inter({
@@ -37,7 +38,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${notoBengali.variable}`}>
-      <body>{children}</body>
+      <body>
+        <OrientationGuard />
+        {children}
+      </body>
     </html>
   );
 }
