@@ -217,6 +217,22 @@ export function speakSpokenVoice(
     return false;
   }
 
+  // 0. HARDWARE AUDIO PRIORITY: Android Native Hardware TextToSpeech Bridge
+  // Bypasses Android WebView limitation where window.speechSynthesis has no audio pipeline
+  if (typeof window !== "undefined" && (window as any).SmritiNativeTTS) {
+    try {
+      (window as any).SmritiNativeTTS.speak(cleanText, language);
+      const wordCount = cleanText.split(/\s+/).length;
+      const durationMs = Math.max(1200, (wordCount / 2.3) * 1000);
+      if (options.onEnd) {
+        setTimeout(options.onEnd, durationMs);
+      }
+      return true;
+    } catch (nativeErr) {
+      console.warn("SmritiNativeTTS bridge error, falling back to Web Speech:", nativeErr);
+    }
+  }
+
   if (!("speechSynthesis" in window) || !window.speechSynthesis) {
     playParametricFormantCadence(cleanText.length);
     setTimeout(() => options.onEnd?.(), 1200);
@@ -378,6 +394,11 @@ export function stopAllSpeech(): void {
   if (keepAliveTimer) {
     clearInterval(keepAliveTimer);
     keepAliveTimer = null;
+  }
+  if (typeof window !== "undefined" && (window as any).SmritiNativeTTS) {
+    try {
+      (window as any).SmritiNativeTTS.stop();
+    } catch {}
   }
   if (typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis) {
     try {

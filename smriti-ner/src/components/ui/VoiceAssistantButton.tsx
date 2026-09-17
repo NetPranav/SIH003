@@ -337,6 +337,8 @@ export default function VoiceAssistantButton({
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [apiKeyInput, setApiKeyInput] = useState<string>("");
   const [hasApiKey, setHasApiKey] = useState<boolean>(false);
+  const [isKeyVerified, setIsKeyVerified] = useState<boolean>(false);
+  const [activeModel, setActiveModel] = useState<string>("");
   const [keySavedMessage, setKeySavedMessage] = useState<string>("");
   const [isTestingVoice, setIsTestingVoice] = useState<boolean>(false);
   const [isTestingKey, setIsTestingKey] = useState<boolean>(false);
@@ -370,6 +372,7 @@ export default function VoiceAssistantButton({
   const handleTestApiKey = async () => {
     if (!apiKeyInput.trim()) {
       setKeyTestFeedback({ success: false, text: "Please enter an API key to test." });
+      setIsKeyVerified(false);
       return;
     }
     setIsTestingKey(true);
@@ -381,11 +384,16 @@ export default function VoiceAssistantButton({
       if (res.success) {
         offlineMobileStore.setGeminiApiKey(apiKeyInput.trim());
         setHasApiKey(true);
-        setKeySavedMessage("✓ Key verified and active for all users!");
-        setTimeout(() => setKeySavedMessage(""), 4000);
+        setIsKeyVerified(true);
+        setActiveModel(res.model || "Gemini");
+        setKeySavedMessage(`✓ Verified & active: ${res.model || "Gemini Cloud"} ready!`);
+        setTimeout(() => setKeySavedMessage(""), 4500);
+      } else {
+        setIsKeyVerified(false);
       }
     } catch {
       setIsTestingKey(false);
+      setIsKeyVerified(false);
       setKeyTestFeedback({ success: false, text: "Connection test failed. Check internet." });
     }
   };
@@ -395,7 +403,13 @@ export default function VoiceAssistantButton({
     offlineMobileStore.setGeminiApiKey(apiKeyInput);
     const hasKey = Boolean(apiKeyInput && apiKeyInput.trim().length > 0);
     setHasApiKey(hasKey);
-    setKeySavedMessage(hasKey ? "✓ Gemini API Key saved. Cloud AI active." : "✓ Offline clinical engine active.");
+    if (!hasKey) {
+      setIsKeyVerified(false);
+      setKeyTestFeedback(null);
+      setKeySavedMessage("✓ 100% On-Device Clinical Rule Engine active.");
+    } else {
+      setKeySavedMessage("✓ Key saved. Click 'Test Key' to verify Google Cloud connection.");
+    }
     setTimeout(() => setKeySavedMessage(""), 3500);
   };
 
@@ -403,8 +417,10 @@ export default function VoiceAssistantButton({
     setApiKeyInput("");
     offlineMobileStore.setGeminiApiKey("");
     setHasApiKey(false);
+    setIsKeyVerified(false);
+    setActiveModel("");
     setKeyTestFeedback(null);
-    setKeySavedMessage("✓ Reverted to 100% Offline Clinical Engine.");
+    setKeySavedMessage("✓ Reverted to 100% On-Device Clinical Engine.");
     setTimeout(() => setKeySavedMessage(""), 3500);
   };
 
@@ -895,19 +911,62 @@ export default function VoiceAssistantButton({
                     style={{
                       fontSize: "0.7rem",
                       fontWeight: 700,
-                      padding: "0.15rem 0.55rem",
+                      padding: "0.18rem 0.6rem",
                       borderRadius: "999px",
-                      background: hasApiKey ? "#ecfdf5" : "#f1f5f9",
-                      color: hasApiKey ? "#065f46" : "#475569",
-                      border: hasApiKey ? "1px solid #a7f3d0" : "1px solid #cbd5e1",
+                      background:
+                        keyTestFeedback && !keyTestFeedback.success
+                          ? "#fef2f2"
+                          : hasApiKey && isKeyVerified
+                          ? "#ecfdf5"
+                          : hasApiKey
+                          ? "#fffbeb"
+                          : "#eff6ff",
+                      color:
+                        keyTestFeedback && !keyTestFeedback.success
+                          ? "#b91c1c"
+                          : hasApiKey && isKeyVerified
+                          ? "#065f46"
+                          : hasApiKey
+                          ? "#b45309"
+                          : "#1e40af",
+                      border:
+                        keyTestFeedback && !keyTestFeedback.success
+                          ? "1px solid #fecaca"
+                          : hasApiKey && isKeyVerified
+                          ? "1px solid #a7f3d0"
+                          : hasApiKey
+                          ? "1px solid #fde68a"
+                          : "1px solid #bfdbfe",
                       cursor: "pointer",
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "0.3rem",
                     }}
                   >
-                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: hasApiKey ? "#10b981" : "#0284c7" }} />
-                    <span>{hasApiKey ? "Live Gemini AI (Active)" : "Clinical AI (On-Device)"}</span>
+                    <span
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: "50%",
+                        background:
+                          keyTestFeedback && !keyTestFeedback.success
+                            ? "#ef4444"
+                            : hasApiKey && isKeyVerified
+                            ? "#10b981"
+                            : hasApiKey
+                            ? "#f59e0b"
+                            : "#3b82f6",
+                      }}
+                    />
+                    <span>
+                      {keyTestFeedback && !keyTestFeedback.success
+                        ? "Key Error • Clinical AI Active"
+                        : hasApiKey && isKeyVerified
+                        ? `Live ${activeModel || "Gemini"} Active`
+                        : hasApiKey
+                        ? "Gemini Key Saved (Test to Verify)"
+                        : "Clinical AI (100% On-Device)"}
+                    </span>
                     <span style={{ fontSize: "0.65rem", opacity: 0.8 }}>• Setup</span>
                   </button>
                 </div>

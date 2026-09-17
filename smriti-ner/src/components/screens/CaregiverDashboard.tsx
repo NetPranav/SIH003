@@ -63,6 +63,8 @@ export default function CaregiverDashboard({ navigate }: Props) {
   const [geminiKey, setGeminiKey] = useState<string>(() =>
     offlineMobileStore.getGeminiApiKey()
   );
+  const [isKeyVerified, setIsKeyVerified] = useState<boolean>(false);
+  const [verifiedModel, setVerifiedModel] = useState<string>("");
   const [isTestingKey, setIsTestingKey] = useState<boolean>(false);
   const [keyFeedback, setKeyFeedback] = useState<{ success: boolean; text: string } | null>(null);
   const [keySavedMessage, setKeySavedMessage] = useState<string>("");
@@ -83,6 +85,7 @@ export default function CaregiverDashboard({ navigate }: Props) {
   const handleTestApiKey = async () => {
     if (!geminiKey.trim()) {
       setKeyFeedback({ success: false, text: "Please enter an API key to test." });
+      setIsKeyVerified(false);
       return;
     }
     setIsTestingKey(true);
@@ -93,11 +96,16 @@ export default function CaregiverDashboard({ navigate }: Props) {
       setKeyFeedback({ success: res.success, text: res.message });
       if (res.success) {
         offlineMobileStore.setGeminiApiKey(geminiKey.trim());
-        setKeySavedMessage("✓ Key verified and active across all users and features!");
+        setIsKeyVerified(true);
+        setVerifiedModel(res.model || "Gemini");
+        setKeySavedMessage(`✓ Key verified! Google ${res.model || "Gemini"} active across all features.`);
         setTimeout(() => setKeySavedMessage(""), 4500);
+      } else {
+        setIsKeyVerified(false);
       }
     } catch {
       setIsTestingKey(false);
+      setIsKeyVerified(false);
       setKeyFeedback({ success: false, text: "Connection test failed. Check internet." });
     }
   };
@@ -106,17 +114,21 @@ export default function CaregiverDashboard({ navigate }: Props) {
     if (e) e.preventDefault();
     offlineMobileStore.setGeminiApiKey(geminiKey);
     const hasKey = Boolean(geminiKey && geminiKey.trim().length > 0);
-    setKeySavedMessage(
-      hasKey
-        ? "✓ Custom Gemini API Key saved. Live Cloud AI Companion active."
-        : "✓ Offline Clinical Engine active."
-    );
+    if (!hasKey) {
+      setIsKeyVerified(false);
+      setKeyFeedback(null);
+      setKeySavedMessage("✓ Reset to 100% On-Device Clinical Rule Engine.");
+    } else {
+      setKeySavedMessage("✓ Key saved. Click 'Test Key' to verify Google Cloud connection.");
+    }
     setTimeout(() => setKeySavedMessage(""), 3500);
   };
 
   const handleClearApiKey = () => {
     setGeminiKey("");
     offlineMobileStore.setGeminiApiKey("");
+    setIsKeyVerified(false);
+    setVerifiedModel("");
     setKeyFeedback(null);
     setKeySavedMessage("✓ Reverted to 100% On-Device Clinical Rule Engine.");
     setTimeout(() => setKeySavedMessage(""), 3500);
@@ -829,9 +841,31 @@ export default function CaregiverDashboard({ navigate }: Props) {
               fontWeight: 700,
               padding: "0.2rem 0.6rem",
               borderRadius: "999px",
-              background: geminiKey.trim() ? "#ecfdf5" : "#eff6ff",
-              color: geminiKey.trim() ? "#065f46" : "#1e40af",
-              border: `1px solid ${geminiKey.trim() ? "#a7f3d0" : "#bfdbfe"}`,
+              background:
+                keyFeedback && !keyFeedback.success
+                  ? "#fef2f2"
+                  : geminiKey.trim() && isKeyVerified
+                  ? "#ecfdf5"
+                  : geminiKey.trim()
+                  ? "#fffbeb"
+                  : "#eff6ff",
+              color:
+                keyFeedback && !keyFeedback.success
+                  ? "#b91c1c"
+                  : geminiKey.trim() && isKeyVerified
+                  ? "#065f46"
+                  : geminiKey.trim()
+                  ? "#b45309"
+                  : "#1e40af",
+              border: `1px solid ${
+                keyFeedback && !keyFeedback.success
+                  ? "#fecaca"
+                  : geminiKey.trim() && isKeyVerified
+                  ? "#a7f3d0"
+                  : geminiKey.trim()
+                  ? "#fde68a"
+                  : "#bfdbfe"
+              }`,
               display: "inline-flex",
               alignItems: "center",
               gap: "0.3rem",
@@ -842,10 +876,23 @@ export default function CaregiverDashboard({ navigate }: Props) {
                 width: "7px",
                 height: "7px",
                 borderRadius: "50%",
-                background: geminiKey.trim() ? "#10b981" : "#3b82f6",
+                background:
+                  keyFeedback && !keyFeedback.success
+                    ? "#ef4444"
+                    : geminiKey.trim() && isKeyVerified
+                    ? "#10b981"
+                    : geminiKey.trim()
+                    ? "#f59e0b"
+                    : "#3b82f6",
               }}
             />
-            {geminiKey.trim() ? "Live Gemini AI Active" : "Clinical AI (100% On-Device)"}
+            {keyFeedback && !keyFeedback.success
+              ? "Key Error • Clinical AI Active"
+              : geminiKey.trim() && isKeyVerified
+              ? `Live ${verifiedModel || "Gemini"} Active`
+              : geminiKey.trim()
+              ? "Gemini Key Saved (Test to Verify)"
+              : "Clinical AI (100% On-Device)"}
           </span>
         </div>
 

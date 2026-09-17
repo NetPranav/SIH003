@@ -632,6 +632,57 @@ export function classifyElderIntent(prompt: string): string {
   return "default";
 }
 
+// ── DYNAMIC GEMINI MODEL RESOLUTION & AUTO-DISCOVERY ─────────────────────────
+export let activeGeminiModelName: string = "gemini-2.5-flash";
+
+export const CANDIDATE_GEMINI_MODELS = [
+  "gemini-2.5-flash",
+  "gemini-2.0-flash",
+  "gemini-1.5-flash-latest",
+  "gemini-1.5-flash",
+  "gemini-pro",
+];
+
+/**
+ * Discovers which Gemini model is active and accessible for the user's specific API key.
+ * Queries Google's /models endpoint and picks the best available flash/pro model.
+ */
+export async function resolveAvailableGeminiModel(apiKey: string): Promise<string> {
+  const cleanKey = apiKey.trim();
+  if (!cleanKey || typeof window === "undefined" || !navigator.onLine) {
+    return activeGeminiModelName;
+  }
+
+  try {
+    const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${cleanKey}`;
+    const res = await fetch(listUrl);
+    if (res.ok) {
+      const data = await res.json();
+      const models = data?.models as Array<{ name: string; supportedGenerationMethods?: string[] }> | undefined;
+      if (models && models.length > 0) {
+        const genModels = models.filter((m) =>
+          m.supportedGenerationMethods?.includes("generateContent")
+        );
+        const flashCandidate =
+          genModels.find((m) => m.name.includes("flash") && (m.name.includes("2.5") || m.name.includes("2.0") || m.name.includes("1.5"))) ||
+          genModels.find((m) => m.name.includes("flash")) ||
+          genModels.find((m) => m.name.includes("gemini")) ||
+          genModels[0];
+
+        if (flashCandidate) {
+          const modelId = flashCandidate.name.replace(/^models\//, "");
+          activeGeminiModelName = modelId;
+          return modelId;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("Could not list Google models, fallback cascade will be used:", e);
+  }
+
+  return activeGeminiModelName;
+}
+
 /**
  * Queries Gemini AI directly from the client (if API key present)
  * or seamlessly runs the Clinical Geriatric NLU Brain on-device.
@@ -644,50 +695,54 @@ export async function generateGeminiCompanionReply(
 
   // 1. Direct Client-Side Gemini REST API (if key is configured and device is online)
   if (apiKey && typeof window !== "undefined" && navigator.onLine) {
-    try {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-      const response = await fetch(geminiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: GEMINI_SYSTEM_INSTRUCTION }],
-          },
-          contents: [
-            {
-              parts: [
-                {
-                  text: `Target Language: ${language}. The elder spoke/typed: "${prompt}". Provide compassionate, soothing JSON response.`,
-                },
-              ],
+    const modelsToTry = Array.from(new Set([activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS]));
+    for (const model of modelsToTry) {
+      try {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const response = await fetch(geminiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [{ text: GEMINI_SYSTEM_INSTRUCTION }],
             },
-          ],
-          generationConfig: {
-            response_mime_type: "application/json",
-            temperature: 0.35,
-            maxOutputTokens: 250,
-          },
-        }),
-      });
+            contents: [
+              {
+                parts: [
+                  {
+                    text: `Target Language: ${language}. The elder spoke/typed: "${prompt}". Provide compassionate, soothing JSON response.`,
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              response_mime_type: "application/json",
+              temperature: 0.35,
+              maxOutputTokens: 250,
+            },
+          }),
+        });
 
-      if (response.ok) {
-        const result = await response.json();
-        const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (rawText) {
-          const parsed = JSON.parse(rawText);
-          return {
-            replyText: parsed.replyText || rawText,
-            englishTranslation: parsed.englishTranslation || parsed.replyText || rawText,
-            language,
-            emotionTone: parsed.emotionTone || "CALMING",
-            suggestedScreen: parsed.suggestedScreen || undefined,
-            transcript: parsed.transcript || prompt,
-            source: "gemini_online",
-          };
+        if (response.ok) {
+          activeGeminiModelName = model;
+          const result = await response.json();
+          const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawText) {
+            const parsed = JSON.parse(rawText);
+            return {
+              replyText: parsed.replyText || rawText,
+              englishTranslation: parsed.englishTranslation || parsed.replyText || rawText,
+              language,
+              emotionTone: parsed.emotionTone || "CALMING",
+              suggestedScreen: parsed.suggestedScreen || undefined,
+              transcript: parsed.transcript || prompt,
+              source: "gemini_online",
+            };
+          }
         }
+      } catch (apiErr) {
+        console.warn(`Gemini call to ${model} failed, trying next candidate:`, apiErr);
       }
-    } catch (apiErr) {
-      console.warn("Direct Gemini call failed, seamlessly using on-device clinical engine:", apiErr);
     }
   }
 
@@ -716,56 +771,60 @@ export async function generateGeminiCompanionAudioReply(
 
   // 1. Direct Multimodal Gemini API Call
   if (apiKey && typeof window !== "undefined" && navigator.onLine) {
-    try {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-      const response = await fetch(geminiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: GEMINI_SYSTEM_INSTRUCTION }],
-          },
-          contents: [
-            {
-              parts: [
-                {
-                  inlineData: {
-                    mimeType: mimeType.split(";")[0],
-                    data: audioBase64,
-                  },
-                },
-                {
-                  text: `Target Language: ${language}. The elder spoke into the microphone. Transcribe their words accurately in "transcript" and provide your soothing JSON response.`,
-                },
-              ],
+    const modelsToTry = Array.from(new Set([activeGeminiModelName, ...CANDIDATE_GEMINI_MODELS]));
+    for (const model of modelsToTry) {
+      try {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const response = await fetch(geminiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [{ text: GEMINI_SYSTEM_INSTRUCTION }],
             },
-          ],
-          generationConfig: {
-            response_mime_type: "application/json",
-            temperature: 0.35,
-            maxOutputTokens: 250,
-          },
-        }),
-      });
+            contents: [
+              {
+                parts: [
+                  {
+                    inlineData: {
+                      mimeType: mimeType.split(";")[0],
+                      data: audioBase64,
+                    },
+                  },
+                  {
+                    text: `Target Language: ${language}. The elder spoke into the microphone. Transcribe their words accurately in "transcript" and provide your soothing JSON response.`,
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              response_mime_type: "application/json",
+              temperature: 0.35,
+              maxOutputTokens: 250,
+            },
+          }),
+        });
 
-      if (response.ok) {
-        const result = await response.json();
-        const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (rawText) {
-          const parsed = JSON.parse(rawText);
-          return {
-            replyText: parsed.replyText || rawText,
-            englishTranslation: parsed.englishTranslation || parsed.replyText || rawText,
-            language,
-            emotionTone: parsed.emotionTone || "CALMING",
-            suggestedScreen: parsed.suggestedScreen || undefined,
-            transcript: parsed.transcript || "Spoken Voice Query",
-            source: "gemini_online",
-          };
+        if (response.ok) {
+          activeGeminiModelName = model;
+          const result = await response.json();
+          const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawText) {
+            const parsed = JSON.parse(rawText);
+            return {
+              replyText: parsed.replyText || rawText,
+              englishTranslation: parsed.englishTranslation || parsed.replyText || rawText,
+              language,
+              emotionTone: parsed.emotionTone || "CALMING",
+              suggestedScreen: parsed.suggestedScreen || undefined,
+              transcript: parsed.transcript || "Spoken Voice Query",
+              source: "gemini_online",
+            };
+          }
         }
+      } catch (apiErr) {
+        console.warn(`Multimodal call to ${model} failed, trying next candidate:`, apiErr);
       }
-    } catch (apiErr) {
-      console.warn("Direct Gemini audio call failed, using on-device clinical engine:", apiErr);
     }
   }
 
@@ -805,40 +864,76 @@ export function stopTTS(): void {
 }
 
 /**
- * Tests if a Gemini API key is valid and responsive
+ * Tests if a Gemini API key is valid and responsive, discovering the working model automatically.
  */
 export async function testGeminiApiKey(
   apiKey: string
-): Promise<{ success: boolean; message: string }> {
+): Promise<{ success: boolean; message: string; model?: string }> {
   const cleanKey = apiKey.trim();
   if (!cleanKey) {
     return { success: false, message: "Please enter an API key to test." };
   }
 
   if (typeof window !== "undefined" && !navigator.onLine) {
-    return { success: false, message: "Device is currently offline. Key will be saved for when connectivity returns." };
+    return {
+      success: false,
+      message: "Device is currently offline. Key saved for when connectivity returns.",
+    };
   }
 
   try {
-    const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanKey}`;
-    const res = await fetch(testUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: "ping" }] }],
-        generationConfig: { maxOutputTokens: 5 },
-      }),
-    });
+    // 1. Discover available models for this specific user key
+    const discoveredModel = await resolveAvailableGeminiModel(cleanKey);
+    const modelsToTry = Array.from(new Set([discoveredModel, ...CANDIDATE_GEMINI_MODELS]));
 
-    if (res.ok) {
-      return { success: true, message: "Connected successfully to Google Gemini 1.5 Flash!" };
+    let lastError = "";
+
+    for (const model of modelsToTry) {
+      try {
+        const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${cleanKey}`;
+        const res = await fetch(testUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: "ping" }] }],
+            generationConfig: { maxOutputTokens: 5 },
+          }),
+        });
+
+        if (res.ok) {
+          activeGeminiModelName = model;
+          return {
+            success: true,
+            message: `Connected successfully to Google ${model}!`,
+            model,
+          };
+        }
+
+        const errJson = await res.json().catch(() => null);
+        lastError = errJson?.error?.message || `HTTP ${res.status}: ${res.statusText}`;
+
+        // Stop immediately if key itself is invalid
+        if (res.status === 400 && lastError.toLowerCase().includes("api_key_invalid")) {
+          return {
+            success: false,
+            message: "Google Gemini API Key is invalid. Please check your key from Google AI Studio.",
+          };
+        }
+      } catch (err: any) {
+        lastError = err?.message || "Network request failed";
+      }
     }
 
-    const errJson = await res.json().catch(() => null);
-    const errMsg = errJson?.error?.message || `HTTP ${res.status}: ${res.statusText}`;
-    return { success: false, message: `Key error: ${errMsg}` };
+    return {
+      success: false,
+      message: `Key error: ${lastError}`,
+    };
   } catch (err: any) {
-    return { success: false, message: `Network request error: ${err?.message || "Check connection"}` };
+    return {
+      success: false,
+      message: `Network request error: ${err?.message || "Check connection"}`,
+    };
   }
 }
+
 
